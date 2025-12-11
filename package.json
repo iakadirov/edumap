@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "linear:list": "tsx scripts/linear-list.ts",
-    "linear:todo": "tsx scripts/linear-todo.ts"
+    "linear:todo": "tsx scripts/linear-todo.ts",
+    "linear:cursor": "tsx scripts/check-cursor-tasks.ts"
   },
   "dependencies": {
     "@linear/sdk": "^65.2.0",
