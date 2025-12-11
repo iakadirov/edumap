@@ -11,7 +11,9 @@
     "linear:todo": "tsx scripts/linear-todo.ts",
     "linear:cursor": "tsx scripts/check-cursor-tasks.ts",
     "linear:create-today": "tsx scripts/create-today-tasks.ts",
-    "linear:create": "tsx scripts/create-linear-task.ts"
+    "linear:create": "tsx scripts/create-linear-task.ts",
+    "db:migrate": "tsx scripts/run-migrations.ts",
+    "db:reset": "tsx scripts/run-migrations.ts --reset"
   },
   "dependencies": {
     "@linear/sdk": "^65.2.0",
@@ -31,6 +33,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.9",
     "tailwindcss": "^4",
