@@ -12,35 +12,57 @@ $$ LANGUAGE plpgsql;
 
 -- Создание таблицы organizations
 CREATE TABLE IF NOT EXISTS organizations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  org_type TEXT NOT NULL CHECK (org_type IN ('school', 'university', 'kindergarten', 'center', 'course')),
-  name TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
-  description TEXT,
-  logo_url TEXT,
-  phone TEXT,
-  email TEXT,
-  website TEXT,
-  address TEXT,
-  district TEXT,
-  city TEXT,
-  lat DECIMAL(10, 8),
-  lng DECIMAL(11, 8),
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('active', 'inactive', 'pending')),
-  is_verified BOOLEAN NOT NULL DEFAULT false,
-  overall_rating DECIMAL(3, 2) CHECK (overall_rating >= 0 AND overall_rating <= 100),
-  reviews_count INTEGER NOT NULL DEFAULT 0,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    org_type TEXT NOT NULL CHECK (
+        org_type IN (
+            'school',
+            'university',
+            'kindergarten',
+            'center',
+            'course'
+        )
+    ),
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    description TEXT,
+    logo_url TEXT,
+    phone TEXT,
+    email TEXT,
+    website TEXT,
+    address TEXT,
+    district TEXT,
+    city TEXT,
+    lat DECIMAL(10, 8),
+    lng DECIMAL(11, 8),
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (
+        status IN (
+            'active',
+            'inactive',
+            'pending'
+        )
+    ),
+    is_verified BOOLEAN NOT NULL DEFAULT false,
+    overall_rating DECIMAL(3, 2) CHECK (
+        overall_rating >= 0
+        AND overall_rating <= 100
+    ),
+    reviews_count INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Индексы для organizations
-CREATE INDEX IF NOT EXISTS idx_organizations_org_type ON organizations(org_type);
-CREATE INDEX IF NOT EXISTS idx_organizations_slug ON organizations(slug);
-CREATE INDEX IF NOT EXISTS idx_organizations_city ON organizations(city);
-CREATE INDEX IF NOT EXISTS idx_organizations_district ON organizations(district);
-CREATE INDEX IF NOT EXISTS idx_organizations_status ON organizations(status);
-CREATE INDEX IF NOT EXISTS idx_organizations_rating ON organizations(overall_rating DESC);
+CREATE INDEX IF NOT EXISTS idx_organizations_org_type ON organizations (org_type);
+
+CREATE INDEX IF NOT EXISTS idx_organizations_slug ON organizations (slug);
+
+CREATE INDEX IF NOT EXISTS idx_organizations_city ON organizations (city);
+
+CREATE INDEX IF NOT EXISTS idx_organizations_district ON organizations (district);
+
+CREATE INDEX IF NOT EXISTS idx_organizations_status ON organizations (status);
+
+CREATE INDEX IF NOT EXISTS idx_organizations_rating ON organizations (overall_rating DESC);
 
 -- Триггер для обновления updated_at в organizations
 CREATE TRIGGER update_organizations_updated_at
@@ -73,10 +95,16 @@ CREATE TABLE IF NOT EXISTS school_details (
 );
 
 -- Индексы для school_details
-CREATE INDEX IF NOT EXISTS idx_school_details_organization_id ON school_details(organization_id);
-CREATE INDEX IF NOT EXISTS idx_school_details_school_type ON school_details(school_type);
-CREATE INDEX IF NOT EXISTS idx_school_details_curriculum ON school_details USING GIN(curriculum);
-CREATE INDEX IF NOT EXISTS idx_school_details_fee_range ON school_details(fee_monthly_min, fee_monthly_max);
+CREATE INDEX IF NOT EXISTS idx_school_details_organization_id ON school_details (organization_id);
+
+CREATE INDEX IF NOT EXISTS idx_school_details_school_type ON school_details (school_type);
+
+CREATE INDEX IF NOT EXISTS idx_school_details_curriculum ON school_details USING GIN (curriculum);
+
+CREATE INDEX IF NOT EXISTS idx_school_details_fee_range ON school_details (
+    fee_monthly_min,
+    fee_monthly_max
+);
 
 -- Триггер для обновления updated_at в school_details
 CREATE TRIGGER update_school_details_updated_at
@@ -86,23 +114,21 @@ CREATE TRIGGER update_school_details_updated_at
 
 -- Row Level Security (RLS)
 ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
+
 ALTER TABLE school_details ENABLE ROW LEVEL SECURITY;
 
 -- Политика: все могут читать активные организации
-CREATE POLICY "Anyone can view active organizations"
-  ON organizations
-  FOR SELECT
-  USING (status = 'active');
+CREATE POLICY "Anyone can view active organizations" ON organizations FOR
+SELECT USING (status = 'active');
 
 -- Политика: все могут читать детали активных школ
-CREATE POLICY "Anyone can view active school details"
-  ON school_details
-  FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM organizations
-      WHERE organizations.id = school_details.organization_id
-      AND organizations.status = 'active'
-    )
-  );
-
+CREATE POLICY "Anyone can view active school details" ON school_details FOR
+SELECT USING (
+        EXISTS (
+            SELECT 1
+            FROM organizations
+            WHERE
+                organizations.id = school_details.organization_id
+                AND organizations.status = 'active'
+        )
+    );
