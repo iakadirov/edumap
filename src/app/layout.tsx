@@ -17,17 +17,19 @@ export const metadata: Metadata = {
   description: "Помогаем родителям выбрать лучшее образование для детей через прозрачные данные, честные отзывы и AI-рекомендации",
 };
 
+import { Layout } from '@/components/shared/Layout';
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Layout>{children}</Layout>
       </body>
     </html>
   );

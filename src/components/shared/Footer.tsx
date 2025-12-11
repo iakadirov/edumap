@@ -1,0 +1,102 @@
+import Link from 'next/link';
+
+/**
+ * Footer компонент с информацией о проекте
+ * 
+ * Features:
+ * - Информация о проекте EduMap.uz
+ * - Ссылки: О проекте, Контакты
+ * - Copyright
+ * - Responsive дизайн
+ */
+export function Footer() {
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer className="border-t bg-background">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+          {/* О проекте */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">EduMap.uz</h3>
+            <p className="text-sm text-muted-foreground">
+              Единая образовательная платформа Узбекистана. Помогаем родителям
+              выбрать лучшее образование для детей.
+            </p>
+          </div>
+
+          {/* Навигация */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Навигация</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link
+                  href="/"
+                  className="text-muted-foreground transition-colors hover:text-primary"
+                >
+                  Главная
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/schools"
+                  className="text-muted-foreground transition-colors hover:text-primary"
+                >
+                  Каталог школ
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  className="text-muted-foreground transition-colors hover:text-primary"
+                >
+                  О проекте
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Информация */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Информация</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link
+                  href="/contacts"
+                  className="text-muted-foreground transition-colors hover:text-primary"
+                >
+                  Контакты
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/privacy"
+                  className="text-muted-foreground transition-colors hover:text-primary"
+                >
+                  Политика конфиденциальности
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Контакты */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Контакты</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>Email: info@edumap.uz</li>
+              <li>Узбекистан, Ташкент</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Copyright */}
+        <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
+          <p>
+            © {currentYear} EduMap.uz. Все права защищены.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
