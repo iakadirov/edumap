@@ -12,7 +12,15 @@
 
 import { createIssue, getTeams } from '../src/lib/linear';
 
-// Задачи на сегодня (13 декабря 2025) - следующий шаг после инициализации
+// Получаем текущую дату для отображения
+const today = new Date();
+const todayFormatted = today.toLocaleDateString('ru-RU', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+// Задачи на сегодня - следующий шаг после инициализации
 const tasksForToday = [
   {
     title: '[DB] Создать проект в Supabase',
@@ -93,7 +101,7 @@ const tasksForToday = [
 
 async function main() {
   try {
-    console.log('\n📋 Создание задач на сегодня (13 декабря 2025)\n');
+    console.log(`\n📋 Создание задач на сегодня (${todayFormatted})\n`);
 
     // Получаем список команд
     const teams = await getTeams();
@@ -164,4 +172,3 @@ async function main() {
 }
 
 main().catch(console.error);
-
