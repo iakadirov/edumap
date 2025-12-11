@@ -38,7 +38,7 @@ export interface Database {
           lng: number | null
           status: 'active' | 'inactive' | 'pending'
           is_verified: boolean
-          overall_rating: number | null
+          overall_rating: number | null // DECIMAL(5,2) - может быть от 0.00 до 100.00
           reviews_count: number
           created_at: string
           updated_at: string
@@ -51,8 +51,8 @@ export interface Database {
           id: string
           organization_id: string
           school_type: 'private' | 'state' | 'international'
-          grade_from: number
-          grade_to: number
+          grade_from: number // 1-12 (12 для международных школ)
+          grade_to: number // 1-12 (12 для международных школ)
           total_students: number | null
           avg_class_size: number | null
           primary_language: string

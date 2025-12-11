@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS organizations (
         )
     ),
     is_verified BOOLEAN NOT NULL DEFAULT false,
-    overall_rating DECIMAL(3, 2) CHECK (
+    overall_rating DECIMAL(5, 2) CHECK (
         overall_rating >= 0
         AND overall_rating <= 100
     ),
@@ -75,8 +75,8 @@ CREATE TABLE IF NOT EXISTS school_details (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   school_type TEXT NOT NULL CHECK (school_type IN ('private', 'state', 'international')),
-  grade_from INTEGER NOT NULL CHECK (grade_from >= 1 AND grade_from <= 11),
-  grade_to INTEGER NOT NULL CHECK (grade_to >= 1 AND grade_to <= 11 AND grade_to >= grade_from),
+  grade_from INTEGER NOT NULL CHECK (grade_from >= 1 AND grade_from <= 12),
+  grade_to INTEGER NOT NULL CHECK (grade_to >= 1 AND grade_to <= 12 AND grade_to >= grade_from),
   total_students INTEGER CHECK (total_students > 0),
   avg_class_size INTEGER CHECK (avg_class_size > 0),
   primary_language TEXT NOT NULL DEFAULT 'uzbek',
