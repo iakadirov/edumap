@@ -13,7 +13,9 @@
     "linear:create-today": "tsx scripts/create-today-tasks.ts",
     "linear:create": "tsx scripts/create-linear-task.ts",
     "db:migrate": "tsx scripts/run-migrations.ts",
-    "db:reset": "tsx scripts/run-migrations.ts --reset"
+    "db:reset": "tsx scripts/run-migrations.ts --reset",
+    "db:push": "supabase db push",
+    "db:reset-cli": "supabase db reset"
   },
   "dependencies": {
     "@linear/sdk": "^65.2.0",
