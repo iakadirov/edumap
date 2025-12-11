@@ -27,6 +27,12 @@ npm run build
 npm start
 ```
 
+## 🌐 Production
+
+**Live URL**: https://edumap-roan.vercel.app/
+
+Проект автоматически деплоится на Vercel при каждом push в `main` ветку.
+
 ## 🛠 Технологический стек
 
 - **Framework**: Next.js 16 (App Router)
