@@ -77,6 +77,7 @@ edumap/
 - `npm run build` — сборка для production
 - `npm run start` — запуск production-сервера
 - `npm run lint` — проверка кода ESLint
+- `npm run linear:check` — проверка подключения к Linear API
 - `npm run linear:list` — список всех задач из Linear
 - `npm run linear:todo` — список задач готовых к работе
 
@@ -95,6 +96,8 @@ edumap/
 - Программный доступ к задачам
 - Скрипты для работы с задачами
 - API endpoints
+- Health-check endpoint: `GET /api/linear/check`
+- CLI проверка: `npm run linear:check`
 
 👉 [Документация: Linear API](docs/LINEAR_INTEGRATION.md)
 

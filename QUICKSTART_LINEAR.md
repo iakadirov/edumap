@@ -36,6 +36,9 @@ LINEAR_API_KEY=lin_api_ваш_ключ_здесь
 ### 3️⃣ Проверьте работу
 
 ```bash
+# Проверка API ключа
+npm run linear:check
+
 # Список всех задач
 npm run linear:list
 
