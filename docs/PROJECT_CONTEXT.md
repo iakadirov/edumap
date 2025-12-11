@@ -136,7 +136,7 @@ edumap/
 
 | Ресурс | URL |
 |--------|-----|
-| GitHub | *добавить после создания* |
+| GitHub | https://github.com/iakadirov/edumap |
 | Vercel | *добавить после деплоя* |
 | Supabase | *добавить после настройки* |
 | Linear | *добавить ссылку на проект* |
