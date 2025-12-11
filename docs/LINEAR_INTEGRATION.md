@@ -37,6 +37,14 @@ LINEAR_API_KEY=lin_api_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 npm install @linear/sdk graphql
 ```
 
+### 4. Проверка подключения
+
+```bash
+npm run linear:check
+```
+
+Или откройте `GET /api/linear/check` в браузере/через `curl`, чтобы убедиться, что API ключ работает и видны команды.
+
 ## 📝 Использование
 
 ### В коде (TypeScript)
@@ -89,6 +97,28 @@ export async function GET() {
 ## 🛠 Скрипты для командной строки
 
 Создайте папку `scripts/` и добавьте утилиты:
+
+### Проверка интеграции
+
+В репозитории уже есть `scripts/linear-check.ts`, который использует `getLinearConnectionStatus` и выводит текущее состояние подключения:
+
+```typescript
+// scripts/linear-check.ts
+import { getLinearConnectionStatus } from '../src/lib/linear';
+
+async function main() {
+  const status = await getLinearConnectionStatus(true);
+  console.log(status);
+}
+
+main().catch(console.error);
+```
+
+Запуск:
+```bash
+npx tsx scripts/linear-check.ts
+# или npm run linear:check
+```
 
 ### Получить задачи
 

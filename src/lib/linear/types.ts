@@ -45,3 +45,14 @@ export interface LinearTeam {
   key: string; // Префикс для идентификаторов (например: "EDU")
 }
 
+export interface LinearConnectionStatus {
+  ok: boolean;
+  viewer?: {
+    id: string;
+    name: string;
+    email?: string;
+  };
+  teams?: LinearTeam[];
+  error?: string;
+}
+
