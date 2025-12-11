@@ -16,9 +16,12 @@ ADD CONSTRAINT school_details_grade_from_check CHECK (
     AND grade_from <= 12
 );
 
-ALTER TABLE school_details
+ALTER TABLE school_details 
 ADD CONSTRAINT school_details_grade_to_check CHECK (
     grade_to >= 1
     AND grade_to <= 12
-    AND grade_to >= grade_from
 );
+
+-- Добавляем table-level constraint для проверки grade_to >= grade_from
+ALTER TABLE school_details
+  ADD CONSTRAINT IF NOT EXISTS grade_range_check CHECK (grade_to >= grade_from);
