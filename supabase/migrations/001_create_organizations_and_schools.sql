@@ -85,13 +85,19 @@ CREATE TABLE IF NOT EXISTS school_details (
     curriculum <@ ARRAY['national', 'cambridge', 'ib']::TEXT[]
   ),
   fee_monthly_min DECIMAL(10, 2) CHECK (fee_monthly_min >= 0),
-  fee_monthly_max DECIMAL(10, 2) CHECK (fee_monthly_max >= 0 AND fee_monthly_max >= fee_monthly_min),
+  fee_monthly_max DECIMAL(10, 2) CHECK (fee_monthly_max >= 0),
   has_transport BOOLEAN NOT NULL DEFAULT false,
   has_meals BOOLEAN NOT NULL DEFAULT false,
   has_extended_day BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE(organization_id)
+  UNIQUE(organization_id),
+  CONSTRAINT fee_range_check CHECK (
+    (fee_monthly_min IS NULL AND fee_monthly_max IS NULL) OR
+    (fee_monthly_min IS NOT NULL AND fee_monthly_max IS NOT NULL AND fee_monthly_max >= fee_monthly_min) OR
+    (fee_monthly_min IS NOT NULL AND fee_monthly_max IS NULL) OR
+    (fee_monthly_min IS NULL AND fee_monthly_max IS NOT NULL)
+  )
 );
 
 -- Индексы для school_details
