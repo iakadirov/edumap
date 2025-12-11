@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS school_details (
   primary_language TEXT NOT NULL DEFAULT 'uzbek',
   additional_languages TEXT[],
   curriculum TEXT[] CHECK (
-    curriculum <@ ARRAY['national', 'cambridge', 'ib']::TEXT[]
+    curriculum IS NULL OR curriculum <@ ARRAY['national', 'cambridge', 'ib']::TEXT[]
   ),
   fee_monthly_min DECIMAL(10, 2) CHECK (fee_monthly_min >= 0),
   fee_monthly_max DECIMAL(10, 2) CHECK (fee_monthly_max >= 0),
