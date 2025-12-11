@@ -18,7 +18,7 @@ export async function getActiveSchools() {
     `)
     .eq('org_type', 'school')
     .eq('status', 'active')
-    .order('overall_rating', { ascending: false, nullsLast: true });
+    .order('overall_rating', { ascending: false, nullsFirst: false });
 
   if (error) {
     throw error;
@@ -99,7 +99,7 @@ export async function getSchoolsWithFilters(filters: {
 
   const { data, error } = await query.order('overall_rating', {
     ascending: false,
-    nullsLast: true,
+    nullsFirst: false,
   });
 
   if (error) {
