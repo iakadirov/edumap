@@ -7,4 +7,3 @@ SELECT
 FROM pg_constraint
 WHERE conrelid = 'school_details'::regclass
 ORDER BY conname;
-

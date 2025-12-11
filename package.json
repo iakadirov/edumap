@@ -15,7 +15,8 @@
     "db:migrate": "tsx scripts/run-migrations.ts",
     "db:reset": "tsx scripts/run-migrations.ts --reset",
     "db:push": "supabase db push",
-    "db:reset-cli": "supabase db reset"
+    "db:reset-cli": "supabase db reset",
+    "db:status": "tsx scripts/check-db-status.ts"
   },
   "dependencies": {
     "@linear/sdk": "^65.2.0",
