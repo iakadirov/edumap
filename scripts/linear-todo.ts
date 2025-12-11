@@ -6,6 +6,9 @@
  *   npx tsx scripts/linear-todo.ts
  */
 
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+
 import { getTodoIssues, getTeams } from '../src/lib/linear';
 
 async function main() {

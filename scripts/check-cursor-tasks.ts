@@ -3,6 +3,9 @@
  * Скрипт для проверки задач, назначенных на Cursor
  */
 
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+
 import { getAllIssues, getTeams } from '../src/lib/linear';
 
 async function main() {

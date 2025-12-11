@@ -7,6 +7,9 @@
  *   npx tsx scripts/linear-list.ts --team EDU
  */
 
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+
 import { getAllIssues, getTeams } from '../src/lib/linear';
 
 async function main() {

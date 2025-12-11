@@ -13,6 +13,9 @@
  *   - LINEAR_API_KEY в .env.local
  */
 
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+
 import { createIssue, getTeams } from '../src/lib/linear';
 
 async function main() {
