@@ -1,6 +1,7 @@
 import { getActiveSchools } from '@/lib/supabase/queries';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SchoolCard } from '@/components/schools/SchoolCard';
 import Link from 'next/link';
 
 /**
@@ -72,67 +73,9 @@ export default async function SchoolsPage() {
 
       {/* Список школ */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {schools.map((school: any) => {
-        const details = Array.isArray(school.school_details) 
-          ? school.school_details[0] 
-          : school.school_details;
-          
-          return (
-            <Card key={school.id} className="flex flex-col">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-xl">{school.name}</CardTitle>
-                  {school.overall_rating && (
-                    <div className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
-                      {school.overall_rating.toFixed(1)}
-                    </div>
-                  )}
-                </div>
-                {school.district && school.city && (
-                  <p className="text-sm text-muted-foreground">
-                    {school.district}, {school.city}
-                  </p>
-                )}
-              </CardHeader>
-              <CardContent className="flex-1">
-                {school.description && (
-                  <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">
-                    {school.description}
-                  </p>
-                )}
-                
-                {details && (
-                  <div className="mb-4 space-y-2 text-sm">
-                    {details.school_type && (
-                      <div>
-                        <span className="font-medium">Тип: </span>
-                        <span className="text-muted-foreground">
-                          {details.school_type === 'private' && 'Частная'}
-                          {details.school_type === 'state' && 'Государственная'}
-                          {details.school_type === 'international' && 'Международная'}
-                        </span>
-                      </div>
-                    )}
-                    {details.fee_monthly_min && details.fee_monthly_max && (
-                      <div>
-                        <span className="font-medium">Стоимость: </span>
-                        <span className="text-muted-foreground">
-                          {details.fee_monthly_min.toLocaleString('ru-RU')} - {details.fee_monthly_max.toLocaleString('ru-RU')} сум/месяц
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                <Button asChild className="w-full" variant="outline">
-                  <Link href={`/schools/${school.slug || school.id}`}>
-                    Подробнее
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {schools.map((school: any) => (
+          <SchoolCard key={school.id} school={school} />
+        ))}
       </div>
     </div>
   );
