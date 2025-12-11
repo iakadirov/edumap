@@ -126,8 +126,12 @@ export async function getDistricts() {
     throw error;
   }
 
+  if (!data) {
+    return [];
+  }
+
   const uniqueDistricts = Array.from(
-    new Set(data.map((org) => org.district).filter(Boolean))
+    new Set(data.map((org: { district: string | null }) => org.district).filter(Boolean))
   ) as string[];
 
   return uniqueDistricts.sort();
@@ -150,8 +154,12 @@ export async function getCities() {
     throw error;
   }
 
+  if (!data) {
+    return [];
+  }
+
   const uniqueCities = Array.from(
-    new Set(data.map((org) => org.city).filter(Boolean))
+    new Set(data.map((org: { city: string | null }) => org.city).filter(Boolean))
   ) as string[];
 
   return uniqueCities.sort();
