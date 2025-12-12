@@ -17,6 +17,7 @@ export type Database = {
       organizations: {
         Row: {
           address: string | null
+          admin_user_id: string | null
           city: string | null
           cover_image_url: string | null
           created_at: string
@@ -58,6 +59,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          admin_user_id?: string | null
           city?: string | null
           cover_image_url?: string | null
           created_at?: string
@@ -99,6 +101,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          admin_user_id?: string | null
           city?: string | null
           cover_image_url?: string | null
           created_at?: string
@@ -139,6 +142,13 @@ export type Database = {
           youtube?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "organizations_admin_user_id_fkey"
+            columns: ["admin_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "organizations_parent_organization_id_fkey"
             columns: ["parent_organization_id"]
@@ -334,6 +344,65 @@ export type Database = {
             foreignKeyName: "school_details_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          auth_user_id: string | null
+          avatar_url: string | null
+          created_at: string
+          email: string
+          email_verified: boolean
+          full_name: string | null
+          id: string
+          is_active: boolean
+          last_login_at: string | null
+          organization_id: string | null
+          role: string
+          subscription_expires_at: string | null
+          subscription_tier: string
+          updated_at: string
+        }
+        Insert: {
+          auth_user_id?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          email_verified?: boolean
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          last_login_at?: string | null
+          organization_id?: string | null
+          role?: string
+          subscription_expires_at?: string | null
+          subscription_tier?: string
+          updated_at?: string
+        }
+        Update: {
+          auth_user_id?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          email_verified?: boolean
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          last_login_at?: string | null
+          organization_id?: string | null
+          role?: string
+          subscription_expires_at?: string | null
+          subscription_tier?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },

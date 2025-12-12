@@ -316,7 +316,6 @@ async function main() {
         title: task.title,
         description: task.description,
         priority: task.priority,
-        labels: task.labels || [],
       });
 
       console.log(`   ✅ Создано: ${issue.identifier} - ${issue.title}\n`);
