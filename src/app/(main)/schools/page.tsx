@@ -1,23 +1,66 @@
-import { getActiveSchools } from '@/lib/supabase/queries';
+import { getActiveSchools, getSchoolsWithFilters, getDistricts, getCities } from '@/lib/supabase/queries';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SchoolCard } from '@/components/schools/SchoolCard';
+import { SchoolFilters } from '@/components/schools/SchoolFilters';
 import Link from 'next/link';
+
+interface SchoolsPageProps {
+  searchParams: {
+    district?: string;
+    city?: string;
+    school_type?: string;
+    price_min?: string;
+    price_max?: string;
+    language?: string;
+    curriculum?: string;
+  };
+}
 
 /**
  * Страница списка школ
  * 
  * Features:
  * - Отображение всех активных школ из Supabase
- * - Базовая пагинация (если > 10 школ)
+ * - Фильтрация школ по различным параметрам
  * - Обработка состояний: loading, error, empty
  */
-export default async function SchoolsPage() {
+export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
   let schools;
+  let districts: string[] = [];
+  let cities: string[] = [];
   let error: Error | null = null;
 
   try {
-    schools = await getActiveSchools();
+    // Получаем списки для фильтров
+    [districts, cities] = await Promise.all([getDistricts(), getCities()]);
+
+    // Проверяем, есть ли фильтры в URL
+    const hasFilters = 
+      searchParams.district ||
+      searchParams.city ||
+      searchParams.school_type ||
+      searchParams.price_min ||
+      searchParams.price_max ||
+      searchParams.language ||
+      searchParams.curriculum;
+
+    if (hasFilters) {
+      // Используем фильтры
+      const filters = {
+        district: searchParams.district,
+        city: searchParams.city,
+        school_type: searchParams.school_type,
+        price_min: searchParams.price_min ? Number(searchParams.price_min) : undefined,
+        price_max: searchParams.price_max ? Number(searchParams.price_max) : undefined,
+        language: searchParams.language,
+        curriculum: searchParams.curriculum ? searchParams.curriculum.split(',') : undefined,
+      };
+      schools = await getSchoolsWithFilters(filters);
+    } else {
+      // Получаем все школы
+      schools = await getActiveSchools();
+    }
   } catch (e) {
     error = e instanceof Error ? e : new Error('Ошибка загрузки школ');
     schools = null;
@@ -71,11 +114,18 @@ export default async function SchoolsPage() {
         </p>
       </div>
 
-      {/* Список школ */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {schools.map((school: any) => (
-          <SchoolCard key={school.id} school={school} />
-        ))}
+      <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
+        {/* Панель фильтров */}
+        <aside className="lg:sticky lg:top-4 lg:h-fit">
+          <SchoolFilters districts={districts} cities={cities} />
+        </aside>
+
+        {/* Список школ */}
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {schools.map((school: any) => (
+            <SchoolCard key={school.id} school={school} />
+          ))}
+        </div>
       </div>
     </div>
   );
