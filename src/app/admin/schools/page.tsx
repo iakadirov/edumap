@@ -21,11 +21,11 @@ export default async function AdminSchoolsPage({
   // Построение запроса
   let query = supabase
     .from('organizations')
-    .select('id, name_uz, name_ru, status, created_at, city, district', { count: 'exact' });
+    .select('id, name, name_uz, name_ru, status, created_at, city, district', { count: 'exact' });
 
   // Фильтр по поиску
   if (search) {
-    query = query.or(`name_uz.ilike.%${search}%,name_ru.ilike.%${search}%`);
+    query = query.or(`name.ilike.%${search}%,name_uz.ilike.%${search}%,name_ru.ilike.%${search}%`);
   }
 
   // Фильтр по статусу

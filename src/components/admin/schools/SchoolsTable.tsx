@@ -30,8 +30,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
+import { getCityDistrict } from '@/lib/utils/translations';
+
 interface School {
   id: string;
+  name: string;
   name_uz: string | null;
   name_ru: string | null;
   status: string | null;
@@ -164,10 +167,10 @@ export function SchoolsTable({
               schools.map((school) => (
                 <TableRow key={school.id}>
                   <TableCell className="font-medium">
-                    {school.name_uz || school.name_ru || 'Nomsiz'}
+                    {school.name_uz || school.name_ru || school.name || 'Nomsiz'}
                   </TableCell>
                   <TableCell>
-                    {school.city || '-'} {school.district ? `, ${school.district}` : ''}
+                    {getCityDistrict(school.city, school.district)}
                   </TableCell>
                   <TableCell>
                     <Badge
