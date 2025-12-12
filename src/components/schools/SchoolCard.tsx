@@ -30,9 +30,9 @@ export function SchoolCard({ school }: SchoolCardProps) {
 
   // Форматирование типа школы
   const schoolTypeLabels: Record<string, string> = {
-    private: 'Частная',
-    state: 'Государственная',
-    international: 'Международная',
+    private: 'Xususiy',
+    state: 'Davlat',
+    international: 'Xalqaro',
   };
 
   const schoolTypeLabel = details?.school_type
@@ -42,7 +42,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
   // Форматирование цены
   const formatPrice = (min: number | null, max: number | null) => {
     if (!min || !max) return null;
-    return `${min.toLocaleString('ru-RU')} - ${max.toLocaleString('ru-RU')} сум/месяц`;
+    return `${min.toLocaleString('ru-RU')} - ${max.toLocaleString('ru-RU')} soʻm/oy`;
   };
 
   return (
@@ -64,7 +64,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
               <div className="rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">
                 {school.overall_rating.toFixed(1)}
               </div>
-              <span className="mt-1 text-xs text-muted-foreground">Рейтинг</span>
+              <span className="mt-1 text-xs text-muted-foreground">Reyting</span>
             </div>
           )}
         </div>
@@ -83,14 +83,14 @@ export function SchoolCard({ school }: SchoolCardProps) {
           <div className="space-y-2 text-sm">
             {schoolTypeLabel && (
               <div className="flex items-center gap-2">
-                <span className="font-medium">Тип:</span>
+                <span className="font-medium">Tur:</span>
                 <span className="text-muted-foreground">{schoolTypeLabel}</span>
               </div>
             )}
 
             {details.fee_monthly_min && details.fee_monthly_max && (
               <div className="flex items-center gap-2">
-                <span className="font-medium">Стоимость:</span>
+                <span className="font-medium">Narx:</span>
                 <span className="text-muted-foreground">
                   {formatPrice(details.fee_monthly_min, details.fee_monthly_max)}
                 </span>
@@ -99,7 +99,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
 
             {details.grade_from && details.grade_to && (
               <div className="flex items-center gap-2">
-                <span className="font-medium">Классы:</span>
+                <span className="font-medium">Sinflar:</span>
                 <span className="text-muted-foreground">
                   {details.grade_from}–{details.grade_to}
                 </span>
@@ -111,7 +111,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
         {/* Кнопка "Подробнее" */}
         <Button asChild className="mt-auto w-full" variant="outline">
           <Link href={`/schools/${school.slug || school.id}`}>
-            Подробнее →
+            Batafsil →
           </Link>
         </Button>
       </CardContent>

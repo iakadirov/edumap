@@ -18,9 +18,9 @@ interface SchoolProfilePageProps {
  * 
  * Features:
  * - Полная информация о школе
- * - Контактная информация
+ * - Aloqa maʼlumotlari
  * - Детали: тип, классы, языки, программа, цены
- * - Услуги: транспорт, питание, продленка
+ * - Xizmatlar: транспорт, питание, продленка
  */
 export default async function SchoolProfilePage({ params }: SchoolProfilePageProps) {
   const { slug } = await params;
@@ -86,7 +86,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
       {/* Кнопка назад */}
       <div className="mb-6">
         <Button variant="ghost" asChild>
-          <Link href="/schools">← Назад к каталогу</Link>
+          <Link href="/schools">← Katalogga qaytish</Link>
         </Button>
       </div>
 
@@ -94,7 +94,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
       {isBranch && branchesData?.main && (
         <div className="mb-4 rounded-lg bg-muted p-4">
           <p className="text-sm text-muted-foreground">
-            Филиал сети:{' '}
+            Tarmoq filiali:{' '}
             <Link
               href={`/schools/${branchesData.main.slug}`}
               className="font-medium text-primary hover:underline"
@@ -138,7 +138,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               <div>
                 {isBranch && (
                   <Badge variant="outline" className="mb-2">
-                    Филиал
+                    Filial
                   </Badge>
                 )}
                 <h1 className="mb-2 text-4xl font-bold">{school.name}</h1>
@@ -166,7 +166,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                   )}
                   {school.founded_year && (
                     <p className="text-sm text-muted-foreground">
-                      Основана в {school.founded_year} году
+                      {school.founded_year} yilda tashkil etilgan
                     </p>
                   )}
                   {school.motto && (
@@ -184,7 +184,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                     {school.overall_rating.toFixed(1)}
                   </div>
                   <span className="mt-1 text-sm text-muted-foreground">
-                    Рейтинг ({school.reviews_count || 0} отзывов)
+                    Reyting ({school.reviews_count || 0} sharh)
                   </span>
                 </div>
               )}
@@ -205,7 +205,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                     </Badge>
                   ))}
                 {details.has_international_accreditation && (
-                  <Badge variant="default">Международная аккредитация</Badge>
+                  <Badge variant="default">Xalqaro akkreditatsiya</Badge>
                 )}
               </div>
             )}
@@ -216,10 +216,10 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
       {/* Основной контент */}
       <Tabs defaultValue="about" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="about">О школе</TabsTrigger>
-          <TabsTrigger value="details">Детали</TabsTrigger>
-          <TabsTrigger value="infrastructure">Инфраструктура</TabsTrigger>
-          <TabsTrigger value="contacts">Контакты</TabsTrigger>
+          <TabsTrigger value="about">Maktab haqida</TabsTrigger>
+          <TabsTrigger value="details">Tafsilotlar</TabsTrigger>
+          <TabsTrigger value="infrastructure">Infratuzilma</TabsTrigger>
+          <TabsTrigger value="contacts">Aloqa</TabsTrigger>
         </TabsList>
 
         {/* Вкладка: О школе */}
@@ -227,7 +227,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
           {school.description && (
             <Card>
               <CardHeader>
-                <CardTitle>Описание</CardTitle>
+                <CardTitle>Tavsif</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="whitespace-pre-line text-muted-foreground">
@@ -243,8 +243,8 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               {(details.accepts_preparatory || (details.grade_from && details.grade_to)) && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Классы</CardTitle>
-                    <CardDescription>Классы для приёма</CardDescription>
+                    <CardTitle>Sinf</CardTitle>
+                    <CardDescription>Qabul qilinadigan sinflar</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-2xl font-semibold">
@@ -258,7 +258,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               {details.total_students && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Учеников</CardTitle>
+                    <CardTitle>Oʻquvchilar</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-2xl font-semibold">
@@ -272,7 +272,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               {details.avg_class_size && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Средний размер класса</CardTitle>
+                    <CardTitle>Oʻrtacha sinf hajmi</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-2xl font-semibold">{details.avg_class_size}</p>
@@ -284,13 +284,13 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               {details.total_teachers && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Учителей</CardTitle>
+                    <CardTitle>Oʻqituvchilar</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-2xl font-semibold">{details.total_teachers}</p>
                     {details.teachers_with_higher_ed_percent && (
                       <p className="mt-1 text-sm text-muted-foreground">
-                        {details.teachers_with_higher_ed_percent}% с высшим образованием
+                        {details.teachers_with_higher_ed_percent}% yuqori maʼlumotli
                       </p>
                     )}
                   </CardContent>
@@ -301,17 +301,17 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               {details.fee_monthly_min && details.fee_monthly_max && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Стоимость обучения</CardTitle>
+                    <CardTitle>Taʼlim narxi</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-2xl font-semibold">
                       {details.fee_monthly_min.toLocaleString('ru-RU')} -{' '}
                       {details.fee_monthly_max.toLocaleString('ru-RU')}
                     </p>
-                    <p className="mt-1 text-sm text-muted-foreground">сум в месяц</p>
+                    <p className="mt-1 text-sm text-muted-foreground">soʻm/oy</p>
                     {details.has_sibling_discount && details.sibling_discount_percent && (
                       <p className="mt-2 text-sm text-green-600">
-                        Скидка для второго ребёнка: {details.sibling_discount_percent}%
+                        Ikkinchi farzand uchun chegirma: {details.sibling_discount_percent}%
                       </p>
                     )}
                   </CardContent>
@@ -320,7 +320,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
             </div>
           )}
 
-          {/* Расписание */}
+          {/* Jadval */}
           {details &&
             (details.school_start_time ||
               details.school_end_time ||
@@ -330,12 +330,12 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               details.extended_day_until) && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Расписание</CardTitle>
+                  <CardTitle>Jadval</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {(details.school_start_time || details.school_end_time) && (
                     <div>
-                      <span className="font-medium">Время занятий: </span>
+                      <span className="font-medium">Dars vaqti: </span>
                       <span className="text-muted-foreground">
                         {details.school_start_time && details.school_end_time
                           ? `${details.school_start_time} - ${details.school_end_time}`
@@ -345,33 +345,33 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                   )}
                   {details.lesson_duration && (
                     <div>
-                      <span className="font-medium">Длительность урока: </span>
-                      <span className="text-muted-foreground">{details.lesson_duration} минут</span>
+                      <span className="font-medium">Dars davomiyligi: </span>
+                      <span className="text-muted-foreground">{details.lesson_duration} daqiqa</span>
                     </div>
                   )}
                   {details.lessons_per_day && (
                     <div>
-                      <span className="font-medium">Уроков в день: </span>
+                      <span className="font-medium">Kuniga darslar: </span>
                       <span className="text-muted-foreground">{details.lessons_per_day}</span>
                     </div>
                   )}
                   {details.extended_day_until && details.has_extended_day && (
                     <div>
-                      <span className="font-medium">Продленка до: </span>
+                      <span className="font-medium">Kengaytirilgan kun: </span>
                       <span className="text-muted-foreground">{details.extended_day_until}</span>
                     </div>
                   )}
                   {details.has_saturday_classes && (
                     <div>
-                      <span className="font-medium">Занятия в субботу: </span>
-                      <span className="text-muted-foreground">Да</span>
+                      <span className="font-medium">Shanba kunlari darslar: </span>
+                      <span className="text-muted-foreground">Ha</span>
                     </div>
                   )}
                 </CardContent>
               </Card>
             )}
 
-          {/* Педагогический состав */}
+          {/* Pedagogik tarkib */}
           {details &&
             (details.total_teachers ||
               details.teachers_with_higher_ed_percent ||
@@ -380,26 +380,26 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               details.native_english_speakers_count) && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Педагогический состав</CardTitle>
+                  <CardTitle>Pedagogik tarkib</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {details.avg_teacher_experience_years && (
                     <div>
-                      <span className="font-medium">Средний стаж работы: </span>
+                      <span className="font-medium">Oʻrtacha ish staji: </span>
                       <span className="text-muted-foreground">
-                        {details.avg_teacher_experience_years} лет
+                        {details.avg_teacher_experience_years} yil
                       </span>
                     </div>
                   )}
                   {details.has_foreign_teachers && (
                     <div>
-                      <span className="font-medium">Иностранные преподаватели: </span>
-                      <span className="text-muted-foreground">Да</span>
+                      <span className="font-medium">Chet ellik oʻqituvchilar: </span>
+                      <span className="text-muted-foreground">Ha</span>
                     </div>
                   )}
                   {details.native_english_speakers_count && (
                     <div>
-                      <span className="font-medium">Носителей английского языка: </span>
+                      <span className="font-medium">Ingliz tili soʻzlashuvchilar: </span>
                       <span className="text-muted-foreground">
                         {details.native_english_speakers_count}
                       </span>
@@ -417,19 +417,19 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               {/* Языки */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Языки обучения</CardTitle>
+                  <CardTitle>Taʼlim tillari</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div>
-                      <span className="font-medium">Основной: </span>
+                      <span className="font-medium">Asosiy: </span>
                       <span className="text-muted-foreground">
                         {languageLabels[details.primary_language] || details.primary_language}
                       </span>
                     </div>
                     {details.additional_languages && details.additional_languages.length > 0 && (
                       <div>
-                        <span className="font-medium">Дополнительные: </span>
+                        <span className="font-medium">Qoʻshimcha: </span>
                         <span className="text-muted-foreground">
                           {details.additional_languages
                             .map((lang: string) => languageLabels[lang] || lang)
@@ -445,7 +445,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               {details.curriculum && details.curriculum.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Программа обучения</CardTitle>
+                    <CardTitle>Taʼlim dasturi</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2">
@@ -459,10 +459,10 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 </Card>
               )}
 
-              {/* Услуги */}
+              {/* Xizmatlar */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Услуги</CardTitle>
+                  <CardTitle>Xizmatlar</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-3">
@@ -471,11 +471,11 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                         <span className={details.has_transport ? 'text-green-600' : 'text-gray-400'}>
                           {details.has_transport ? '✓' : '✗'}
                         </span>
-                        <span>Транспорт</span>
+                        <span>Transport</span>
                       </div>
                       {details.transport_fee_monthly && (
                         <span className="text-sm text-muted-foreground">
-                          {details.transport_fee_monthly.toLocaleString('ru-RU')} сум/мес
+                          {details.transport_fee_monthly.toLocaleString('ru-RU')} soʻm/oy
                         </span>
                       )}
                     </div>
@@ -484,11 +484,11 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                         <span className={details.has_meals ? 'text-green-600' : 'text-gray-400'}>
                           {details.has_meals ? '✓' : '✗'}
                         </span>
-                        <span>Питание</span>
+                        <span>Ovqatlanish</span>
                       </div>
                       {details.meal_fee_monthly && (
                         <span className="text-sm text-muted-foreground">
-                          {details.meal_fee_monthly.toLocaleString('ru-RU')} сум/мес
+                          {details.meal_fee_monthly.toLocaleString('ru-RU')} soʻm/oy
                         </span>
                       )}
                     </div>
@@ -497,10 +497,10 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                         <span className={details.has_extended_day ? 'text-green-600' : 'text-gray-400'}>
                           {details.has_extended_day ? '✓' : '✗'}
                         </span>
-                        <span>Продленка</span>
+                        <span>Kengaytirilgan kun</span>
                       </div>
                       {details.extended_day_until && (
-                        <span className="text-sm text-muted-foreground">до {details.extended_day_until}</span>
+                        <span className="text-sm text-muted-foreground">gacha {details.extended_day_until}</span>
                       )}
                     </div>
                   </div>
@@ -513,12 +513,12 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 details.uniform_fee) && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Дополнительные расходы</CardTitle>
+                    <CardTitle>Qoʻshimcha xarajatlar</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {details.entrance_fee && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Вступительный взнос:</span>
+                        <span className="text-muted-foreground">Kirish toʻlovi:</span>
                         <span className="font-medium">
                           {details.entrance_fee.toLocaleString('ru-RU')} сум
                         </span>
@@ -526,7 +526,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                     )}
                     {details.textbook_fee_yearly && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Учебники (в год):</span>
+                        <span className="text-muted-foreground">Darsliklar (yiliga):</span>
                         <span className="font-medium">
                           {details.textbook_fee_yearly.toLocaleString('ru-RU')} сум
                         </span>
@@ -534,7 +534,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                     )}
                     {details.uniform_fee && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Форма:</span>
+                        <span className="text-muted-foreground">Forma:</span>
                         <span className="font-medium">
                           {details.uniform_fee.toLocaleString('ru-RU')} сум
                         </span>
@@ -544,18 +544,18 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 </Card>
               )}
 
-              {/* Дополнительное образование */}
+              {/* Qoʻshimcha taʼlim */}
               {(details.extracurricular_activities?.length ||
                 details.clubs?.length ||
                 details.sports_sections?.length) && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Дополнительное образование</CardTitle>
+                    <CardTitle>Qoʻshimcha taʼlim</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {details.clubs && details.clubs.length > 0 && (
                       <div>
-                        <h4 className="mb-2 font-medium">Клубы</h4>
+                        <h4 className="mb-2 font-medium">Klublar</h4>
                         <div className="flex flex-wrap gap-2">
                           {details.clubs.map((club: string, index: number) => (
                             <Badge key={index} variant="outline">
@@ -567,7 +567,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                     )}
                     {details.sports_sections && details.sports_sections.length > 0 && (
                       <div>
-                        <h4 className="mb-2 font-medium">Спортивные секции</h4>
+                        <h4 className="mb-2 font-medium">Sport boʻlimlari</h4>
                         <div className="flex flex-wrap gap-2">
                           {details.sports_sections.map((sport: string, index: number) => (
                             <Badge key={index} variant="outline">
@@ -579,7 +579,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                     )}
                     {details.extracurricular_activities && details.extracurricular_activities.length > 0 && (
                       <div>
-                        <h4 className="mb-2 font-medium">Кружки и секции</h4>
+                        <h4 className="mb-2 font-medium">Doʻkonlar va boʻlimlar</h4>
                         <div className="flex flex-wrap gap-2">
                           {details.extracurricular_activities.map((activity: string, index: number) => (
                             <Badge key={index} variant="outline">
@@ -602,24 +602,24 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 details.accreditation_body) && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Документы и аккредитация</CardTitle>
+                    <CardTitle>Hujjatlar va litsenziyalar</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {details.license_number && (
                       <div>
-                        <span className="font-medium">Лицензия №: </span>
+                        <span className="font-medium">Litsenziya №: </span>
                         <span className="text-muted-foreground">{details.license_number}</span>
                       </div>
                     )}
                     {details.license_authority && (
                       <div>
-                        <span className="font-medium">Выдана: </span>
+                        <span className="font-medium">Berilgan: </span>
                         <span className="text-muted-foreground">{details.license_authority}</span>
                       </div>
                     )}
                     {details.license_date && (
                       <div>
-                        <span className="font-medium">Дата выдачи: </span>
+                        <span className="font-medium">Haта выдачи: </span>
                         <span className="text-muted-foreground">
                           {new Date(details.license_date).toLocaleDateString('ru-RU')}
                         </span>
@@ -627,7 +627,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                     )}
                     {details.license_valid_until && (
                       <div>
-                        <span className="font-medium">Действует до: </span>
+                        <span className="font-medium">Amal qiladi: </span>
                         <span className="text-muted-foreground">
                           {new Date(details.license_valid_until).toLocaleDateString('ru-RU')}
                         </span>
@@ -635,7 +635,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                     )}
                     {details.has_international_accreditation && details.accreditation_body && (
                       <div>
-                        <span className="font-medium">Международная аккредитация: </span>
+                        <span className="font-medium">Xalqaro akkreditatsiya: </span>
                         <span className="text-muted-foreground">{details.accreditation_body}</span>
                       </div>
                     )}
@@ -646,28 +646,28 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
           )}
         </TabsContent>
 
-        {/* Вкладка: Инфраструктура */}
+        {/* Вкладка: Infratuzilma */}
         <TabsContent value="infrastructure" className="space-y-6">
           {details && (
             <>
-              {/* Общая информация */}
+              {/* Umumiy maʼlumot */}
               {(details.school_area_sqm || details.classrooms_count) && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Общая информация</CardTitle>
+                    <CardTitle>Umumiy maʼlumot</CardTitle>
                   </CardHeader>
                   <CardContent className="grid gap-4 md:grid-cols-2">
                     {details.school_area_sqm && (
                       <div>
-                        <span className="font-medium">Площадь школы: </span>
+                        <span className="font-medium">Maktab maydoni: </span>
                         <span className="text-muted-foreground">
-                          {details.school_area_sqm.toLocaleString('ru-RU')} м²
+                          {details.school_area_sqm.toLocaleString('ru-RU')} m²
                         </span>
                       </div>
                     )}
                     {details.classrooms_count && (
                       <div>
-                        <span className="font-medium">Количество кабинетов: </span>
+                        <span className="font-medium">Sinflar soni: </span>
                         <span className="text-muted-foreground">{details.classrooms_count}</span>
                       </div>
                     )}
@@ -675,32 +675,32 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 </Card>
               )}
 
-              {/* Спортивная инфраструктура */}
+              {/* Sport infratuzilmasi */}
               {(details.has_gym ||
                 details.has_swimming_pool ||
                 details.has_football_field) && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Спортивная инфраструктура</CardTitle>
+                    <CardTitle>Sport infratuzilmasi</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-3 md:grid-cols-3">
                       {details.has_gym && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Спортзал</span>
+                          <span>Sport zali</span>
                         </div>
                       )}
                       {details.has_swimming_pool && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Бассейн</span>
+                          <span>Suzish havzasi</span>
                         </div>
                       )}
                       {details.has_football_field && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Футбольное поле</span>
+                          <span>Futbol maydoni</span>
                         </div>
                       )}
                     </div>
@@ -708,7 +708,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 </Card>
               )}
 
-              {/* Учебные помещения */}
+              {/* Taʼlim xonalari */}
               {(details.has_library ||
                 details.has_computer_lab ||
                 details.has_science_labs ||
@@ -716,38 +716,38 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 details.has_cafeteria) && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Учебные помещения</CardTitle>
+                    <CardTitle>Taʼlim xonalari</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-3 md:grid-cols-3">
                       {details.has_library && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Библиотека</span>
+                          <span>Kutubxona</span>
                         </div>
                       )}
                       {details.has_computer_lab && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Компьютерный класс</span>
+                          <span>Kompyuter xonasi</span>
                         </div>
                       )}
                       {details.has_science_labs && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Лаборатории</span>
+                          <span>Laboratoriyalar</span>
                         </div>
                       )}
                       {details.has_medical_room && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Медпункт</span>
+                          <span>Shifoxona</span>
                         </div>
                       )}
                       {details.has_cafeteria && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Столовая</span>
+                          <span>Oshxona</span>
                         </div>
                       )}
                     </div>
@@ -759,26 +759,26 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               {(details.has_security_24_7 || details.has_cctv || details.has_psychologist) && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Безопасность и поддержка</CardTitle>
+                    <CardTitle>Xavfsizlik va qoʻllab-quvvatlash</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-3 md:grid-cols-3">
                       {details.has_security_24_7 && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Охрана 24/7</span>
+                          <span>24/7 qoʻriqchi</span>
                         </div>
                       )}
                       {details.has_cctv && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Видеонаблюдение</span>
+                          <span>Video kuzatuv</span>
                         </div>
                       )}
                       {details.has_psychologist && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">✓</span>
-                          <span>Психолог</span>
+                          <span>Psixolog</span>
                         </div>
                       )}
                     </div>
@@ -789,15 +789,15 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
           )}
         </TabsContent>
 
-        {/* Вкладка: Контакты */}
+        {/* Вкладка: Aloqa */}
         <TabsContent value="contacts" className="space-y-6">
-          {/* Филиалы (если есть) */}
+          {/* Filiallar (если есть) */}
           {branches.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Филиалы</CardTitle>
+                <CardTitle>Filiallar</CardTitle>
                 <CardDescription>
-                  Другие филиалы сети {school.name}
+                  Tarmoqning boshqa filiallari {school.name}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -822,7 +822,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                             )}
                             {branchDetails?.fee_monthly_min && (
                               <p className="mt-2 text-sm">
-                                От {branchDetails.fee_monthly_min.toLocaleString('ru-RU')} сум/мес
+                                От {branchDetails.fee_monthly_min.toLocaleString('ru-RU')} soʻm/oy
                               </p>
                             )}
                           </div>
@@ -838,12 +838,12 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
 
           <Card>
             <CardHeader>
-              <CardTitle>Контактная информация</CardTitle>
+              <CardTitle>Aloqa maʼlumotlari</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {school.address && (
                 <div>
-                  <span className="font-medium">Адрес: </span>
+                  <span className="font-medium">Manzil: </span>
                   <span className="text-muted-foreground">{school.address}</span>
                 </div>
               )}
@@ -853,7 +853,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 <div className="space-y-2">
                   {school.phone && (
                     <div>
-                      <span className="font-medium">Телефон: </span>
+                      <span className="font-medium">Telefon: </span>
                       <a
                         href={`tel:${school.phone}`}
                         className="text-primary hover:underline"
@@ -864,7 +864,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                   )}
                   {school.phone_secondary && (
                     <div>
-                      <span className="font-medium">Дополнительный: </span>
+                      <span className="font-medium">Qoʻshimcha: </span>
                       <a
                         href={`tel:${school.phone_secondary}`}
                         className="text-primary hover:underline"
@@ -875,7 +875,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                   )}
                   {school.phone_admission && (
                     <div>
-                      <span className="font-medium">Приёмная комиссия: </span>
+                      <span className="font-medium">Qabul komissiyasi: </span>
                       <a
                         href={`tel:${school.phone_admission}`}
                         className="text-primary hover:underline"
@@ -903,7 +903,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                   )}
                   {school.email_admission && (
                     <div>
-                      <span className="font-medium">Приёмная комиссия: </span>
+                      <span className="font-medium">Qabul komissiyasi: </span>
                       <a
                         href={`mailto:${school.email_admission}`}
                         className="text-primary hover:underline"
@@ -917,7 +917,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
 
               {school.website && (
                 <div>
-                  <span className="font-medium">Сайт: </span>
+                  <span className="font-medium">Sayt: </span>
                   <a
                     href={school.website}
                     target="_blank"
@@ -949,7 +949,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 school.youtube ||
                 school.facebook) && (
                 <div className="space-y-2">
-                  <div className="font-medium">Социальные сети:</div>
+                  <div className="font-medium">Ijtimoiy tarmoqlar:</div>
                   <div className="flex flex-wrap gap-3">
                     {school.instagram && (
                       <a
@@ -968,7 +968,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
-                        Telegram канал
+                        Telegram kanal
                       </a>
                     )}
                     {school.youtube && (
@@ -998,7 +998,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
               {/* Карты */}
               {(school.google_maps_url || school.yandex_maps_url || (school.lat && school.lng)) && (
                 <div className="space-y-2">
-                  <div className="font-medium">Карта:</div>
+                  <div className="font-medium">Xarita:</div>
                   <div className="flex flex-wrap gap-3">
                     {school.google_maps_url && (
                       <a
@@ -1027,7 +1027,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
-                        Открыть на карте
+                        Xaritada ochish
                       </a>
                     )}
                   </div>

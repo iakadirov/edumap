@@ -78,21 +78,21 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
 
   // Типы школ
   const schoolTypes = [
-    { value: 'private', label: 'Частная' },
-    { value: 'state', label: 'Государственная' },
-    { value: 'international', label: 'Международная' },
+    { value: 'private', label: 'Xususiy' },
+    { value: 'state', label: 'Davlat' },
+    { value: 'international', label: 'Xalqaro' },
   ];
 
   // Языки
   const languages = [
-    { value: 'russian', label: 'Русский' },
-    { value: 'uzbek', label: 'Узбекский' },
-    { value: 'english', label: 'Английский' },
+    { value: 'russian', label: 'Rus' },
+    { value: 'uzbek', label: 'Oʻzbek' },
+    { value: 'english', label: 'Ingliz' },
   ];
 
   // Программы
   const curricula = [
-    { value: 'national', label: 'Национальная' },
+    { value: 'national', label: 'Milliy' },
     { value: 'cambridge', label: 'Cambridge' },
     { value: 'ib', label: 'IB (International Baccalaureate)' },
   ];
@@ -156,10 +156,10 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Фильтры поиска</CardTitle>
+          <CardTitle>Qidiruv filtrlari</CardTitle>
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={resetFilters}>
-              Сбросить
+              Tozalash
             </Button>
           )}
         </div>
@@ -167,16 +167,16 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
       <CardContent className="space-y-6">
         {/* Район */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Район</label>
+          <label className="text-sm font-medium">Tuman</label>
           <Select
             value={filters.district ? filters.district : 'all'}
             onValueChange={(value) => updateFilters({ district: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Все районы" />
+              <SelectValue placeholder="Barcha tumanlar" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все районы</SelectItem>
+              <SelectItem value="all">Barcha tumanlar</SelectItem>
               {districts.map((district) => (
                 <SelectItem key={district} value={district}>
                   {district}
@@ -188,16 +188,16 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
 
         {/* Город */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Город</label>
+          <label className="text-sm font-medium">Shahar</label>
           <Select
             value={filters.city ? filters.city : 'all'}
             onValueChange={(value) => updateFilters({ city: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Все города" />
+              <SelectValue placeholder="Barcha shaharlar" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все города</SelectItem>
+              <SelectItem value="all">Barcha shaharlar</SelectItem>
               {cities.map((city) => (
                 <SelectItem key={city} value={city}>
                   {city}
@@ -209,16 +209,16 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
 
         {/* Тип школы */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Тип школы</label>
+          <label className="text-sm font-medium">Maktab turi</label>
           <Select
             value={filters.school_type ? filters.school_type : 'all'}
             onValueChange={(value) => updateFilters({ school_type: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Все типы" />
+              <SelectValue placeholder="Barcha turlar" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все типы</SelectItem>
+              <SelectItem value="all">Barcha turlar</SelectItem>
               {schoolTypes.map((type) => (
                 <SelectItem key={type.value} value={type.value}>
                   {type.label}
@@ -231,10 +231,10 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
         {/* Диапазон цены */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Стоимость в месяц</label>
+            <label className="text-sm font-medium">Oyiga narx</label>
             <span className="text-sm text-muted-foreground">
               {filters.price_range?.[0]?.toLocaleString('ru-RU') || 0} -{' '}
-              {filters.price_range?.[1]?.toLocaleString('ru-RU') || 50000000} сум
+              {filters.price_range?.[1]?.toLocaleString('ru-RU') || 50000000} soʻm
             </span>
           </div>
           <Slider
@@ -249,16 +249,16 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
 
         {/* Язык обучения */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Язык обучения</label>
+          <label className="text-sm font-medium">Taʼlim tili</label>
           <Select
             value={filters.language ? filters.language : 'all'}
             onValueChange={(value) => updateFilters({ language: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Все языки" />
+              <SelectValue placeholder="Barcha tillar" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Все языки</SelectItem>
+              <SelectItem value="all">Barcha tillar</SelectItem>
               {languages.map((lang) => (
                 <SelectItem key={lang.value} value={lang.value}>
                   {lang.label}
@@ -270,7 +270,7 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
 
         {/* Программа обучения */}
         <div className="space-y-3">
-          <label className="text-sm font-medium">Программа обучения</label>
+          <label className="text-sm font-medium">Taʼlim dasturi</label>
           <div className="space-y-2">
             {curricula.map((curr) => (
               <div key={curr.value} className="flex items-center space-x-2">
