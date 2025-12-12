@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
     if (!user) {
       const redirectUrl = new URL('/auth/login', request.url);
       redirectUrl.searchParams.set('redirect', request.nextUrl.pathname);
-      return NextResponse.redirect(redirectUrl);
+      return NextResponse.redirect(new URL('/auth/login', request.url));
     }
 
     // Проверка роли пользователя

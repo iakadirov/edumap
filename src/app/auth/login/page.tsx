@@ -51,10 +51,11 @@ export default function LoginPage() {
           .eq('auth_user_id', data.user.id);
 
         // Редирект в зависимости от роли
+        const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
         if (['super_admin', 'admin', 'moderator'].includes(userData.role)) {
-          router.push('/admin/dashboard');
+          router.push(redirectUrl || '/admin/dashboard');
         } else {
-          router.push('/');
+          router.push(redirectUrl || '/');
         }
         router.refresh();
       }

@@ -13,7 +13,7 @@ export default async function AdminLayout({
   try {
     user = await getCurrentUser();
   } catch {
-    redirect('/auth/login?redirect=/admin');
+    redirect('/auth/login?redirect=/admin/dashboard');
   }
 
   if (!user || !['super_admin', 'admin', 'moderator'].includes(user.role)) {
