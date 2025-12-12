@@ -103,9 +103,10 @@ export function SchoolsTable({
       });
 
       if (response.ok) {
-        router.refresh();
         setDeleteDialogOpen(false);
         setSchoolToDelete(null);
+        // Полная перезагрузка страницы для обновления данных
+        window.location.reload();
       } else {
         alert('Xatolik yuz berdi');
       }

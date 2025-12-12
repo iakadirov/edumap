@@ -101,9 +101,10 @@ export function UsersTable({
       });
 
       if (response.ok) {
-        router.refresh();
         setDeleteDialogOpen(false);
         setUserToDelete(null);
+        // Полная перезагрузка страницы для обновления данных
+        window.location.reload();
       } else {
         alert('Xatolik yuz berdi');
       }

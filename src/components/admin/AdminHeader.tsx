@@ -25,8 +25,8 @@ export function AdminHeader({ user }: AdminHeaderProps) {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push('/auth/login');
-    router.refresh();
+    // Полная перезагрузка для очистки состояния
+    window.location.href = '/auth/login';
   };
 
   return (

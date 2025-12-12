@@ -3,12 +3,17 @@ import { SchoolsTable } from '@/components/admin/schools/SchoolsTable';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import { unstable_noStore as noStore } from 'next/cache';
+
+// Админ-панель всегда динамическая (не кэшируется)
+export const dynamic = 'force-dynamic';
 
 export default async function AdminSchoolsPage({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string; search?: string; status?: string }>;
 }) {
+  noStore(); // Отключаем кэширование для админ-панели
   const supabase = await createClient();
   const params = await searchParams;
   

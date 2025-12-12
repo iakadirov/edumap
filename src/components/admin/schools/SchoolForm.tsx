@@ -156,10 +156,11 @@ export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {
 
       // Успешно сохранено
       if (isEdit) {
-        router.refresh();
+        // Используем window.location для полной перезагрузки
+        window.location.href = `/admin/schools/${organization.id}`;
       } else {
-        router.push(`/admin/schools/${data.id}`);
-        router.refresh();
+        // Редирект на страницу редактирования
+        window.location.href = `/admin/schools/${data.id}`;
       }
     } catch (err: any) {
       setError(err.message || 'Xatolik yuz berdi');

@@ -4,12 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { unstable_noStore as noStore } from 'next/cache';
+
+// Админ-панель всегда динамическая (не кэшируется)
+export const dynamic = 'force-dynamic';
 
 export default async function EditSchoolPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  noStore(); // Отключаем кэширование для админ-панели
   const { id } = await params;
   const supabase = await createClient();
 

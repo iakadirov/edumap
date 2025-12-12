@@ -2,8 +2,13 @@ import { SchoolForm } from '@/components/admin/schools/SchoolForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { unstable_noStore as noStore } from 'next/cache';
+
+// Админ-панель всегда динамическая (не кэшируется)
+export const dynamic = 'force-dynamic';
 
 export default function NewSchoolPage() {
+  noStore();
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-6 space-y-6">
