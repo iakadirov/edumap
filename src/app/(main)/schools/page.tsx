@@ -1,9 +1,10 @@
-import { getActiveSchools, getSchoolsWithFilters, getDistricts, getCities } from '@/lib/supabase/queries';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { SchoolCard } from '@/components/schools/SchoolCard';
+import { getDistricts, getCities } from '@/lib/supabase/queries';
 import { SchoolFilters } from '@/components/schools/SchoolFilters';
-import Link from 'next/link';
+import { Suspense } from 'react';
+import { SchoolsList } from './schools-list';
+
+// Кэширование на 60 секунд для быстрой загрузки
+export const revalidate = 60;
 
 interface SchoolsPageProps {
   searchParams: Promise<{
@@ -32,112 +33,21 @@ interface SchoolsPageProps {
  * - Отображение всех активных школ из Supabase
  * - Фильтрация школ по различным параметрам
  * - Обработка состояний: loading, error, empty
+ * - Streaming SSR с Suspense для быстрой загрузки
  */
 export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
   // В Next.js 16 searchParams может быть Promise, проверяем
   const params = searchParams instanceof Promise ? await searchParams : searchParams;
-  let schools;
   let districts: string[] = [];
   let cities: string[] = [];
-  let error: Error | null = null;
 
   try {
-    // Получаем списки для фильтров и школы параллельно для ускорения
-    const [districtsData, citiesData, schoolsData] = await Promise.all([
-      getDistricts(),
-      getCities(),
-      // Предзагружаем школы параллельно с фильтрами
-      (async () => {
-        const hasFilters = 
-          params.district ||
-          params.city ||
-          params.school_type ||
-          params.price_min ||
-          params.price_max ||
-          params.language ||
-          params.curriculum;
-
-        if (hasFilters) {
-          const filters = {
-            district: params.district,
-            city: params.city,
-            school_type: params.school_type,
-            price_min: params.price_min ? Number(params.price_min) : undefined,
-            price_max: params.price_max ? Number(params.price_max) : undefined,
-            language: params.language,
-            curriculum: params.curriculum ? params.curriculum.split(',') : undefined,
-          };
-          return getSchoolsWithFilters(filters);
-        } else {
-          return getActiveSchools();
-        }
-      })(),
-    ]);
-
-    districts = districtsData;
-    cities = citiesData;
-    schools = schoolsData;
-
-    // Проверяем, есть ли фильтры в URL
-    const hasFilters = 
-      params.district ||
-      params.city ||
-      params.school_type ||
-      params.price_min ||
-      params.price_max ||
-      params.language ||
-      params.curriculum;
-
-    // Школы уже загружены в Promise.all выше
+    // Получаем только списки для фильтров (параллельно, быстрее)
+    [districts, cities] = await Promise.all([getDistricts(), getCities()]);
   } catch (e) {
-    error = e instanceof Error ? e : new Error('Ошибка загрузки школ');
-    schools = null;
-  }
-
-  // Состояние ошибки
-  if (error) {
-    return (
-      <div className="container-wrapper py-16">
-        <div className="container-content">
-          <div className="container-inner">
-            <Card>
-          <CardHeader>
-            <CardTitle>Yuklashda xatolik</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              Maktablar roʻyxatini yuklash muvaffaqiyatsiz. Sahifani yangilab koʻring.
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {error.message}
-            </p>
-          </CardContent>
-        </Card>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Пустое состояние
-  if (!schools || schools.length === 0) {
-    return (
-      <div className="container-wrapper py-16">
-        <div className="container-content">
-          <div className="container-inner">
-            <div className="mx-auto max-w-2xl text-center">
-          <h1 className="mb-4 text-4xl font-bold">Maktablar katalogi</h1>
-          <p className="mb-8 text-lg text-muted-foreground">
-            Maktablar hali qoʻshilmagan. Keyinroq qaytib keling.
-          </p>
-          <Button asChild>
-            <Link href="/">Bosh sahifaga</Link>
-          </Button>
-        </div>
-          </div>
-        </div>
-      </div>
-    );
+    // В случае ошибки просто используем пустые массивы
+    districts = [];
+    cities = [];
   }
 
   return (
@@ -147,26 +57,39 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
           {/* Заголовок */}
           <div className="mb-8">
             <h1 className="mb-2 text-4xl font-bold">Maktablar katalogi</h1>
-            <p className="text-lg text-muted-foreground">
-              Topilgan maktablar: <span className="font-semibold text-foreground">{schools.length}</span>
-            </p>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
-            {/* Панель фильтров */}
+            {/* Панель фильтров - загружается сразу */}
             <aside className="lg:sticky lg:top-4 lg:h-fit">
               <SchoolFilters 
                 districts={districts} 
                 cities={cities}
-                initialFilters={params}
+                initialFilters={{
+                  district: params.district,
+                  city: params.city,
+                  school_type: params.school_type,
+                  price_min: params.price_min,
+                  price_max: params.price_max,
+                  language: params.language,
+                  curriculum: params.curriculum,
+                }}
               />
             </aside>
 
-            {/* Список школ */}
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {schools.map((school: any) => (
-                <SchoolCard key={school.id} school={school} />
-              ))}
+            {/* Список школ - загружается отдельно через Suspense для streaming */}
+            <div className="space-y-6">
+              <Suspense 
+                fallback={
+                  <div className="space-y-4">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
+                    ))}
+                  </div>
+                }
+              >
+                <SchoolsList params={params} />
+              </Suspense>
             </div>
           </div>
         </div>
@@ -174,4 +97,3 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
     </div>
   );
 }
-

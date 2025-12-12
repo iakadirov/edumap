@@ -7,6 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Кэширование на 300 секунд (5 минут) для страниц школ
+export const revalidate = 300;
+
 interface SchoolProfilePageProps {
   params: Promise<{
     slug: string;
