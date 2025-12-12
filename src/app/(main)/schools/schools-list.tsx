@@ -52,10 +52,15 @@ export async function SchoolsList({ params }: SchoolsListProps) {
   }
 
   return (
-    <div className="grid gap-4">
-      {schools.map((school: any) => (
-        <SchoolCard key={school.id} school={school} />
-      ))}
+    <div>
+      <p className="text-muted-foreground mb-6">
+        Topilgan maktablar: <span className="font-semibold text-foreground">{schools.length}</span>
+      </p>
+      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+        {schools.map((school: any) => (
+          <SchoolCard key={school.id} school={school} />
+        ))}
+      </div>
     </div>
   );
 }
