@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getSchoolBySlug } from '@/lib/supabase/queries';
+import { getSchoolBySlug, getSchoolWithBranches } from '@/lib/supabase/queries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,10 +25,13 @@ interface SchoolProfilePageProps {
 export default async function SchoolProfilePage({ params }: SchoolProfilePageProps) {
   const { slug } = await params;
   let school: any;
+  let branchesData: any = null;
   let error: Error | null = null;
 
   try {
-    school = await getSchoolBySlug(slug);
+    // Получаем школу с филиалами
+    branchesData = await getSchoolWithBranches(slug);
+    school = branchesData.current;
   } catch (e) {
     error = e instanceof Error ? e : new Error('Ошибка загрузки школы');
     school = null;
@@ -42,6 +45,9 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
   const details = Array.isArray(school.school_details)
     ? school.school_details[0]
     : school.school_details;
+  
+  const branches = branchesData?.branches || [];
+  const isBranch = !!school.parent_organization_id;
 
   // Форматирование данных
   const schoolTypeLabels: Record<string, string> = {
@@ -84,14 +90,29 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
         </Button>
       </div>
 
+      {/* Информация о филиале/главной школе */}
+      {isBranch && branchesData?.main && (
+        <div className="mb-4 rounded-lg bg-muted p-4">
+          <p className="text-sm text-muted-foreground">
+            Филиал сети:{' '}
+            <Link
+              href={`/schools/${branchesData.main.slug}`}
+              className="font-medium text-primary hover:underline"
+            >
+              {branchesData.main.name}
+            </Link>
+          </p>
+        </div>
+      )}
+
       {/* Заголовок школы */}
       <div className="mb-8">
         <div className="flex flex-col md:flex-row md:items-start gap-6">
-          {/* Логотип */}
-          {school.logo_url && (
+          {/* Логотип - используем логотип главной школы, если это филиал */}
+          {(school.logo_url || (isBranch && branchesData?.main?.logo_url)) && (
             <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg border">
               <Image
-                src={school.logo_url}
+                src={school.logo_url || branchesData?.main?.logo_url || ''}
                 alt={school.name}
                 fill
                 className="object-cover"
@@ -102,6 +123,11 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
           <div className="flex-1">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
               <div>
+                {isBranch && (
+                  <Badge variant="outline" className="mb-2">
+                    Филиал
+                  </Badge>
+                )}
                 <h1 className="mb-2 text-4xl font-bold">{school.name}</h1>
                 {(school.district || school.city) && (
                   <p className="text-lg text-muted-foreground">
@@ -310,6 +336,51 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
 
         {/* Вкладка: Контакты */}
         <TabsContent value="contacts" className="space-y-6">
+          {/* Филиалы (если есть) */}
+          {branches.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Филиалы</CardTitle>
+                <CardDescription>
+                  Другие филиалы сети {school.name}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {branches.map((branch: any) => {
+                    const branchDetails = Array.isArray(branch.school_details)
+                      ? branch.school_details[0]
+                      : branch.school_details;
+                    return (
+                      <Link
+                        key={branch.id}
+                        href={`/schools/${branch.slug}`}
+                        className="block rounded-lg border p-4 transition-colors hover:bg-muted"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-semibold">{branch.name}</h3>
+                            {(branch.district || branch.city) && (
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                {[branch.district, branch.city].filter(Boolean).join(', ')}
+                              </p>
+                            )}
+                            {branchDetails?.fee_monthly_min && (
+                              <p className="mt-2 text-sm">
+                                От {branchDetails.fee_monthly_min.toLocaleString('ru-RU')} сум/мес
+                              </p>
+                            )}
+                          </div>
+                          <Badge variant="outline">Филиал</Badge>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle>Контактная информация</CardTitle>
