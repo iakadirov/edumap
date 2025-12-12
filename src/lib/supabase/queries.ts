@@ -51,6 +51,78 @@ export async function getSchoolBySlug(slug: string) {
 }
 
 /**
+ * Получить филиалы школы
+ */
+export async function getSchoolBranches(parentId: string) {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('organizations')
+    .select(`
+      *,
+      school_details (*)
+    `)
+    .eq('parent_organization_id', parentId)
+    .eq('status', 'active')
+    .order('name');
+
+  if (error) {
+    throw error;
+  }
+
+  return data || [];
+}
+
+/**
+ * Получить школу по ID
+ */
+export async function getSchoolById(id: string) {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('organizations')
+    .select(`
+      *,
+      school_details (*)
+    `)
+    .eq('id', id)
+    .eq('status', 'active')
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+/**
+ * Получить главную школу и её филиалы
+ */
+export async function getSchoolWithBranches(slug: string) {
+  const school = await getSchoolBySlug(slug);
+  
+  // Если это филиал, получаем главную школу
+  if (school.parent_organization_id) {
+    const mainSchool = await getSchoolById(school.parent_organization_id);
+    const branches = await getSchoolBranches(school.parent_organization_id);
+    return {
+      main: mainSchool,
+      current: school,
+      branches: branches.filter(b => b.id !== school.id),
+    };
+  }
+  
+  // Если это главная школа, получаем филиалы
+  const branches = await getSchoolBranches(school.id);
+  return {
+    main: school,
+    current: school,
+    branches,
+  };
+}
+
+/**
  * Получить школы с фильтрами
  */
 export async function getSchoolsWithFilters(filters: {
@@ -164,4 +236,3 @@ export async function getCities() {
 
   return uniqueCities.sort();
 }
-

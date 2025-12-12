@@ -62,6 +62,19 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
     ib: 'IB (International Baccalaureate)',
   };
 
+  // Форматирование классов для отображения
+  const formatGrades = (details: any) => {
+    if (!details) return null;
+    const parts: string[] = [];
+    if (details.accepts_preparatory) {
+      parts.push('0');
+    }
+    if (details.grade_from && details.grade_to) {
+      parts.push(`${details.grade_from}–${details.grade_to}`);
+    }
+    return parts.join(', ');
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Кнопка назад */}
@@ -155,14 +168,15 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
           {details && (
             <div className="grid gap-6 md:grid-cols-2">
               {/* Классы */}
-              {details.grade_from && details.grade_to && (
+              {(details.accepts_preparatory || (details.grade_from && details.grade_to)) && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Классы</CardTitle>
+                    <CardDescription>Классы для приёма</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-2xl font-semibold">
-                      {details.grade_from}–{details.grade_to}
+                      {formatGrades(details)}
                     </p>
                   </CardContent>
                 </Card>
