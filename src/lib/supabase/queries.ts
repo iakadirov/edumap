@@ -4,6 +4,11 @@ import type { Database } from '@/types/database';
 type Organization = Database['public']['Tables']['organizations']['Row'];
 type SchoolDetails = Database['public']['Tables']['school_details']['Row'];
 
+// Тип для школы с деталями (результат SELECT с JOIN)
+type SchoolWithDetails = Organization & {
+  school_details: SchoolDetails | SchoolDetails[] | null;
+};
+
 /**
  * Получить все активные школы
  */
@@ -30,7 +35,7 @@ export async function getActiveSchools() {
 /**
  * Получить школу по slug
  */
-export async function getSchoolBySlug(slug: string) {
+export async function getSchoolBySlug(slug: string): Promise<SchoolWithDetails> {
   const supabase = await createClient();
   
   const { data, error } = await supabase
@@ -47,13 +52,13 @@ export async function getSchoolBySlug(slug: string) {
     throw error;
   }
 
-  return data;
+  return data as SchoolWithDetails;
 }
 
 /**
  * Получить филиалы школы
  */
-export async function getSchoolBranches(parentId: string) {
+export async function getSchoolBranches(parentId: string): Promise<SchoolWithDetails[]> {
   const supabase = await createClient();
   
   const { data, error } = await supabase
@@ -70,13 +75,13 @@ export async function getSchoolBranches(parentId: string) {
     throw error;
   }
 
-  return data || [];
+  return (data || []) as SchoolWithDetails[];
 }
 
 /**
  * Получить школу по ID
  */
-export async function getSchoolById(id: string) {
+export async function getSchoolById(id: string): Promise<SchoolWithDetails> {
   const supabase = await createClient();
   
   const { data, error } = await supabase
@@ -93,7 +98,7 @@ export async function getSchoolById(id: string) {
     throw error;
   }
 
-  return data;
+  return data as SchoolWithDetails;
 }
 
 /**

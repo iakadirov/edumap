@@ -40,13 +40,19 @@
 ### Таблица: school_details (специфичная)
 ```sql
 - school_type (private, state, international)
-- grade_from, grade_to
+- accepts_preparatory (BOOLEAN) - принимает ли 0 класс
+- grade_from, grade_to (1-11) - классы для приёма
 - total_students, avg_class_size
 - primary_language, additional_languages
 - curriculum (national, cambridge, ib)
 - fee_monthly_min, fee_monthly_max
 - has_transport, has_meals, has_extended_day
 ```
+
+### Филиалы школ
+- `organizations.parent_organization_id` - ссылка на главную школу
+- Филиалы имеют общий бренд/логотип, но независимые данные
+- Функции: `getSchoolBranches()`, `getSchoolWithBranches()`
 
 ---
 
