@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,46 +15,52 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 
-export function SchoolForm() {
+interface SchoolFormProps {
+  organization?: any;
+  schoolDetails?: any;
+}
+
+export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {
   const router = useRouter();
+  const isEdit = !!organization;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Основная информация
-  const [nameUz, setNameUz] = useState('');
-  const [nameRu, setNameRu] = useState('');
-  const [description, setDescription] = useState('');
-  const [shortDescription, setShortDescription] = useState('');
-  const [status, setStatus] = useState('pending');
-  const [isVerified, setIsVerified] = useState(false);
+  const [nameUz, setNameUz] = useState(organization?.name_uz || '');
+  const [nameRu, setNameRu] = useState(organization?.name_ru || '');
+  const [description, setDescription] = useState(organization?.description || '');
+  const [shortDescription, setShortDescription] = useState(organization?.short_description || '');
+  const [status, setStatus] = useState(organization?.status || 'pending');
+  const [isVerified, setIsVerified] = useState(organization?.is_verified || false);
 
   // Контакты
-  const [phone, setPhone] = useState('');
-  const [phoneAdmission, setPhoneAdmission] = useState('');
-  const [email, setEmail] = useState('');
-  const [emailAdmission, setEmailAdmission] = useState('');
-  const [website, setWebsite] = useState('');
+  const [phone, setPhone] = useState(organization?.phone || '');
+  const [phoneAdmission, setPhoneAdmission] = useState(organization?.phone_admission || '');
+  const [email, setEmail] = useState(organization?.email || '');
+  const [emailAdmission, setEmailAdmission] = useState(organization?.email_admission || '');
+  const [website, setWebsite] = useState(organization?.website || '');
 
   // Адрес
-  const [city, setCity] = useState('');
-  const [district, setDistrict] = useState('');
-  const [address, setAddress] = useState('');
-  const [landmark, setLandmark] = useState('');
+  const [city, setCity] = useState(organization?.city || '');
+  const [district, setDistrict] = useState(organization?.district || '');
+  const [address, setAddress] = useState(organization?.address || '');
+  const [landmark, setLandmark] = useState(organization?.landmark || '');
 
   // School Details
-  const [schoolType, setSchoolType] = useState('private');
-  const [gradeFrom, setGradeFrom] = useState('1');
-  const [gradeTo, setGradeTo] = useState('11');
-  const [acceptsPreparatory, setAcceptsPreparatory] = useState(false);
-  const [primaryLanguage, setPrimaryLanguage] = useState('uzbek');
-  const [totalStudents, setTotalStudents] = useState('');
-  const [avgClassSize, setAvgClassSize] = useState('');
-  const [feeMonthlyMin, setFeeMonthlyMin] = useState('');
-  const [feeMonthlyMax, setFeeMonthlyMax] = useState('');
-  const [hasTransport, setHasTransport] = useState(false);
-  const [hasMeals, setHasMeals] = useState(false);
-  const [hasExtendedDay, setHasExtendedDay] = useState(false);
-  const [curriculum, setCurriculum] = useState<string[]>([]);
+  const [schoolType, setSchoolType] = useState(schoolDetails?.school_type || 'private');
+  const [gradeFrom, setGradeFrom] = useState(schoolDetails?.grade_from?.toString() || '1');
+  const [gradeTo, setGradeTo] = useState(schoolDetails?.grade_to?.toString() || '11');
+  const [acceptsPreparatory, setAcceptsPreparatory] = useState(schoolDetails?.accepts_preparatory || false);
+  const [primaryLanguage, setPrimaryLanguage] = useState(schoolDetails?.primary_language || 'uzbek');
+  const [totalStudents, setTotalStudents] = useState(schoolDetails?.total_students?.toString() || '');
+  const [avgClassSize, setAvgClassSize] = useState(schoolDetails?.avg_class_size?.toString() || '');
+  const [feeMonthlyMin, setFeeMonthlyMin] = useState(schoolDetails?.fee_monthly_min?.toString() || '');
+  const [feeMonthlyMax, setFeeMonthlyMax] = useState(schoolDetails?.fee_monthly_max?.toString() || '');
+  const [hasTransport, setHasTransport] = useState(schoolDetails?.has_transport || false);
+  const [hasMeals, setHasMeals] = useState(schoolDetails?.has_meals || false);
+  const [hasExtendedDay, setHasExtendedDay] = useState(schoolDetails?.has_extended_day || false);
+  const [curriculum, setCurriculum] = useState<string[]>(schoolDetails?.curriculum || []);
 
   // Генерация slug из названия
   const generateSlug = (text: string): string => {
@@ -85,7 +91,7 @@ export function SchoolForm() {
         return;
       }
 
-      const slug = generateSlug(nameUz || nameRu || 'school');
+      const slug = isEdit ? organization.slug : generateSlug(nameUz || nameRu || 'school');
 
       // Подготовка данных
       const organizationData = {
@@ -93,7 +99,7 @@ export function SchoolForm() {
         name: nameUz || nameRu || 'School',
         name_uz: nameUz || null,
         name_ru: nameRu || null,
-        slug,
+        ...(isEdit ? {} : { slug }),
         description: description || null,
         short_description: shortDescription || null,
         status,
@@ -125,8 +131,11 @@ export function SchoolForm() {
         curriculum: curriculum.length > 0 ? curriculum : null,
       };
 
-      const response = await fetch('/api/admin/schools', {
-        method: 'POST',
+      const url = isEdit ? `/api/admin/schools/${organization.id}` : '/api/admin/schools';
+      const method = isEdit ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -144,9 +153,13 @@ export function SchoolForm() {
         return;
       }
 
-      // Успешно создано
-      router.push(`/admin/schools/${data.id}`);
-      router.refresh();
+      // Успешно сохранено
+      if (isEdit) {
+        router.refresh();
+      } else {
+        router.push(`/admin/schools/${data.id}`);
+        router.refresh();
+      }
     } catch (err: any) {
       setError(err.message || 'Xatolik yuz berdi');
       setLoading(false);
