@@ -14,7 +14,15 @@ interface SchoolsPageProps {
     price_max?: string;
     language?: string;
     curriculum?: string;
-  }>;
+  }> | {
+    district?: string;
+    city?: string;
+    school_type?: string;
+    price_min?: string;
+    price_max?: string;
+    language?: string;
+    curriculum?: string;
+  };
 }
 
 /**
