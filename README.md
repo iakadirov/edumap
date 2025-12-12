@@ -33,6 +33,12 @@ npm start
 
 Проект автоматически деплоится на Vercel при каждом push в `main` ветку.
 
+### Основные страницы
+- Главная: https://edumap-roan.vercel.app/
+- Каталог школ: https://edumap-roan.vercel.app/schools
+- О проекте: https://edumap-roan.vercel.app/about
+- Admin Panel: https://edumap-roan.vercel.app/admin/dashboard
+
 ## 🛠 Технологический стек
 
 - **Framework**: Next.js 16 (App Router)

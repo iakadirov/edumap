@@ -27,25 +27,63 @@
 
 ```
 Фаза: 1 — Foundation
-Спринт: 1 — Project Setup
-Дата начала: Декабрь 2025
+Спринт: 2 — UI & Performance Optimization
+Дата: Декабрь 2025
 ```
 
 ### Что сделано
+
+#### Setup & Infrastructure
 - [x] Выбран технологический стек
 - [x] Созданы аккаунты (GitHub, Vercel, Supabase, Linear)
 - [x] Установлен Cursor IDE
 - [x] Создана структура документации
-- [x] Инициализирован Next.js проект
+- [x] Инициализирован Next.js 16 проект
 - [x] Настроен TypeScript (strict mode)
-- [x] Настроен Tailwind CSS
+- [x] Настроен Tailwind CSS v4
 - [x] Установлен и настроен shadcn/ui
-- [x] Создана базовая структура папок
-- [ ] Настроен Supabase ← ТЕКУЩЕЕ
-- [ ] Базовый UI
+
+#### Database & Backend
+- [x] Настроен Supabase
+- [x] Создана схема БД (organizations, school_details, users)
+- [x] Миграции для всех таблиц
+- [x] RLS политики для безопасности
+- [x] Тестовые данные
+
+#### UI Foundation
+- [x] Layout компонент (Header + Footer)
+- [x] Header с навигацией
+- [x] Footer
+- [x] Главная страница
+- [x] Переход на узбекский язык (Latin script)
+- [x] Font Onest (Google Fonts)
+- [x] Container system (1440px max-width)
+- [x] Bento card стиль
+
+#### Модуль школ (Public)
+- [x] Страница списка школ `/schools`
+- [x] Фильтры (район, город, тип, цена, язык, программа)
+- [x] Страница профиля школы `/schools/[slug]`
+- [x] Поддержка филиалов школ
+- [x] Поддержка 0 класса (preparatory)
+- [x] Фаза 2 поля (инфраструктура, безопасность, финансы)
+
+#### Admin Panel
+- [x] Dashboard с статистикой
+- [x] Управление школами (CRUD)
+- [x] Управление пользователями (CRUD)
+- [x] Аутентификация и авторизация
+- [x] Роли и права доступа
+
+#### Performance & UX
+- [x] Loading states (skeleton UI)
+- [x] Streaming SSR с Suspense
+- [x] Кэширование страниц (revalidate)
+- [x] Оптимизация запросов к Supabase
+- [x] Оптимизация font loading
 
 ### Текущая задача
-Настройка UI Foundation (Layout, Header, Footer, главная страница).
+Оптимизация производительности завершена. Готовимся к следующей фазе.
 
 ---
 
@@ -67,25 +105,29 @@
 ## 🛠 Технологический стек
 
 ### Frontend
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
+- **Framework**: Next.js 16.0.9 (App Router)
+- **Language**: TypeScript (strict mode)
+- **Styling**: Tailwind CSS v4
 - **UI Components**: shadcn/ui
-- **Forms**: React Hook Form + Zod
+- **Font**: Onest (Google Fonts)
+- **Forms**: React Hook Form + Zod (планируется)
 
 ### Backend & Database
 - **Database**: Supabase (PostgreSQL)
 - **Auth**: Supabase Auth
 - **Storage**: Supabase Storage
 - **API**: Next.js API Routes
+- **RLS**: Row Level Security включен
 
 ### AI
-- **Matching & NLG**: Claude API (Anthropic)
+- **Matching & NLG**: Claude API (Anthropic) - планируется
 
 ### Infrastructure
 - **Hosting**: Vercel
 - **Domain**: edumap.uz
 - **Repository**: GitHub
+- **CI/CD**: Автоматический деплой из GitHub
+- **URL**: https://edumap-roan.vercel.app/
 
 ---
 
@@ -152,11 +194,11 @@ edumap/
 | Ресурс | URL |
 |--------|-----|
 | GitHub | https://github.com/iakadirov/edumap |
-| Vercel | *добавить после деплоя* |
-| Supabase | *добавить после настройки* |
+| Vercel | https://edumap-roan.vercel.app/ |
+| Production | https://edumap-roan.vercel.app/ |
+| Supabase | *добавить ссылку* |
 | Linear | *добавить ссылку на проект* |
 | Figma | *добавить ссылку на дизайн* |
-| Production | https://edumap.uz |
 
 ---
 
