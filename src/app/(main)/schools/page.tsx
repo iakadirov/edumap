@@ -26,8 +26,8 @@ interface SchoolsPageProps {
  * - Обработка состояний: loading, error, empty
  */
 export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
-  // В Next.js 16 searchParams может быть Promise
-  const params = await searchParams;
+  // В Next.js 16 searchParams может быть Promise, проверяем
+  const params = searchParams instanceof Promise ? await searchParams : searchParams;
   let schools;
   let districts: string[] = [];
   let cities: string[] = [];
