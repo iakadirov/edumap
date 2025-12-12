@@ -1,8 +1,10 @@
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import { getCurrentUser } from '@/lib/auth/middleware';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { unstable_noStore as noStore } from 'next/cache';
+import AdminLoading from './loading';
 
 // Админ-панель всегда динамическая (не кэшируется)
 export const dynamic = 'force-dynamic';
@@ -31,7 +33,9 @@ export default async function AdminLayout({
       <div className="flex-1 flex flex-col">
         <AdminHeader user={user} />
         <main className="flex-1 overflow-auto">
-          {children}
+          <Suspense fallback={<AdminLoading />}>
+            {children}
+          </Suspense>
         </main>
       </div>
     </div>

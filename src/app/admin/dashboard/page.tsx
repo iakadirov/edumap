@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
   noStore(); // Отключаем кэширование для админ-панели
   const supabase = await createClient();
 
-  // Получаем статистику
+  // Получаем статистику (оптимизировано - только нужные поля)
   const [
     { count: totalSchools },
     { count: activeSchools },
@@ -22,15 +22,15 @@ export default async function AdminDashboardPage() {
     { data: recentUsers },
     { data: recentSchools },
   ] = await Promise.all([
-    supabase.from('organizations').select('*', { count: 'exact', head: true }),
+    supabase.from('organizations').select('id', { count: 'exact', head: true }),
     supabase
       .from('organizations')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .eq('status', 'active'),
-    supabase.from('users').select('*', { count: 'exact', head: true }),
+    supabase.from('users').select('id', { count: 'exact', head: true }),
     supabase
       .from('users')
-      .select('*', { count: 'exact', head: true })
+      .select('id', { count: 'exact', head: true })
       .eq('subscription_tier', 'premium'),
     supabase
       .from('users')

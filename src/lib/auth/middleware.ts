@@ -32,12 +32,12 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     return null;
   }
 
-  // Получаем данные пользователя из таблицы users
-  const { data: user, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('auth_user_id', authUser.id)
-    .single();
+      // Получаем данные пользователя из таблицы users (оптимизировано - только нужные поля)
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('id, email, full_name, avatar_url, role, subscription_tier, subscription_expires_at, organization_id, is_active')
+        .eq('auth_user_id', authUser.id)
+        .single();
 
   if (error || !user) {
     return null;

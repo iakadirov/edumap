@@ -23,7 +23,7 @@ export default async function AdminUsersPage({
   const search = params.search || '';
   const role = params.role || 'all';
 
-  // Построение запроса
+  // Построение запроса (оптимизировано)
   let query = supabase
     .from('users')
     .select('id, email, full_name, role, subscription_tier, is_active, created_at', { count: 'exact' });
