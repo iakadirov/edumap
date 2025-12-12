@@ -105,6 +105,19 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
         </div>
       )}
 
+      {/* Обложка школы */}
+      {school.cover_image_url && (
+        <div className="relative mb-8 h-64 w-full overflow-hidden rounded-lg">
+          <Image
+            src={school.cover_image_url}
+            alt={school.name}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
+
       {/* Заголовок школы */}
       <div className="mb-8">
         <div className="flex flex-col md:flex-row md:items-start gap-6">
@@ -129,10 +142,39 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                   </Badge>
                 )}
                 <h1 className="mb-2 text-4xl font-bold">{school.name}</h1>
-                {(school.district || school.city) && (
-                  <p className="text-lg text-muted-foreground">
-                    {[school.district, school.city].filter(Boolean).join(', ')}
+                {(school.name_uz || school.name_ru) && (
+                  <p className="mb-2 text-lg text-muted-foreground">
+                    {school.name_uz && school.name_ru
+                      ? `${school.name_uz} / ${school.name_ru}`
+                      : school.name_uz || school.name_ru}
                   </p>
+                )}
+                <div className="space-y-1">
+                  {[school.region, school.district, school.city, school.landmark]
+                    .filter(Boolean)
+                    .length > 0 && (
+                    <p className="text-muted-foreground">
+                      {[
+                        school.region,
+                        school.district,
+                        school.city,
+                        school.landmark && `(${school.landmark})`,
+                      ]
+                        .filter(Boolean)
+                        .join(', ')}
+                    </p>
+                  )}
+                  {school.founded_year && (
+                    <p className="text-sm text-muted-foreground">
+                      Основана в {school.founded_year} году
+                    </p>
+                  )}
+                  {school.motto && (
+                    <p className="text-sm italic text-muted-foreground">"{school.motto}"</p>
+                  )}
+                </div>
+                {school.short_description && (
+                  <p className="mt-3 text-muted-foreground">{school.short_description}</p>
                 )}
               </div>
 
@@ -162,6 +204,9 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                       {curriculumLabels[curr] || curr}
                     </Badge>
                   ))}
+                {details.has_international_accreditation && (
+                  <Badge variant="default">Международная аккредитация</Badge>
+                )}
               </div>
             )}
           </div>
@@ -173,6 +218,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
         <TabsList>
           <TabsTrigger value="about">О школе</TabsTrigger>
           <TabsTrigger value="details">Детали</TabsTrigger>
+          <TabsTrigger value="infrastructure">Инфраструктура</TabsTrigger>
           <TabsTrigger value="contacts">Контакты</TabsTrigger>
         </TabsList>
 
@@ -234,6 +280,23 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 </Card>
               )}
 
+              {/* Учителя */}
+              {details.total_teachers && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Учителей</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-semibold">{details.total_teachers}</p>
+                    {details.teachers_with_higher_ed_percent && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {details.teachers_with_higher_ed_percent}% с высшим образованием
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Стоимость */}
               {details.fee_monthly_min && details.fee_monthly_max && (
                 <Card>
@@ -246,11 +309,105 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                       {details.fee_monthly_max.toLocaleString('ru-RU')}
                     </p>
                     <p className="mt-1 text-sm text-muted-foreground">сум в месяц</p>
+                    {details.has_sibling_discount && details.sibling_discount_percent && (
+                      <p className="mt-2 text-sm text-green-600">
+                        Скидка для второго ребёнка: {details.sibling_discount_percent}%
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
               )}
             </div>
           )}
+
+          {/* Расписание */}
+          {details &&
+            (details.school_start_time ||
+              details.school_end_time ||
+              details.lesson_duration ||
+              details.lessons_per_day ||
+              details.has_saturday_classes ||
+              details.extended_day_until) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Расписание</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {(details.school_start_time || details.school_end_time) && (
+                    <div>
+                      <span className="font-medium">Время занятий: </span>
+                      <span className="text-muted-foreground">
+                        {details.school_start_time && details.school_end_time
+                          ? `${details.school_start_time} - ${details.school_end_time}`
+                          : details.school_start_time || details.school_end_time}
+                      </span>
+                    </div>
+                  )}
+                  {details.lesson_duration && (
+                    <div>
+                      <span className="font-medium">Длительность урока: </span>
+                      <span className="text-muted-foreground">{details.lesson_duration} минут</span>
+                    </div>
+                  )}
+                  {details.lessons_per_day && (
+                    <div>
+                      <span className="font-medium">Уроков в день: </span>
+                      <span className="text-muted-foreground">{details.lessons_per_day}</span>
+                    </div>
+                  )}
+                  {details.extended_day_until && details.has_extended_day && (
+                    <div>
+                      <span className="font-medium">Продленка до: </span>
+                      <span className="text-muted-foreground">{details.extended_day_until}</span>
+                    </div>
+                  )}
+                  {details.has_saturday_classes && (
+                    <div>
+                      <span className="font-medium">Занятия в субботу: </span>
+                      <span className="text-muted-foreground">Да</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+          {/* Педагогический состав */}
+          {details &&
+            (details.total_teachers ||
+              details.teachers_with_higher_ed_percent ||
+              details.avg_teacher_experience_years ||
+              details.has_foreign_teachers ||
+              details.native_english_speakers_count) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Педагогический состав</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {details.avg_teacher_experience_years && (
+                    <div>
+                      <span className="font-medium">Средний стаж работы: </span>
+                      <span className="text-muted-foreground">
+                        {details.avg_teacher_experience_years} лет
+                      </span>
+                    </div>
+                  )}
+                  {details.has_foreign_teachers && (
+                    <div>
+                      <span className="font-medium">Иностранные преподаватели: </span>
+                      <span className="text-muted-foreground">Да</span>
+                    </div>
+                  )}
+                  {details.native_english_speakers_count && (
+                    <div>
+                      <span className="font-medium">Носителей английского языка: </span>
+                      <span className="text-muted-foreground">
+                        {details.native_english_speakers_count}
+                      </span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
         </TabsContent>
 
         {/* Вкладка: Детали */}
@@ -309,27 +466,325 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-3">
-                    <div className="flex items-center gap-2">
-                      <span className={details.has_transport ? 'text-green-600' : 'text-gray-400'}>
-                        {details.has_transport ? '✓' : '✗'}
-                      </span>
-                      <span>Транспорт</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={details.has_transport ? 'text-green-600' : 'text-gray-400'}>
+                          {details.has_transport ? '✓' : '✗'}
+                        </span>
+                        <span>Транспорт</span>
+                      </div>
+                      {details.transport_fee_monthly && (
+                        <span className="text-sm text-muted-foreground">
+                          {details.transport_fee_monthly.toLocaleString('ru-RU')} сум/мес
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={details.has_meals ? 'text-green-600' : 'text-gray-400'}>
-                        {details.has_meals ? '✓' : '✗'}
-                      </span>
-                      <span>Питание</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={details.has_meals ? 'text-green-600' : 'text-gray-400'}>
+                          {details.has_meals ? '✓' : '✗'}
+                        </span>
+                        <span>Питание</span>
+                      </div>
+                      {details.meal_fee_monthly && (
+                        <span className="text-sm text-muted-foreground">
+                          {details.meal_fee_monthly.toLocaleString('ru-RU')} сум/мес
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={details.has_extended_day ? 'text-green-600' : 'text-gray-400'}>
-                        {details.has_extended_day ? '✓' : '✗'}
-                      </span>
-                      <span>Продленка</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={details.has_extended_day ? 'text-green-600' : 'text-gray-400'}>
+                          {details.has_extended_day ? '✓' : '✗'}
+                        </span>
+                        <span>Продленка</span>
+                      </div>
+                      {details.extended_day_until && (
+                        <span className="text-sm text-muted-foreground">до {details.extended_day_until}</span>
+                      )}
                     </div>
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Финансовые детали */}
+              {(details.entrance_fee ||
+                details.textbook_fee_yearly ||
+                details.uniform_fee) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Дополнительные расходы</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {details.entrance_fee && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Вступительный взнос:</span>
+                        <span className="font-medium">
+                          {details.entrance_fee.toLocaleString('ru-RU')} сум
+                        </span>
+                      </div>
+                    )}
+                    {details.textbook_fee_yearly && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Учебники (в год):</span>
+                        <span className="font-medium">
+                          {details.textbook_fee_yearly.toLocaleString('ru-RU')} сум
+                        </span>
+                      </div>
+                    )}
+                    {details.uniform_fee && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Форма:</span>
+                        <span className="font-medium">
+                          {details.uniform_fee.toLocaleString('ru-RU')} сум
+                        </span>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Дополнительное образование */}
+              {(details.extracurricular_activities?.length ||
+                details.clubs?.length ||
+                details.sports_sections?.length) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Дополнительное образование</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {details.clubs && details.clubs.length > 0 && (
+                      <div>
+                        <h4 className="mb-2 font-medium">Клубы</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {details.clubs.map((club: string, index: number) => (
+                            <Badge key={index} variant="outline">
+                              {club}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {details.sports_sections && details.sports_sections.length > 0 && (
+                      <div>
+                        <h4 className="mb-2 font-medium">Спортивные секции</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {details.sports_sections.map((sport: string, index: number) => (
+                            <Badge key={index} variant="outline">
+                              {sport}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {details.extracurricular_activities && details.extracurricular_activities.length > 0 && (
+                      <div>
+                        <h4 className="mb-2 font-medium">Кружки и секции</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {details.extracurricular_activities.map((activity: string, index: number) => (
+                            <Badge key={index} variant="outline">
+                              {activity}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Документы и лицензии */}
+              {(details.license_number ||
+                details.license_date ||
+                details.license_valid_until ||
+                details.license_authority ||
+                details.has_international_accreditation ||
+                details.accreditation_body) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Документы и аккредитация</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {details.license_number && (
+                      <div>
+                        <span className="font-medium">Лицензия №: </span>
+                        <span className="text-muted-foreground">{details.license_number}</span>
+                      </div>
+                    )}
+                    {details.license_authority && (
+                      <div>
+                        <span className="font-medium">Выдана: </span>
+                        <span className="text-muted-foreground">{details.license_authority}</span>
+                      </div>
+                    )}
+                    {details.license_date && (
+                      <div>
+                        <span className="font-medium">Дата выдачи: </span>
+                        <span className="text-muted-foreground">
+                          {new Date(details.license_date).toLocaleDateString('ru-RU')}
+                        </span>
+                      </div>
+                    )}
+                    {details.license_valid_until && (
+                      <div>
+                        <span className="font-medium">Действует до: </span>
+                        <span className="text-muted-foreground">
+                          {new Date(details.license_valid_until).toLocaleDateString('ru-RU')}
+                        </span>
+                      </div>
+                    )}
+                    {details.has_international_accreditation && details.accreditation_body && (
+                      <div>
+                        <span className="font-medium">Международная аккредитация: </span>
+                        <span className="text-muted-foreground">{details.accreditation_body}</span>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
+        </TabsContent>
+
+        {/* Вкладка: Инфраструктура */}
+        <TabsContent value="infrastructure" className="space-y-6">
+          {details && (
+            <>
+              {/* Общая информация */}
+              {(details.school_area_sqm || details.classrooms_count) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Общая информация</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid gap-4 md:grid-cols-2">
+                    {details.school_area_sqm && (
+                      <div>
+                        <span className="font-medium">Площадь школы: </span>
+                        <span className="text-muted-foreground">
+                          {details.school_area_sqm.toLocaleString('ru-RU')} м²
+                        </span>
+                      </div>
+                    )}
+                    {details.classrooms_count && (
+                      <div>
+                        <span className="font-medium">Количество кабинетов: </span>
+                        <span className="text-muted-foreground">{details.classrooms_count}</span>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Спортивная инфраструктура */}
+              {(details.has_gym ||
+                details.has_swimming_pool ||
+                details.has_football_field) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Спортивная инфраструктура</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3 md:grid-cols-3">
+                      {details.has_gym && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Спортзал</span>
+                        </div>
+                      )}
+                      {details.has_swimming_pool && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Бассейн</span>
+                        </div>
+                      )}
+                      {details.has_football_field && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Футбольное поле</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Учебные помещения */}
+              {(details.has_library ||
+                details.has_computer_lab ||
+                details.has_science_labs ||
+                details.has_medical_room ||
+                details.has_cafeteria) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Учебные помещения</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3 md:grid-cols-3">
+                      {details.has_library && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Библиотека</span>
+                        </div>
+                      )}
+                      {details.has_computer_lab && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Компьютерный класс</span>
+                        </div>
+                      )}
+                      {details.has_science_labs && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Лаборатории</span>
+                        </div>
+                      )}
+                      {details.has_medical_room && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Медпункт</span>
+                        </div>
+                      )}
+                      {details.has_cafeteria && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Столовая</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Безопасность */}
+              {(details.has_security_24_7 || details.has_cctv || details.has_psychologist) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Безопасность и поддержка</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3 md:grid-cols-3">
+                      {details.has_security_24_7 && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Охрана 24/7</span>
+                        </div>
+                      )}
+                      {details.has_cctv && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Видеонаблюдение</span>
+                        </div>
+                      )}
+                      {details.has_psychologist && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">✓</span>
+                          <span>Психолог</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </>
           )}
         </TabsContent>
@@ -393,27 +848,70 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 </div>
               )}
 
-              {school.phone && (
-                <div>
-                  <span className="font-medium">Телефон: </span>
-                  <a
-                    href={`tel:${school.phone}`}
-                    className="text-primary hover:underline"
-                  >
-                    {school.phone}
-                  </a>
+              {/* Телефоны */}
+              {(school.phone || school.phone_secondary || school.phone_admission) && (
+                <div className="space-y-2">
+                  {school.phone && (
+                    <div>
+                      <span className="font-medium">Телефон: </span>
+                      <a
+                        href={`tel:${school.phone}`}
+                        className="text-primary hover:underline"
+                      >
+                        {school.phone}
+                      </a>
+                    </div>
+                  )}
+                  {school.phone_secondary && (
+                    <div>
+                      <span className="font-medium">Дополнительный: </span>
+                      <a
+                        href={`tel:${school.phone_secondary}`}
+                        className="text-primary hover:underline"
+                      >
+                        {school.phone_secondary}
+                      </a>
+                    </div>
+                  )}
+                  {school.phone_admission && (
+                    <div>
+                      <span className="font-medium">Приёмная комиссия: </span>
+                      <a
+                        href={`tel:${school.phone_admission}`}
+                        className="text-primary hover:underline"
+                      >
+                        {school.phone_admission}
+                      </a>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {school.email && (
-                <div>
-                  <span className="font-medium">Email: </span>
-                  <a
-                    href={`mailto:${school.email}`}
-                    className="text-primary hover:underline"
-                  >
-                    {school.email}
-                  </a>
+              {/* Email */}
+              {(school.email || school.email_admission) && (
+                <div className="space-y-2">
+                  {school.email && (
+                    <div>
+                      <span className="font-medium">Email: </span>
+                      <a
+                        href={`mailto:${school.email}`}
+                        className="text-primary hover:underline"
+                      >
+                        {school.email}
+                      </a>
+                    </div>
+                  )}
+                  {school.email_admission && (
+                    <div>
+                      <span className="font-medium">Приёмная комиссия: </span>
+                      <a
+                        href={`mailto:${school.email_admission}`}
+                        className="text-primary hover:underline"
+                      >
+                        {school.email_admission}
+                      </a>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -431,12 +929,108 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 </div>
               )}
 
-              {/* Карта будет добавлена позже */}
-              {school.lat && school.lng && (
-                <div className="mt-4">
-                  <p className="mb-2 text-sm text-muted-foreground">
-                    Карта будет добавлена позже
-                  </p>
+              {school.telegram && (
+                <div>
+                  <span className="font-medium">Telegram: </span>
+                  <a
+                    href={`https://t.me/${school.telegram.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    {school.telegram}
+                  </a>
+                </div>
+              )}
+
+              {/* Социальные сети */}
+              {(school.instagram ||
+                school.telegram_channel ||
+                school.youtube ||
+                school.facebook) && (
+                <div className="space-y-2">
+                  <div className="font-medium">Социальные сети:</div>
+                  <div className="flex flex-wrap gap-3">
+                    {school.instagram && (
+                      <a
+                        href={`https://instagram.com/${school.instagram.replace('@', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Instagram
+                      </a>
+                    )}
+                    {school.telegram_channel && (
+                      <a
+                        href={`https://t.me/${school.telegram_channel.replace('@', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Telegram канал
+                      </a>
+                    )}
+                    {school.youtube && (
+                      <a
+                        href={`https://youtube.com/${school.youtube}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        YouTube
+                      </a>
+                    )}
+                    {school.facebook && (
+                      <a
+                        href={`https://facebook.com/${school.facebook}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Facebook
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Карты */}
+              {(school.google_maps_url || school.yandex_maps_url || (school.lat && school.lng)) && (
+                <div className="space-y-2">
+                  <div className="font-medium">Карта:</div>
+                  <div className="flex flex-wrap gap-3">
+                    {school.google_maps_url && (
+                      <a
+                        href={school.google_maps_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Google Maps
+                      </a>
+                    )}
+                    {school.yandex_maps_url && (
+                      <a
+                        href={school.yandex_maps_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Яндекс Карты
+                      </a>
+                    )}
+                    {school.lat && school.lng && !school.google_maps_url && !school.yandex_maps_url && (
+                      <a
+                        href={`https://www.google.com/maps?q=${school.lat},${school.lng}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Открыть на карте
+                      </a>
+                    )}
+                  </div>
                 </div>
               )}
             </CardContent>
