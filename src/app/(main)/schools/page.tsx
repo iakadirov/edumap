@@ -117,7 +117,11 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
       <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
         {/* Панель фильтров */}
         <aside className="lg:sticky lg:top-4 lg:h-fit">
-          <SchoolFilters districts={districts} cities={cities} />
+          <SchoolFilters 
+            districts={districts} 
+            cities={cities}
+            initialFilters={searchParams}
+          />
         </aside>
 
         {/* Список школ */}

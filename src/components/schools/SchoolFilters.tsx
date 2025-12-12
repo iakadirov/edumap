@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -17,6 +17,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface SchoolFiltersProps {
   districts: string[];
   cities: string[];
+  initialFilters?: {
+    district?: string;
+    city?: string;
+    school_type?: string;
+    price_min?: string;
+    price_max?: string;
+    language?: string;
+    curriculum?: string;
+  };
   onFiltersChange?: (filters: FilterValues) => void;
 }
 
@@ -37,20 +46,19 @@ export interface FilterValues {
  * - Использует URL search params для состояния
  * - Кнопка "Сбросить фильтры"
  */
-export function SchoolFilters({ districts, cities, onFiltersChange }: SchoolFiltersProps) {
+export function SchoolFilters({ districts, cities, initialFilters, onFiltersChange }: SchoolFiltersProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  // Инициализируем фильтры из URL
+  // Инициализируем фильтры из пропсов (передаются из server component)
   const [filters, setFilters] = useState<FilterValues>({
-    district: searchParams.get('district') || undefined,
-    city: searchParams.get('city') || undefined,
-    school_type: searchParams.get('school_type') || undefined,
-    price_range: searchParams.get('price_min') && searchParams.get('price_max')
-      ? [Number(searchParams.get('price_min')), Number(searchParams.get('price_max'))]
+    district: initialFilters?.district || undefined,
+    city: initialFilters?.city || undefined,
+    school_type: initialFilters?.school_type || undefined,
+    price_range: initialFilters?.price_min && initialFilters?.price_max
+      ? [Number(initialFilters.price_min), Number(initialFilters.price_max)]
       : [0, 50000000], // Диапазон по умолчанию: 0 - 50 млн
-    language: searchParams.get('language') || undefined,
-    curriculum: searchParams.get('curriculum')?.split(',') || [],
+    language: initialFilters?.language || undefined,
+    curriculum: initialFilters?.curriculum?.split(',') || [],
   });
 
   // Типы школ
