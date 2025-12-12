@@ -42,8 +42,41 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
   let error: Error | null = null;
 
   try {
-    // Получаем списки для фильтров
-    [districts, cities] = await Promise.all([getDistricts(), getCities()]);
+    // Получаем списки для фильтров и школы параллельно для ускорения
+    const [districtsData, citiesData, schoolsData] = await Promise.all([
+      getDistricts(),
+      getCities(),
+      // Предзагружаем школы параллельно с фильтрами
+      (async () => {
+        const hasFilters = 
+          params.district ||
+          params.city ||
+          params.school_type ||
+          params.price_min ||
+          params.price_max ||
+          params.language ||
+          params.curriculum;
+
+        if (hasFilters) {
+          const filters = {
+            district: params.district,
+            city: params.city,
+            school_type: params.school_type,
+            price_min: params.price_min ? Number(params.price_min) : undefined,
+            price_max: params.price_max ? Number(params.price_max) : undefined,
+            language: params.language,
+            curriculum: params.curriculum ? params.curriculum.split(',') : undefined,
+          };
+          return getSchoolsWithFilters(filters);
+        } else {
+          return getActiveSchools();
+        }
+      })(),
+    ]);
+
+    districts = districtsData;
+    cities = citiesData;
+    schools = schoolsData;
 
     // Проверяем, есть ли фильтры в URL
     const hasFilters = 
@@ -55,22 +88,7 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
       params.language ||
       params.curriculum;
 
-    if (hasFilters) {
-      // Используем фильтры
-      const filters = {
-        district: params.district,
-        city: params.city,
-        school_type: params.school_type,
-        price_min: params.price_min ? Number(params.price_min) : undefined,
-        price_max: params.price_max ? Number(params.price_max) : undefined,
-        language: params.language,
-        curriculum: params.curriculum ? params.curriculum.split(',') : undefined,
-      };
-      schools = await getSchoolsWithFilters(filters);
-    } else {
-      // Получаем все школы
-      schools = await getActiveSchools();
-    }
+    // Школы уже загружены в Promise.all выше
   } catch (e) {
     error = e instanceof Error ? e : new Error('Ошибка загрузки школ');
     schools = null;

@@ -10,20 +10,48 @@ type SchoolWithDetails = Organization & {
 };
 
 /**
- * Получить все активные школы
+ * Получить все активные школы (оптимизировано - только нужные поля для списка)
  */
 export async function getActiveSchools() {
   const supabase = await createClient();
   
+  // Для списка школ не нужны все поля - оптимизируем запрос
   const { data, error } = await supabase
     .from('organizations')
     .select(`
-      *,
-      school_details (*)
+      id,
+      name,
+      name_uz,
+      name_ru,
+      slug,
+      description,
+      short_description,
+      status,
+      overall_rating,
+      city,
+      district,
+      address,
+      phone,
+      email,
+      website,
+      logo_url,
+      org_type,
+      school_details (
+        id,
+        school_type,
+        grade_from,
+        grade_to,
+        accepts_preparatory,
+        primary_language,
+        fee_monthly_min,
+        fee_monthly_max,
+        curriculum
+      )
     `)
     .eq('org_type', 'school')
     .eq('status', 'active')
-    .order('overall_rating', { ascending: false, nullsFirst: false });
+    .order('overall_rating', { ascending: false, nullsFirst: false })
+    .limit(100); // Ограничиваем для производительности
 
   if (error) {
     throw error;
