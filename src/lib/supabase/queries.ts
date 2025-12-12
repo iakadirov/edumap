@@ -169,14 +169,42 @@ export async function getSchoolsWithFilters(filters: {
 }) {
   const supabase = await createClient();
   
+  // Оптимизация: выбираем только нужные поля для списка
   let query = supabase
     .from('organizations')
     .select(`
-      *,
-      school_details (*)
+      id,
+      name,
+      name_uz,
+      name_ru,
+      slug,
+      description,
+      short_description,
+      status,
+      overall_rating,
+      city,
+      district,
+      address,
+      phone,
+      email,
+      website,
+      logo_url,
+      org_type,
+      school_details (
+        id,
+        school_type,
+        grade_from,
+        grade_to,
+        accepts_preparatory,
+        primary_language,
+        fee_monthly_min,
+        fee_monthly_max,
+        curriculum
+      )
     `)
     .eq('org_type', 'school')
-    .eq('status', 'active');
+    .eq('status', 'active')
+    .limit(100); // Ограничиваем для производительности
 
   if (filters.district) {
     query = query.eq('district', filters.district);
