@@ -6,7 +6,7 @@ import { SchoolFilters } from '@/components/schools/SchoolFilters';
 import Link from 'next/link';
 
 interface SchoolsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     district?: string;
     city?: string;
     school_type?: string;
@@ -14,7 +14,7 @@ interface SchoolsPageProps {
     price_max?: string;
     language?: string;
     curriculum?: string;
-  };
+  }>;
 }
 
 /**
@@ -26,6 +26,8 @@ interface SchoolsPageProps {
  * - Обработка состояний: loading, error, empty
  */
 export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
+  // В Next.js 16 searchParams может быть Promise
+  const params = await searchParams;
   let schools;
   let districts: string[] = [];
   let cities: string[] = [];
@@ -37,24 +39,24 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
 
     // Проверяем, есть ли фильтры в URL
     const hasFilters = 
-      searchParams.district ||
-      searchParams.city ||
-      searchParams.school_type ||
-      searchParams.price_min ||
-      searchParams.price_max ||
-      searchParams.language ||
-      searchParams.curriculum;
+      params.district ||
+      params.city ||
+      params.school_type ||
+      params.price_min ||
+      params.price_max ||
+      params.language ||
+      params.curriculum;
 
     if (hasFilters) {
       // Используем фильтры
       const filters = {
-        district: searchParams.district,
-        city: searchParams.city,
-        school_type: searchParams.school_type,
-        price_min: searchParams.price_min ? Number(searchParams.price_min) : undefined,
-        price_max: searchParams.price_max ? Number(searchParams.price_max) : undefined,
-        language: searchParams.language,
-        curriculum: searchParams.curriculum ? searchParams.curriculum.split(',') : undefined,
+        district: params.district,
+        city: params.city,
+        school_type: params.school_type,
+        price_min: params.price_min ? Number(params.price_min) : undefined,
+        price_max: params.price_max ? Number(params.price_max) : undefined,
+        language: params.language,
+        curriculum: params.curriculum ? params.curriculum.split(',') : undefined,
       };
       schools = await getSchoolsWithFilters(filters);
     } else {
@@ -120,7 +122,7 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
           <SchoolFilters 
             districts={districts} 
             cities={cities}
-            initialFilters={searchParams}
+            initialFilters={params}
           />
         </aside>
 

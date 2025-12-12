@@ -50,15 +50,30 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
   const router = useRouter();
 
   // Инициализируем фильтры из пропсов (передаются из server component)
-  const [filters, setFilters] = useState<FilterValues>({
-    district: initialFilters?.district || undefined,
-    city: initialFilters?.city || undefined,
-    school_type: initialFilters?.school_type || undefined,
-    price_range: initialFilters?.price_min && initialFilters?.price_max
-      ? [Number(initialFilters.price_min), Number(initialFilters.price_max)]
-      : [0, 50000000], // Диапазон по умолчанию: 0 - 50 млн
-    language: initialFilters?.language || undefined,
-    curriculum: initialFilters?.curriculum?.split(',') || [],
+  const [filters, setFilters] = useState<FilterValues>(() => {
+    try {
+      const init = initialFilters || {};
+      return {
+        district: init.district || undefined,
+        city: init.city || undefined,
+        school_type: init.school_type || undefined,
+        price_range: init.price_min && init.price_max
+          ? [Number(init.price_min), Number(init.price_max)]
+          : [0, 50000000], // Диапазон по умолчанию: 0 - 50 млн
+        language: init.language || undefined,
+        curriculum: init.curriculum ? init.curriculum.split(',').filter(Boolean) : [],
+      };
+    } catch (error) {
+      // Fallback на значения по умолчанию при ошибке
+      return {
+        district: undefined,
+        city: undefined,
+        school_type: undefined,
+        price_range: [0, 50000000],
+        language: undefined,
+        curriculum: [],
+      };
+    }
   });
 
   // Типы школ
@@ -103,7 +118,8 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
       params.set('curriculum', updated.curriculum.join(','));
     }
 
-    router.push(`/schools?${params.toString()}`, { scroll: false });
+    const newUrl = params.toString() ? `/schools?${params.toString()}` : '/schools';
+    router.push(newUrl, { scroll: false });
     
     // Вызываем callback
     onFiltersChange?.(updated);
@@ -119,8 +135,12 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
       language: undefined,
       curriculum: [],
     });
-    router.push('/schools', { scroll: false });
-    onFiltersChange?.({});
+    try {
+      router.push('/schools');
+      onFiltersChange?.({});
+    } catch (error) {
+      console.error('Ошибка сброса фильтров:', error);
+    }
   };
 
   // Проверяем, есть ли активные фильтры
