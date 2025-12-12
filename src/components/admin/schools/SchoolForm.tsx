@@ -148,7 +148,8 @@ export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Xatolik yuz berdi');
+        console.error('API Error:', data);
+        setError(data.error || 'Xatolik yuz berdi. Konsolni tekshiring.');
         setLoading(false);
         return;
       }
