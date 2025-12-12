@@ -822,11 +822,11 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                             )}
                             {branchDetails?.fee_monthly_min && (
                               <p className="mt-2 text-sm">
-                                От {branchDetails.fee_monthly_min.toLocaleString('ru-RU')} soʻm/oy
+                                {branchDetails.fee_monthly_min.toLocaleString('ru-RU')} soʻm/oy dan
                               </p>
                             )}
                           </div>
-                          <Badge variant="outline">Филиал</Badge>
+                          <Badge variant="outline">Filial</Badge>
                         </div>
                       </Link>
                     );
