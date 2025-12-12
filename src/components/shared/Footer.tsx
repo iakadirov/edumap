@@ -14,7 +14,9 @@ export function Footer() {
 
   return (
     <footer className="border-t bg-background">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container-wrapper">
+        <div className="container-content">
+          <div className="container-inner py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* О проекте */}
           <div className="space-y-4">
@@ -94,6 +96,8 @@ export function Footer() {
           <p>
             © {currentYear} EduMap.uz. Barcha huquqlar himoyalangan.
           </p>
+        </div>
+          </div>
         </div>
       </div>
     </footer>

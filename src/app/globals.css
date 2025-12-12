@@ -45,25 +45,47 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  
+  /* Контейнерная система */
+  --container-wrapper: 1440px;
+  --container-wrapper-padding: 24px;
+  --container-content: 1392px; /* 1440 - 24*2 */
+  --container-content-padding: 24px;
+  --container-inner: 1344px; /* 1392 - 24*2 (12 колонок) */
+  
+  /* Цветовая схема: синий-сероватые фоны, белые карточки */
+  --background: oklch(0.98 0.005 240); /* Светло-голубоватый фон */
+  --foreground: oklch(0.15 0.01 240);
+  --card: oklch(1 0 0); /* Белые карточки */
+  --card-foreground: oklch(0.15 0.01 240);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  /* Primary: Образовательный синий (#2563eb) */
+  --popover-foreground: oklch(0.15 0.01 240);
+  
+  /* Primary: Образовательный синий */
   --primary: oklch(0.488 0.243 264.376);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0.01 264);
+  
+  /* Secondary: Светло-голубоватый */
+  --secondary: oklch(0.96 0.01 240);
+  --secondary-foreground: oklch(0.25 0.01 240);
+  
+  /* Muted: Голубовато-серый */
+  --muted: oklch(0.95 0.01 240);
+  --muted-foreground: oklch(0.5 0.01 240);
+  
+  --accent: oklch(0.95 0.015 240);
   --accent-foreground: oklch(0.488 0.243 264.376);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --border: oklch(0.9 0.01 240); /* Голубоватая граница */
+  --input: oklch(0.95 0.01 240);
   --ring: oklch(0.488 0.243 264.376);
+  
+  /* Тени для bento карточек */
+  --shadow-0: 0 0 0 0 rgba(0, 0, 0, 0);
+  --shadow-1: 0 1px 2px 0 rgba(0, 0, 0, 0.01);
+  --shadow-2: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  --shadow-5: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -122,6 +144,49 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
+  /* Контейнерная система */
+  .container-wrapper {
+    width: 100%;
+    max-width: var(--container-wrapper);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--container-wrapper-padding);
+    padding-right: var(--container-wrapper-padding);
+  }
+  
+  .container-content {
+    width: 100%;
+    max-width: var(--container-content);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--container-content-padding);
+    padding-right: var(--container-content-padding);
+  }
+  
+  .container-inner {
+    width: 100%;
+    max-width: var(--container-inner);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Bento card стиль - тени */
+  .bento-shadow-0 {
+    box-shadow: var(--shadow-0);
+  }
+  
+  .bento-shadow-1 {
+    box-shadow: var(--shadow-1);
+  }
+  
+  .bento-shadow-2 {
+    box-shadow: var(--shadow-2);
+  }
+  
+  .bento-shadow-5 {
+    box-shadow: var(--shadow-5);
+  }
+  
   /* Типографика */
   h1 {
     @apply scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl;
@@ -151,7 +216,7 @@
     @apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold;
   }
   
-  /* Улучшенная типографика для русского языка */
+  /* Улучшенная типографика */
   .text-balance {
     text-wrap: balance;
   }

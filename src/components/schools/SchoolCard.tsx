@@ -46,7 +46,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
   };
 
   return (
-    <Card className="flex h-full flex-col transition-shadow hover:shadow-lg">
+    <Card className="flex h-full flex-col">
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">

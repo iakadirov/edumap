@@ -82,9 +82,11 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Кнопка назад */}
-      <div className="mb-6">
+    <div className="container-wrapper py-8">
+      <div className="container-content">
+        <div className="container-inner">
+          {/* Кнопка назад */}
+          <div className="mb-6">
         <Button variant="ghost" asChild>
           <Link href="/schools">← Katalogga qaytish</Link>
         </Button>
@@ -1037,6 +1039,8 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
           </Card>
         </TabsContent>
       </Tabs>
+        </div>
+      </div>
     </div>
   );
 }

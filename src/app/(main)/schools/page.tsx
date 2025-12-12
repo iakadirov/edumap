@@ -79,8 +79,10 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
   // Состояние ошибки
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-16">
-        <Card>
+      <div className="container-wrapper py-16">
+        <div className="container-content">
+          <div className="container-inner">
+            <Card>
           <CardHeader>
             <CardTitle>Yuklashda xatolik</CardTitle>
           </CardHeader>
@@ -93,6 +95,8 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
             </p>
           </CardContent>
         </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -100,8 +104,10 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
   // Пустое состояние
   if (!schools || schools.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mx-auto max-w-2xl text-center">
+      <div className="container-wrapper py-16">
+        <div className="container-content">
+          <div className="container-inner">
+            <div className="mx-auto max-w-2xl text-center">
           <h1 className="mb-4 text-4xl font-bold">Maktablar katalogi</h1>
           <p className="mb-8 text-lg text-muted-foreground">
             Maktablar hali qoʻshilmagan. Keyinroq qaytib keling.
@@ -110,35 +116,41 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
             <Link href="/">Bosh sahifaga</Link>
           </Button>
         </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Заголовок */}
-      <div className="mb-8">
-        <h1 className="mb-2 text-4xl font-bold">Maktablar katalogi</h1>
-        <p className="text-lg text-muted-foreground">
-          Topilgan maktablar: <span className="font-semibold text-foreground">{schools.length}</span>
-        </p>
-      </div>
+    <div className="container-wrapper py-8">
+      <div className="container-content">
+        <div className="container-inner">
+          {/* Заголовок */}
+          <div className="mb-8">
+            <h1 className="mb-2 text-4xl font-bold">Maktablar katalogi</h1>
+            <p className="text-lg text-muted-foreground">
+              Topilgan maktablar: <span className="font-semibold text-foreground">{schools.length}</span>
+            </p>
+          </div>
 
-      <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
-        {/* Панель фильтров */}
-        <aside className="lg:sticky lg:top-4 lg:h-fit">
-          <SchoolFilters 
-            districts={districts} 
-            cities={cities}
-            initialFilters={params}
-          />
-        </aside>
+          <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
+            {/* Панель фильтров */}
+            <aside className="lg:sticky lg:top-4 lg:h-fit">
+              <SchoolFilters 
+                districts={districts} 
+                cities={cities}
+                initialFilters={params}
+              />
+            </aside>
 
-        {/* Список школ */}
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {schools.map((school: any) => (
-            <SchoolCard key={school.id} school={school} />
-          ))}
+            {/* Список школ */}
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {schools.map((school: any) => (
+                <SchoolCard key={school.id} school={school} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
