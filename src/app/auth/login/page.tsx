@@ -34,38 +34,46 @@ export default function LoginPage() {
         // Проверяем, есть ли пользователь в таблице users
         const { data: userData, error: userError } = await supabase
           .from('users')
-          .select('role, is_active, email')
+          .select('id, role, is_active, email, auth_user_id')
           .eq('auth_user_id', data.user.id)
           .single();
 
         // Если пользователь не найден в таблице users, создаем автоматически
-        if (userError && userError.code === 'PGRST116') {
-          // Пользователь не найден - создаем с ролью user по умолчанию
-          const { error: insertError } = await supabase
-            .from('users')
-            .insert({
-              auth_user_id: data.user.id,
-              email: data.user.email || '',
-              role: 'user',
-              subscription_tier: 'free',
-              is_active: true,
-              email_verified: data.user.email_confirmed_at ? true : false,
-            });
+        if (userError) {
+          // Проверяем код ошибки (PGRST116 = no rows returned)
+          if (userError.code === 'PGRST116' || userError.message?.includes('No rows')) {
+            // Пользователь не найден - создаем с ролью user по умолчанию
+            const { error: insertError } = await supabase
+              .from('users')
+              .insert({
+                auth_user_id: data.user.id,
+                email: data.user.email || '',
+                role: 'user',
+                subscription_tier: 'free',
+                is_active: true,
+                email_verified: data.user.email_confirmed_at ? true : false,
+              });
 
-          if (insertError) {
-            setError('Foydalanuvchi yaratishda xatolik: ' + insertError.message);
+            if (insertError) {
+              setError('Foydalanuvchi yaratishda xatolik: ' + insertError.message);
+              await supabase.auth.signOut();
+              return;
+            }
+
+            // После создания редиректим на главную (обычный пользователь)
+            router.push('/');
+            router.refresh();
+            return;
+          } else {
+            // Другая ошибка
+            setError('Foydalanuvchi topilmadi: ' + (userError.message || 'Nomaʼlum xatolik'));
             await supabase.auth.signOut();
             return;
           }
-
-          // После создания редиректим на главную (обычный пользователь)
-          router.push('/');
-          router.refresh();
-          return;
         }
 
-        if (userError || !userData) {
-          setError('Foydalanuvchi topilmadi: ' + (userError?.message || 'Nomaʼlum xatolik'));
+        if (!userData) {
+          setError('Foydalanuvchi topilmadi');
           await supabase.auth.signOut();
           return;
         }
