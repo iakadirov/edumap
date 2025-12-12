@@ -196,7 +196,7 @@ export function SchoolsTable({
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/admin/schools/${school.id}`}>Tahrirlash</Link>
+                        <Link href={`/admin/schools/${school.id}`} prefetch={false}>Tahrirlash</Link>
                       </Button>
                       <Button
                         variant="ghost"
