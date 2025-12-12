@@ -169,14 +169,14 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
         <div className="space-y-2">
           <label className="text-sm font-medium">Район</label>
           <Select
-            value={filters.district || ''}
-            onValueChange={(value) => updateFilters({ district: value || undefined })}
+            value={filters.district ? filters.district : 'all'}
+            onValueChange={(value) => updateFilters({ district: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Все районы" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Все районы</SelectItem>
+              <SelectItem value="all">Все районы</SelectItem>
               {districts.map((district) => (
                 <SelectItem key={district} value={district}>
                   {district}
@@ -190,14 +190,14 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
         <div className="space-y-2">
           <label className="text-sm font-medium">Город</label>
           <Select
-            value={filters.city || ''}
-            onValueChange={(value) => updateFilters({ city: value || undefined })}
+            value={filters.city ? filters.city : 'all'}
+            onValueChange={(value) => updateFilters({ city: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Все города" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Все города</SelectItem>
+              <SelectItem value="all">Все города</SelectItem>
               {cities.map((city) => (
                 <SelectItem key={city} value={city}>
                   {city}
@@ -211,14 +211,14 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
         <div className="space-y-2">
           <label className="text-sm font-medium">Тип школы</label>
           <Select
-            value={filters.school_type || ''}
-            onValueChange={(value) => updateFilters({ school_type: value || undefined })}
+            value={filters.school_type ? filters.school_type : 'all'}
+            onValueChange={(value) => updateFilters({ school_type: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Все типы" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Все типы</SelectItem>
+              <SelectItem value="all">Все типы</SelectItem>
               {schoolTypes.map((type) => (
                 <SelectItem key={type.value} value={type.value}>
                   {type.label}
@@ -251,14 +251,14 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
         <div className="space-y-2">
           <label className="text-sm font-medium">Язык обучения</label>
           <Select
-            value={filters.language || ''}
-            onValueChange={(value) => updateFilters({ language: value || undefined })}
+            value={filters.language ? filters.language : 'all'}
+            onValueChange={(value) => updateFilters({ language: value === 'all' ? undefined : value })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Все языки" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Все языки</SelectItem>
+              <SelectItem value="all">Все языки</SelectItem>
               {languages.map((lang) => (
                 <SelectItem key={lang.value} value={lang.value}>
                   {lang.label}
