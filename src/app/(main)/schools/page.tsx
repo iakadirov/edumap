@@ -82,11 +82,11 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
       <div className="container mx-auto px-4 py-16">
         <Card>
           <CardHeader>
-            <CardTitle>Ошибка загрузки</CardTitle>
+            <CardTitle>Yuklashda xatolik</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Не удалось загрузить список школ. Попробуйте обновить страницу.
+              Maktablar roʻyxatini yuklash muvaffaqiyatsiz. Sahifani yangilab koʻring.
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               {error.message}
@@ -102,12 +102,12 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="mx-auto max-w-2xl text-center">
-          <h1 className="mb-4 text-4xl font-bold">Каталог школ</h1>
+          <h1 className="mb-4 text-4xl font-bold">Maktablar katalogi</h1>
           <p className="mb-8 text-lg text-muted-foreground">
-            Школы пока не добавлены. Вернитесь позже.
+            Maktablar hali qoʻshilmagan. Keyinroq qaytib keling.
           </p>
           <Button asChild>
-            <Link href="/">На главную</Link>
+            <Link href="/">Bosh sahifaga</Link>
           </Button>
         </div>
       </div>
@@ -118,9 +118,9 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
     <div className="container mx-auto px-4 py-8">
       {/* Заголовок */}
       <div className="mb-8">
-        <h1 className="mb-2 text-4xl font-bold">Каталог школ</h1>
+        <h1 className="mb-2 text-4xl font-bold">Maktablar katalogi</h1>
         <p className="text-lg text-muted-foreground">
-          Найдено школ: <span className="font-semibold text-foreground">{schools.length}</span>
+          Topilgan maktablar: <span className="font-semibold text-foreground">{schools.length}</span>
         </p>
       </div>
 

@@ -1,20 +1,17 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Onest } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const onest = Onest({
+  variable: "--font-onest",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "EduMap.uz — Единая образовательная платформа Узбекистана",
-  description: "Помогаем родителям выбрать лучшее образование для детей через прозрачные данные, честные отзывы и AI-рекомендации",
+  title: "EduMap.uz — Oʻzbekistonning yagona taʼlim platformasi",
+  description: "Ota-onalarga bolalari uchun eng yaxshi taʼlimni tanlashda yordam beramiz — shaffof maʼlumotlar, halol sharhlar va AI tavsiyalari",
 };
 
 import { Layout } from '@/components/shared/Layout';
@@ -25,9 +22,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" suppressHydrationWarning>
+    <html lang="uz" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${onest.variable} font-sans antialiased`}
       >
         <Layout>{children}</Layout>
       </body>

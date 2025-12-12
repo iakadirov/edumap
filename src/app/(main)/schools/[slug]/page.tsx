@@ -51,19 +51,19 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
 
   // Форматирование данных
   const schoolTypeLabels: Record<string, string> = {
-    private: 'Частная',
-    state: 'Государственная',
-    international: 'Международная',
+    private: 'Xususiy',
+    state: 'Davlat',
+    international: 'Xalqaro',
   };
 
   const languageLabels: Record<string, string> = {
-    russian: 'Русский',
-    uzbek: 'Узбекский',
-    english: 'Английский',
+    russian: 'Rus',
+    uzbek: 'Oʻzbek',
+    english: 'Ingliz',
   };
 
   const curriculumLabels: Record<string, string> = {
-    national: 'Национальная',
+    national: 'Milliy',
     cambridge: 'Cambridge',
     ib: 'IB (International Baccalaureate)',
   };

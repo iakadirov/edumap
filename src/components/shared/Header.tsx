@@ -25,33 +25,33 @@ export function Header() {
             href="/"
             className="text-sm font-medium transition-colors hover:text-primary"
           >
-            Главная
+            Bosh sahifa
           </Link>
           <Link
             href="/schools"
             className="text-sm font-medium transition-colors hover:text-primary"
           >
-            Школы
+            Maktablar
           </Link>
           <Link
             href="/about"
             className="text-sm font-medium transition-colors hover:text-primary"
           >
-            О проекте
+            Loyiha haqida
           </Link>
         </nav>
 
         {/* CTA кнопка */}
         <div className="flex items-center space-x-4">
           <Button asChild size="sm" className="hidden sm:inline-flex">
-            <Link href="/schools">Найти школу</Link>
+            <Link href="/schools">Maktab topish</Link>
           </Button>
           {/* Мобильное меню будет добавлено позже */}
           <Button
             variant="ghost"
             size="icon"
             className="md:hidden"
-            aria-label="Открыть меню"
+            aria-label="Menuni ochish"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

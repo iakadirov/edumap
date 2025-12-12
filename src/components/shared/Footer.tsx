@@ -20,21 +20,21 @@ export function Footer() {
           <div className="space-y-4">
             <h3 className="font-semibold">EduMap.uz</h3>
             <p className="text-sm text-muted-foreground">
-              Единая образовательная платформа Узбекистана. Помогаем родителям
-              выбрать лучшее образование для детей.
+              Oʻzbekistonning yagona taʼlim platformasi. Ota-onalarga bolalari uchun
+              eng yaxshi taʼlimni tanlashda yordam beramiz.
             </p>
           </div>
 
           {/* Навигация */}
           <div className="space-y-4">
-            <h3 className="font-semibold">Навигация</h3>
+            <h3 className="font-semibold">Navigatsiya</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/"
                   className="text-muted-foreground transition-colors hover:text-primary"
                 >
-                  Главная
+                  Bosh sahifa
                 </Link>
               </li>
               <li>
@@ -42,7 +42,7 @@ export function Footer() {
                   href="/schools"
                   className="text-muted-foreground transition-colors hover:text-primary"
                 >
-                  Каталог школ
+                  Maktablar katalogi
                 </Link>
               </li>
               <li>
@@ -50,7 +50,7 @@ export function Footer() {
                   href="/about"
                   className="text-muted-foreground transition-colors hover:text-primary"
                 >
-                  О проекте
+                  Loyiha haqida
                 </Link>
               </li>
             </ul>
@@ -58,14 +58,14 @@ export function Footer() {
 
           {/* Информация */}
           <div className="space-y-4">
-            <h3 className="font-semibold">Информация</h3>
+            <h3 className="font-semibold">Maʼlumot</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/contacts"
                   className="text-muted-foreground transition-colors hover:text-primary"
                 >
-                  Контакты
+                  Aloqa
                 </Link>
               </li>
               <li>
@@ -73,7 +73,7 @@ export function Footer() {
                   href="/privacy"
                   className="text-muted-foreground transition-colors hover:text-primary"
                 >
-                  Политика конфиденциальности
+                  Maxfiylik siyosati
                 </Link>
               </li>
             </ul>
@@ -81,10 +81,10 @@ export function Footer() {
 
           {/* Контакты */}
           <div className="space-y-4">
-            <h3 className="font-semibold">Контакты</h3>
+            <h3 className="font-semibold">Aloqa</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>Email: info@edumap.uz</li>
-              <li>Узбекистан, Ташкент</li>
+              <li>Oʻzbekiston, Toshkent</li>
             </ul>
           </div>
         </div>
@@ -92,7 +92,7 @@ export function Footer() {
         {/* Copyright */}
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
           <p>
-            © {currentYear} EduMap.uz. Все права защищены.
+            © {currentYear} EduMap.uz. Barcha huquqlar himoyalangan.
           </p>
         </div>
       </div>

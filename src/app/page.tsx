@@ -11,22 +11,21 @@ export default function Home() {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl md:text-7xl">
-                Найдите лучшую школу
-                <span className="text-primary"> для вашего ребёнка</span>
+                Farzandingiz uchun
+                <span className="text-primary"> eng yaxshi maktabni toping</span>
               </h1>
               <p className="mx-auto max-w-2xl text-lg text-muted-foreground md:text-xl">
-                Единая образовательная платформа Узбекистана. Помогаем родителям
-                выбрать лучшее образование через прозрачные данные, честные отзывы и
-                AI-рекомендации.
+                Oʻzbekistonning yagona taʼlim platformasi. Ota-onalarga shaffof maʼlumotlar,
+                halol sharhlar va AI tavsiyalari orqali eng yaxshi taʼlimni tanlashda yordam beramiz.
               </p>
             </div>
 
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button asChild size="lg" className="w-full sm:w-auto">
-                <Link href="/schools">Найти школу</Link>
+                <Link href="/schools">Maktab topish</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-                <Link href="/schools">Каталог школ</Link>
+                <Link href="/schools">Maktablar katalogi</Link>
               </Button>
             </div>
           </div>
@@ -38,38 +37,38 @@ export default function Home() {
         <div className="mx-auto max-w-5xl">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Почему EduMap.uz?
+              Nima uchun EduMap.uz?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Всё, что нужно для правильного выбора школы
+              Maktabni toʻgʻri tanlash uchun barcha kerakli narsalar
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="p-6">
               <div className="mb-4 text-4xl">📊</div>
-              <h3 className="mb-2 text-xl font-semibold">Прозрачные данные</h3>
+              <h3 className="mb-2 text-xl font-semibold">Shaffof maʼlumotlar</h3>
               <p className="text-muted-foreground">
-                Объективные рейтинги, статистика и результаты школ на основе
-                реальных метрик
+                Obʼektiv reytinglar, statistika va maktablar natijalari
+                haqiqiy metrikalar asosida
               </p>
             </Card>
 
             <Card className="p-6">
               <div className="mb-4 text-4xl">💬</div>
-              <h3 className="mb-2 text-xl font-semibold">Честные отзывы</h3>
+              <h3 className="mb-2 text-xl font-semibold">Halol sharhlar</h3>
               <p className="text-muted-foreground">
-                Отзывы реальных родителей с верификацией. Помогаем принять
-                взвешенное решение
+                Tasdiqlangan haqiqiy ota-onalar sharhlari. Xulosa chiqarishga
+                yordam beramiz
               </p>
             </Card>
 
             <Card className="p-6">
               <div className="mb-4 text-4xl">🤖</div>
-              <h3 className="mb-2 text-xl font-semibold">AI-подбор</h3>
+              <h3 className="mb-2 text-xl font-semibold">AI tavsiyalar</h3>
               <p className="text-muted-foreground">
-                Умные рекомендации на основе ваших требований и предпочтений.
-                Найдём идеальную школу
+                Talab va afzalliklaringizga asoslangan aqlli tavsiyalar.
+                Ideal maktabni topamiz
               </p>
             </Card>
           </div>
