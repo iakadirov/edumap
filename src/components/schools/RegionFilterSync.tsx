@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useRegion } from '@/contexts/RegionContext';
 
 /**
@@ -13,9 +13,14 @@ import { useRegion } from '@/contexts/RegionContext';
 export function RegionFilterSync() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const { selectedRegion } = useRegion();
 
   useEffect(() => {
+    // Обновляем URL только если мы на странице /schools
+    if (pathname !== '/schools') {
+      return;
+    }
     if (!selectedRegion) {
       // Если область не выбрана, удаляем параметр region из URL
       const currentRegion = searchParams.get('region');
@@ -38,7 +43,7 @@ export function RegionFilterSync() {
       // router.push автоматически обновит useSearchParams в DistrictsLoader
       router.push(`/schools?${params.toString()}`, { scroll: false });
     }
-  }, [selectedRegion, searchParams, router]);
+  }, [selectedRegion, searchParams, router, pathname]);
 
   // Этот компонент не рендерит ничего
   return null;
