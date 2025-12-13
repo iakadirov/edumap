@@ -22,9 +22,8 @@ export function RegionFilterSync() {
       if (currentRegion) {
         const params = new URLSearchParams(searchParams.toString());
         params.delete('region');
-        // Используем push для обновления страницы и router.refresh() для перезагрузки данных
+        // router.push автоматически обновит useSearchParams в DistrictsLoader
         router.push(`/schools?${params.toString()}`, { scroll: false });
-        router.refresh();
       }
       return;
     }
@@ -36,9 +35,8 @@ export function RegionFilterSync() {
     if (currentRegion !== regionId) {
       const params = new URLSearchParams(searchParams.toString());
       params.set('region', regionId);
-      // Используем push для обновления страницы и router.refresh() для перезагрузки данных
+      // router.push автоматически обновит useSearchParams в DistrictsLoader
       router.push(`/schools?${params.toString()}`, { scroll: false });
-      router.refresh();
     }
   }, [selectedRegion, searchParams, router]);
 
