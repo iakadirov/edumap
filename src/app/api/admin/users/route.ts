@@ -41,22 +41,26 @@ export async function POST(request: Request) {
     }
 
     let authUserId: string | null = null;
+    let adminClient: ReturnType<typeof createAdminClient> | null = null;
+
+    // Создаем admin client один раз, если есть service role key
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (serviceRoleKey) {
+      adminClient = createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        serviceRoleKey,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false,
+          },
+        }
+      );
+    }
 
     // Пытаемся создать пользователя в auth.users через Admin API
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (serviceRoleKey && password) {
+    if (adminClient && password) {
       try {
-        const adminClient = createAdminClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          serviceRoleKey,
-          {
-            auth: {
-              autoRefreshToken: false,
-              persistSession: false,
-            },
-          }
-        );
-
         // Создаем пользователя в auth.users
         const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
           email,
@@ -81,18 +85,8 @@ export async function POST(request: Request) {
 
     // Создаем запись в users
     // Используем service role клиент для обхода RLS, если доступен
-    const clientToUse = serviceRoleKey 
-      ? createAdminClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          serviceRoleKey,
-          {
-            auth: {
-              autoRefreshToken: false,
-              persistSession: false,
-            },
-          }
-        )
-      : supabase;
+    // Иначе используем обычный клиент (RLS политика должна разрешать)
+    const clientToUse = adminClient || supabase;
 
     const { data: newUser, error: userError } = await clientToUse
       .from('users')
