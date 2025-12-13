@@ -510,6 +510,7 @@ export async function getDistrictsWithCounts(regionId?: number | null) {
       
       // Если выбрана область, получаем районы этой области
       // Иначе получаем все районы
+      // @ts-ignore - таблица districts еще не в типах Supabase
       let districtsQuery = supabase
         .from('districts')
         .select(`
