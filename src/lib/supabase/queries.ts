@@ -333,3 +333,49 @@ export async function getCities() {
     }
   )();
 }
+
+/**
+ * Получить районы с количеством школ в каждом
+ */
+export async function getDistrictsWithCounts() {
+  return unstable_cache(
+    async () => {
+      const supabase = await createClient();
+      
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('district')
+        .eq('org_type', 'school')
+        .eq('status', 'active')
+        .not('district', 'is', null);
+
+      if (error) {
+        throw error;
+      }
+
+      // Группируем и считаем
+      const districtCounts = (data || []).reduce((acc, org) => {
+        const district = org.district;
+        if (district) {
+          acc[district] = (acc[district] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Преобразуем в массив с id, name, count
+      const districts = Object.entries(districtCounts).map(([name, count]) => ({
+        id: name.toLowerCase().replace(/\s+/g, '_'),
+        name: name,
+        name_uz: name, // TODO: использовать переводы из translations.ts
+        count: count,
+      }));
+
+      return districts.sort((a, b) => b.count - a.count); // Сортируем по количеству
+    },
+    ['districts-with-counts'],
+    {
+      revalidate: 3600, // Кэш на 1 час
+      tags: ['districts'],
+    }
+  )();
+}
