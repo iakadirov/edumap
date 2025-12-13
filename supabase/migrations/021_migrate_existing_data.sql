@@ -72,8 +72,8 @@ BEGIN
   
   RAISE NOTICE '=== Статистика миграции ===';
   RAISE NOTICE 'Всего активных школ: %', total_count;
-  RAISE NOTICE 'С region_id: % (%%)', with_region_id, ROUND(with_region_id::NUMERIC / NULLIF(total_count, 0) * 100, 1);
-  RAISE NOTICE 'С district_id: % (%%)', with_district_id, ROUND(with_district_id::NUMERIC / NULLIF(total_count, 0) * 100, 1);
-  RAISE NOTICE 'С обоими: % (%%)', with_both, ROUND(with_both::NUMERIC / NULLIF(total_count, 0) * 100, 1);
+  RAISE NOTICE 'С region_id: % (%)', with_region_id, ROUND(with_region_id::NUMERIC / NULLIF(total_count, 0) * 100, 1);
+  RAISE NOTICE 'С district_id: % (%)', with_district_id, ROUND(with_district_id::NUMERIC / NULLIF(total_count, 0) * 100, 1);
+  RAISE NOTICE 'С обоими: % (%)', with_both, ROUND(with_both::NUMERIC / NULLIF(total_count, 0) * 100, 1);
 END $$;
 

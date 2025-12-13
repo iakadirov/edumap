@@ -54,7 +54,12 @@ async function main() {
   }
 
   console.log('📖 Читаем districts.json...');
-  const districtsData = JSON.parse(fs.readFileSync(districtsPath, 'utf-8')) as District[];
+  // Убираем BOM если есть
+  let fileContent = fs.readFileSync(districtsPath, 'utf-8');
+  if (fileContent.charCodeAt(0) === 0xFEFF) {
+    fileContent = fileContent.slice(1);
+  }
+  const districtsData = JSON.parse(fileContent) as District[];
 
   console.log(`📊 Найдено ${districtsData.length} районов для загрузки\n`);
 
@@ -82,15 +87,17 @@ async function main() {
   console.log(`✅ Найдено ${regionsCount} областей в БД\n`);
 
   // Подготавливаем данные для вставки
-  const districtsToInsert = districtsData.map(district => ({
-    id: district.id,
-    region_id: district.region_id,
-    soato_id: district.soato_id,
-    name_uz: district.name_uz,
-    name_oz: district.name_oz || null,
-    name_ru: district.name_ru,
-    district_type: determineDistrictType(district.name_uz),
-  }));
+  const districtsToInsert = districtsData
+    .filter(district => district.name_ru && district.name_ru.trim() !== '') // Фильтруем записи без name_ru
+    .map(district => ({
+      id: district.id,
+      region_id: district.region_id,
+      soato_id: district.soato_id,
+      name_uz: district.name_uz,
+      name_oz: district.name_oz || null,
+      name_ru: district.name_ru || district.name_uz, // Fallback на name_uz если name_ru отсутствует
+      district_type: determineDistrictType(district.name_uz),
+    }));
 
   // Вставляем батчами по 100 записей
   const batchSize = 100;
