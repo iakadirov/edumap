@@ -3,13 +3,18 @@ import { SchoolCard } from '@/components/schools/SchoolCard';
 
 interface SchoolsListProps {
   params: {
-    district?: string;
+    district?: string; // comma-separated для множественного выбора
     city?: string;
     school_type?: string;
     price_min?: string;
     price_max?: string;
-    language?: string; // В URL это строка с запятыми, парсим в массив
-    curriculum?: string;
+    language?: string; // comma-separated
+    curriculum?: string; // comma-separated
+    grade?: string;
+    rating_min?: string;
+    has_transport?: string;
+    has_meals?: string;
+    has_extended_day?: string;
   };
 }
 
@@ -22,20 +27,30 @@ export async function SchoolsList({ params }: SchoolsListProps) {
     params.price_min ||
     params.price_max ||
     params.language ||
-    params.curriculum;
+    params.curriculum ||
+    params.grade ||
+    params.rating_min ||
+    params.has_transport ||
+    params.has_meals ||
+    params.has_extended_day;
 
   let schools;
   
   if (hasFilters) {
     // Используем фильтры
     const filters = {
-      district: params.district,
+      districts: params.district ? params.district.split(',').filter(Boolean) : undefined,
       city: params.city,
       school_type: params.school_type,
       price_min: params.price_min ? Number(params.price_min) : undefined,
       price_max: params.price_max ? Number(params.price_max) : undefined,
       language: params.language ? params.language.split(',').filter(Boolean) : undefined,
-      curriculum: params.curriculum ? params.curriculum.split(',') : undefined,
+      curriculum: params.curriculum ? params.curriculum.split(',').filter(Boolean) : undefined,
+      grade: params.grade,
+      rating_min: params.rating_min ? Number(params.rating_min) : undefined,
+      has_transport: params.has_transport === 'true',
+      has_meals: params.has_meals === 'true',
+      has_extended_day: params.has_extended_day === 'true',
     };
     schools = await getSchoolsWithFilters(filters);
   } else {

@@ -1,4 +1,4 @@
-import { getDistricts, getCities } from '@/lib/supabase/queries';
+import { getDistrictsWithCounts, getCities } from '@/lib/supabase/queries';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { SchoolsList } from './schools-list';
@@ -27,6 +27,11 @@ interface SchoolsPageProps {
     price_max?: string;
     language?: string;
     curriculum?: string;
+    grade?: string;
+    rating_min?: string;
+    has_transport?: string;
+    has_meals?: string;
+    has_extended_day?: string;
   }> | {
     district?: string;
     city?: string;
@@ -35,6 +40,11 @@ interface SchoolsPageProps {
     price_max?: string;
     language?: string;
     curriculum?: string;
+    grade?: string;
+    rating_min?: string;
+    has_transport?: string;
+    has_meals?: string;
+    has_extended_day?: string;
   };
 }
 
@@ -50,12 +60,12 @@ interface SchoolsPageProps {
 export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
   // В Next.js 16 searchParams может быть Promise, проверяем
   const params = searchParams instanceof Promise ? await searchParams : searchParams;
-  let districts: string[] = [];
+  let districts: Array<{ id: string; name: string; name_uz: string; count?: number }> = [];
   let cities: string[] = [];
 
   try {
     // Получаем только списки для фильтров (параллельно, быстрее)
-    [districts, cities] = await Promise.all([getDistricts(), getCities()]);
+    [districts, cities] = await Promise.all([getDistrictsWithCounts(), getCities()]);
   } catch (e) {
     // В случае ошибки просто используем пустые массивы
     districts = [];
@@ -85,6 +95,11 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
                   price_max: params.price_max,
                   language: params.language,
                   curriculum: params.curriculum,
+                  grade: params.grade,
+                  rating_min: params.rating_min,
+                  has_transport: params.has_transport,
+                  has_meals: params.has_meals,
+                  has_extended_day: params.has_extended_day,
                 }}
               />
             </aside>

@@ -160,13 +160,18 @@ export async function getSchoolWithBranches(slug: string) {
  * Получить школы с фильтрами
  */
 export async function getSchoolsWithFilters(filters: {
-  district?: string;
+  districts?: string[]; // Массив ID районов
   city?: string;
   school_type?: string;
   price_min?: number;
   price_max?: number;
   curriculum?: string[];
-  language?: string[]; // Изменено на массив для множественного выбора
+  language?: string[];
+  grade?: string;
+  rating_min?: number;
+  has_transport?: boolean;
+  has_meals?: boolean;
+  has_extended_day?: boolean;
 }) {
   const supabase = await createClient();
   
@@ -200,36 +205,34 @@ export async function getSchoolsWithFilters(filters: {
         primary_language,
         fee_monthly_min,
         fee_monthly_max,
-        curriculum
+        curriculum,
+        has_transport,
+        has_meals,
+        has_extended_day
       )
     `)
     .eq('org_type', 'school')
     .eq('status', 'active')
     .limit(100); // Ограничиваем для производительности
 
-  if (filters.district) {
-    query = query.eq('district', filters.district);
+  // Districts (multi-select) - фильтруем по массиву
+  if (filters.districts && filters.districts.length > 0) {
+    // Преобразуем ID обратно в названия районов
+    // Для упрощения используем .in() - но нужно сопоставить ID с реальными названиями
+    // TODO: улучшить сопоставление ID -> название района
+    query = query.in('district', filters.districts);
   }
 
   if (filters.city) {
     query = query.eq('city', filters.city);
   }
 
-  if (filters.school_type) {
-    query = query.eq('school_details.school_type', filters.school_type);
-  }
-
-  if (filters.price_min !== undefined) {
-    query = query.gte('school_details.fee_monthly_min', filters.price_min);
-  }
-
-  if (filters.price_max !== undefined) {
-    query = query.lte('school_details.fee_monthly_max', filters.price_max);
-  }
-
-  // Для одного языка используем фильтрацию на уровне БД
-  if (filters.language && filters.language.length === 1) {
-    query = query.eq('school_details.primary_language', filters.language[0]);
+  // Rating min - фильтр по overall_rating
+  if (filters.rating_min !== undefined) {
+    // overall_rating хранится как 0-100, преобразуем в нужный формат
+    // Если rating_min = 3, значит нужен рейтинг >= 60 (3 из 5 = 60%)
+    const minRatingValue = (filters.rating_min / 5) * 100;
+    query = query.gte('overall_rating', minRatingValue);
   }
 
   const { data, error } = await query.order('overall_rating', {
@@ -241,10 +244,74 @@ export async function getSchoolsWithFilters(filters: {
     throw error;
   }
 
-  // Для множественного выбора языков фильтруем на клиенте
-  // (Supabase не поддерживает .in() для вложенных полей напрямую)
-  if (filters.language && filters.language.length > 1 && data) {
-    return data.filter((school: any) => {
+  if (!data) {
+    return [];
+  }
+
+  // Фильтрация на клиенте для сложных фильтров
+  let filteredData = data;
+
+  // School type
+  if (filters.school_type) {
+    filteredData = filteredData.filter((school: any) => {
+      const details = Array.isArray(school.school_details)
+        ? school.school_details[0]
+        : school.school_details;
+      return details && details.school_type === filters.school_type;
+    });
+  }
+
+  // Price range
+  if (filters.price_min !== undefined || filters.price_max !== undefined) {
+    filteredData = filteredData.filter((school: any) => {
+      const details = Array.isArray(school.school_details)
+        ? school.school_details[0]
+        : school.school_details;
+      if (!details) return false;
+      
+      const min = details.fee_monthly_min;
+      const max = details.fee_monthly_max;
+      
+      if (filters.price_min !== undefined && max !== null && max < filters.price_min) {
+        return false;
+      }
+      if (filters.price_max !== undefined && min !== null && min > filters.price_max) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  // Grade - проверяем, что школа принимает в этот класс
+  if (filters.grade && filters.grade !== 'any' && filters.grade !== 'preschool') {
+    filteredData = filteredData.filter((school: any) => {
+      const details = Array.isArray(school.school_details)
+        ? school.school_details[0]
+        : school.school_details;
+      if (!details) return false;
+      
+      const gradeNum = Number(filters.grade);
+      if (isNaN(gradeNum)) return true; // Если не число, пропускаем
+      
+      // Проверяем диапазон классов
+      return (
+        (details.grade_from !== null && gradeNum >= details.grade_from) &&
+        (details.grade_to !== null && gradeNum <= details.grade_to)
+      );
+    });
+  } else if (filters.grade === 'preschool') {
+    // Проверяем подготовительный класс (0 класс)
+    filteredData = filteredData.filter((school: any) => {
+      const details = Array.isArray(school.school_details)
+        ? school.school_details[0]
+        : school.school_details;
+      return details && details.accepts_preparatory === true;
+    });
+  }
+
+  // Language - множественный выбор
+  if (filters.language && filters.language.length > 0) {
+    filteredData = filteredData.filter((school: any) => {
       const details = Array.isArray(school.school_details)
         ? school.school_details[0]
         : school.school_details;
@@ -252,7 +319,47 @@ export async function getSchoolsWithFilters(filters: {
     });
   }
 
-  return data;
+  // Curriculum - множественный выбор
+  if (filters.curriculum && filters.curriculum.length > 0) {
+    filteredData = filteredData.filter((school: any) => {
+      const details = Array.isArray(school.school_details)
+        ? school.school_details[0]
+        : school.school_details;
+      if (!details || !details.curriculum) return false;
+      const schoolCurricula = Array.isArray(details.curriculum) ? details.curriculum : [details.curriculum];
+      return filters.curriculum?.some((curr) => schoolCurricula.includes(curr));
+    });
+  }
+
+  // Services
+  if (filters.has_transport) {
+    filteredData = filteredData.filter((school: any) => {
+      const details = Array.isArray(school.school_details)
+        ? school.school_details[0]
+        : school.school_details;
+      return details && details.has_transport === true;
+    });
+  }
+
+  if (filters.has_meals) {
+    filteredData = filteredData.filter((school: any) => {
+      const details = Array.isArray(school.school_details)
+        ? school.school_details[0]
+        : school.school_details;
+      return details && details.has_meals === true;
+    });
+  }
+
+  if (filters.has_extended_day) {
+    filteredData = filteredData.filter((school: any) => {
+      const details = Array.isArray(school.school_details)
+        ? school.school_details[0]
+        : school.school_details;
+      return details && details.has_extended_day === true;
+    });
+  }
+
+  return filteredData;
 }
 
 /**
@@ -363,8 +470,9 @@ export async function getDistrictsWithCounts() {
       }, {} as Record<string, number>);
 
       // Преобразуем в массив с id, name, count
+      // Используем само название района как ID для упрощения сопоставления
       const districts = Object.entries(districtCounts).map(([name, count]) => ({
-        id: name.toLowerCase().replace(/\s+/g, '_'),
+        id: name, // Используем название как ID для простоты
         name: name,
         name_uz: name, // TODO: использовать переводы из translations.ts
         count: count,
