@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { DistrictMultiSelect } from './filters/DistrictMultiSelect';
+import { DistrictsLoader } from './DistrictsLoader';
 import { PriceRangeSlider } from './filters/PriceRangeSlider';
 import { GradeSelect } from './filters/GradeSelect';
 import { LanguageChips } from './filters/LanguageChips';
@@ -31,7 +31,6 @@ interface DistrictOption {
 }
 
 interface SchoolFiltersProps {
-  districts: DistrictOption[];
   cities: string[];
   initialFilters?: {
     district?: string; // comma-separated для множественного выбора
@@ -76,7 +75,7 @@ export interface FilterValues {
  * - Rating radio со звездами
  * - Services toggles
  */
-export function SchoolFilters({ districts, cities, initialFilters, onFiltersChange }: SchoolFiltersProps) {
+export function SchoolFilters({ cities, initialFilters, onFiltersChange }: SchoolFiltersProps) {
   const router = useRouter();
 
   // Инициализируем фильтры из пропсов
@@ -230,13 +229,7 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
     { value: 'international', label: 'Xalqaro' },
   ];
 
-  // Преобразуем districts в нужный формат
-  const districtOptions: DistrictOption[] = districts.map((d) => ({
-    id: d.id || d.name.toLowerCase().replace(/\s+/g, '_'),
-    name: d.name,
-    name_uz: d.name_uz || translateDistrict(d.name),
-    count: d.count,
-  }));
+  // Districts теперь загружаются реактивно через DistrictsLoader
 
   return (
     <Card>
@@ -253,9 +246,8 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
       <CardContent className="space-y-6">
         {/* ГРУППА 1: ОСНОВНЫЕ ФИЛЬТРЫ (всегда видны) */}
         
-        {/* Район - Multi-select */}
-        <DistrictMultiSelect
-          options={districtOptions}
+        {/* Район - Multi-select (загружается реактивно по области) */}
+        <DistrictsLoader
           selected={filters.districts || []}
           onSelectionChange={(selected) => updateFilters({ districts: selected.length > 0 ? selected : undefined })}
         />

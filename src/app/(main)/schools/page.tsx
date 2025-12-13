@@ -1,4 +1,4 @@
-import { getDistrictsWithCounts, getCities, type SortOption } from '@/lib/supabase/queries';
+import { getCities, type SortOption } from '@/lib/supabase/queries';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { SchoolsList } from './schools-list';
@@ -65,22 +65,14 @@ interface SchoolsPageProps {
 export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
   // В Next.js 16 searchParams может быть Promise, проверяем
   const params = searchParams instanceof Promise ? await searchParams : searchParams;
-  let districts: Array<{ id: string; name: string; name_uz: string; count?: number }> = [];
   let cities: string[] = [];
 
   try {
-    // Получаем regionId из searchParams (если передан)
-    const regionId = params.region ? parseInt(params.region, 10) : null;
-    
-    // Получаем только списки для фильтров (параллельно, быстрее)
-    // Если выбрана область, показываем только её районы
-    [districts, cities] = await Promise.all([
-      getDistrictsWithCounts(isNaN(regionId as number) ? null : regionId), 
-      getCities()
-    ]);
+    // Districts теперь загружаются на клиенте через DistrictsLoader
+    // Получаем только cities
+    cities = await getCities();
   } catch (e) {
-    // В случае ошибки просто используем пустые массивы
-    districts = [];
+    // В случае ошибки просто используем пустой массив
     cities = [];
   }
 
@@ -99,7 +91,6 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
             {/* Панель фильтров - загружается сразу */}
             <aside className="lg:sticky lg:top-4 lg:h-fit">
               <SchoolFilters 
-                districts={districts} 
                 cities={cities}
                 initialFilters={{
                   district: params.district,
