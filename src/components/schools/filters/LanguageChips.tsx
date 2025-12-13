@@ -11,7 +11,7 @@ interface LanguageOption {
 }
 
 interface LanguageChipsProps {
-  options: LanguageOption[];
+  options?: LanguageOption[];
   selected: string[];
   onSelectionChange: (selected: string[]) => void;
   className?: string;
