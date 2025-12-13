@@ -88,7 +88,21 @@ async function main() {
 
   // Подготавливаем данные для вставки
   // ВАЖНО: Загружаем ВСЕ районы, даже если name_ru отсутствует (используем name_uz как fallback)
+  // ИСКЛЮЧАЕМ служебные записи (например, "Toshkent shahrining tumanlari")
   const districtsToInsert = districtsData
+    .filter(district => {
+      // Исключаем служебные записи
+      const nameLower = district.name_uz.toLowerCase();
+      if (nameLower.includes('tumanlari') && !nameLower.includes('tumani')) {
+        // "tumanlari" без "tumani" - это служебная запись (например, "Toshkent shahrining tumanlari")
+        return false;
+      }
+      if (nameLower.includes('shahrining')) {
+        // "shahrining" - служебная запись
+        return false;
+      }
+      return true;
+    })
     .map(district => ({
       id: district.id,
       region_id: district.region_id,
