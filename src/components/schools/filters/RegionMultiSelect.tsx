@@ -13,15 +13,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface DistrictOption {
+interface RegionOption {
   id: string;
   name: string;
   name_uz: string;
   count?: number;
 }
 
-interface DistrictMultiSelectProps {
-  options: DistrictOption[];
+interface RegionMultiSelectProps {
+  options: RegionOption[];
   selected: string[];
   onSelectionChange: (selected: string[]) => void;
   placeholder?: string;
@@ -29,27 +29,30 @@ interface DistrictMultiSelectProps {
 }
 
 /**
- * Multi-select dropdown для выбора районов с поиском
+ * Multi-select dropdown для выбора регионов (областей) с поиском
  * 
  * Features:
  * - Multi-select с чекбоксами
- * - Поиск по названию района
- * - Показывает количество школ в каждом районе
- * - Выбранные районы отображаются как chips
+ * - Поиск по названию региона (русский и узбекский)
+ * - Показывает количество школ в каждом регионе
+ * - Выбранные регионы отображаются как chips под dropdown
+ * - Клик на × удаляет регион из выбора
  */
-export function DistrictMultiSelect({
+export function RegionMultiSelect({
   options,
   selected,
   onSelectionChange,
-  placeholder = 'Barcha tumanlar',
+  placeholder = 'Barcha viloyatlar',
   className,
-}: DistrictMultiSelectProps) {
+}: RegionMultiSelectProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Фильтруем опции по поисковому запросу
   const filteredOptions = options.filter((option) => {
-    const query = searchQuery.toLowerCase();
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    
     return (
       option.name.toLowerCase().includes(query) ||
       option.name_uz.toLowerCase().includes(query)
@@ -61,24 +64,24 @@ export function DistrictMultiSelect({
     selected.includes(option.id)
   );
 
-  const toggleDistrict = (districtId: string) => {
-    if (selected.includes(districtId)) {
-      onSelectionChange(selected.filter((id) => id !== districtId));
+  const toggleRegion = (regionId: string) => {
+    if (selected.includes(regionId)) {
+      onSelectionChange(selected.filter((id) => id !== regionId));
     } else {
-      onSelectionChange([...selected, districtId]);
+      onSelectionChange([...selected, regionId]);
     }
   };
 
-  const removeDistrict = (districtId: string, e: React.MouseEvent) => {
+  const removeRegion = (regionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    onSelectionChange(selected.filter((id) => id !== districtId));
+    onSelectionChange(selected.filter((id) => id !== regionId));
   };
 
   const selectedCount = selected.length;
 
   return (
     <div className={cn('space-y-2', className)}>
-      <label className="text-sm font-medium">Tuman</label>
+      <label className="text-sm font-medium">Viloyat</label>
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button
@@ -90,7 +93,7 @@ export function DistrictMultiSelect({
                 ? placeholder
                 : selectedCount === 1
                 ? selectedOptions[0]?.name_uz || selectedOptions[0]?.name
-                : `${selectedCount} tuman tanlandi`}
+                : `${selectedCount} viloyat tanlandi`}
             </span>
           </Button>
         </DropdownMenuTrigger>
@@ -130,13 +133,13 @@ export function DistrictMultiSelect({
                     <div
                       key={option.id}
                       className="flex items-center gap-2 p-2 rounded-sm hover:bg-accent cursor-pointer transition-colors"
-                      onClick={() => toggleDistrict(option.id)}
+                      onClick={() => toggleRegion(option.id)}
                       role="option"
                       aria-selected={isSelected}
                     >
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={() => toggleDistrict(option.id)}
+                        onCheckedChange={() => toggleRegion(option.id)}
                         onClick={(e) => e.stopPropagation()}
                         className="pointer-events-none"
                       />
@@ -157,7 +160,7 @@ export function DistrictMultiSelect({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Выбранные районы как chips */}
+      {/* Выбранные регионы как chips */}
       {selectedOptions.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {selectedOptions.map((option) => (
@@ -168,7 +171,7 @@ export function DistrictMultiSelect({
             >
               <span>{option.name_uz || option.name}</span>
               <button
-                onClick={(e) => removeDistrict(option.id, e)}
+                onClick={(e) => removeRegion(option.id, e)}
                 className="ml-1 rounded-full hover:bg-secondary-foreground/20 p-0.5 transition-colors"
                 aria-label={`Remove ${option.name_uz || option.name}`}
               >
