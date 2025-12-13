@@ -21,6 +21,8 @@ import { cn } from '@/lib/utils';
  * - Модальное окно для выбора области
  * - Сохранение в localStorage через RegionContext
  */
+const REGION_CHOICE_MADE_KEY = 'edumap_region_choice_made';
+
 export function RegionSelector() {
   const { selectedRegion, setSelectedRegion, isLoading } = useRegion();
   const [regions, setRegions] = useState<Region[]>([]);
@@ -40,15 +42,21 @@ export function RegionSelector() {
     loadRegions();
   }, []);
 
-  // Показываем диалог при первой загрузке, если область не выбрана
+  // Показываем диалог только при первой загрузке, если выбор еще не был сделан
   useEffect(() => {
-    if (!isLoading && !selectedRegion) {
-      setIsDialogOpen(true);
+    if (!isLoading) {
+      const choiceMade = localStorage.getItem(REGION_CHOICE_MADE_KEY) === 'true';
+      // Открываем модальное окно только если выбор еще не был сделан
+      if (!choiceMade) {
+        setIsDialogOpen(true);
+      }
     }
-  }, [isLoading, selectedRegion]);
+  }, [isLoading]);
 
   const handleSelectRegion = (region: Region | null) => {
     setSelectedRegion(region);
+    // Отмечаем, что выбор был сделан (даже если выбран "O'zbekiston" / null)
+    localStorage.setItem(REGION_CHOICE_MADE_KEY, 'true');
     setIsDialogOpen(false);
   };
 
