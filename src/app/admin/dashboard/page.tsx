@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatDate } from '@/lib/utils/date';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -152,7 +153,7 @@ export default async function AdminDashboardPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{school.name_uz}</p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(school.created_at).toLocaleDateString('uz-UZ')}
+                          {formatDate(school.created_at)}
                         </p>
                       </div>
                       <Badge

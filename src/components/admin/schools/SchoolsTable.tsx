@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 
 import { getCityDistrict } from '@/lib/utils/translations';
+import { formatDate } from '@/lib/utils/date';
 
 interface School {
   id: string;
@@ -191,7 +192,7 @@ export function SchoolsTable({
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {new Date(school.created_at).toLocaleDateString('uz-UZ')}
+                    {formatDate(school.created_at)}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
