@@ -8,6 +8,7 @@ import {
   SelectValue,
   SelectSeparator,
   SelectLabel,
+  SelectGroup,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -103,7 +104,7 @@ export function GradeSelect({
             if (groupOptions.length === 0) return null;
 
             return (
-              <div key={groupKey}>
+              <SelectGroup key={groupKey}>
                 <SelectSeparator />
                 <SelectLabel className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
                   {groupLabel}
@@ -120,7 +121,7 @@ export function GradeSelect({
                     </div>
                   </SelectItem>
                 ))}
-              </div>
+              </SelectGroup>
             );
           })}
         </SelectContent>
