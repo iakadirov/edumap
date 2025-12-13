@@ -537,7 +537,7 @@ export async function getDistrictsWithCounts(regionId?: number | null) {
       }
 
       // Получаем количество школ для каждого района
-      const districtIds = districts.map(d => d.id);
+      const districtIds = districts.map((d: any) => d.id);
       const { data: schoolsCount, error: countError } = await supabase
         .from('organizations')
         .select('district_id')
@@ -559,7 +559,7 @@ export async function getDistrictsWithCounts(regionId?: number | null) {
 
       // Формируем результат
       return districts
-        .map(district => ({
+        .map((district: any) => ({
           id: district.id.toString(),
           name: district.name_ru,
           name_uz: district.name_uz,

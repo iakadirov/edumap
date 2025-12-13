@@ -2,6 +2,7 @@ import { getDistrictsWithCounts, getCities, type SortOption } from '@/lib/supaba
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { SchoolsList } from './schools-list';
+import { RegionFilterSync } from '@/components/schools/RegionFilterSync';
 
 // Динамический импорт SchoolFilters для уменьшения bundle size
 // Это client component, поэтому загружаем его только когда нужно
@@ -20,6 +21,7 @@ export const revalidate = 300;
 
 interface SchoolsPageProps {
   searchParams: Promise<{
+    region?: string; // ID области
     district?: string;
     city?: string;
     school_type?: string;
@@ -34,6 +36,7 @@ interface SchoolsPageProps {
     has_extended_day?: string;
     sort?: SortOption;
   }> | {
+    region?: string; // ID области
     district?: string;
     city?: string;
     school_type?: string;
@@ -66,8 +69,15 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
   let cities: string[] = [];
 
   try {
+    // Получаем regionId из searchParams (если передан)
+    const regionId = params.region ? parseInt(params.region, 10) : null;
+    
     // Получаем только списки для фильтров (параллельно, быстрее)
-    [districts, cities] = await Promise.all([getDistrictsWithCounts(), getCities()]);
+    // Если выбрана область, показываем только её районы
+    [districts, cities] = await Promise.all([
+      getDistrictsWithCounts(isNaN(regionId as number) ? null : regionId), 
+      getCities()
+    ]);
   } catch (e) {
     // В случае ошибки просто используем пустые массивы
     districts = [];
@@ -76,6 +86,8 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
 
   return (
     <div className="container-wrapper py-8 bg-white">
+      {/* Синхронизация выбранной области с URL */}
+      <RegionFilterSync />
       <div className="container-content">
         <div className="container-inner">
           {/* Заголовок */}

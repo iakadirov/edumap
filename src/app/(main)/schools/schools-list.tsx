@@ -4,6 +4,7 @@ import { SortControl } from '@/components/schools/SortControl';
 
 interface SchoolsListProps {
   params: {
+    region?: string; // ID области
     district?: string; // comma-separated для множественного выбора
     city?: string;
     school_type?: string;
@@ -23,6 +24,7 @@ interface SchoolsListProps {
 export async function SchoolsList({ params }: SchoolsListProps) {
   // Проверяем, есть ли фильтры в URL
   const hasFilters = 
+    params.region ||
     params.district ||
     params.city ||
     params.school_type ||
@@ -40,7 +42,9 @@ export async function SchoolsList({ params }: SchoolsListProps) {
   
   if (hasFilters) {
     // Используем фильтры
+    const regionId = params.region ? parseInt(params.region, 10) : undefined;
     const filters = {
+      region: isNaN(regionId as number) ? undefined : regionId,
       districts: params.district ? params.district.split(',').filter(Boolean) : undefined,
       city: params.city,
       school_type: params.school_type,
