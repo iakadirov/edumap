@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { RegionSelector } from './RegionSelector';
-import { RegionDialog } from './RegionDialog';
 import { Plus } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
@@ -24,9 +23,7 @@ export function Header() {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <>
-      <RegionDialog />
-      <header className="sticky top-0 z-50 w-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
+    <header className="sticky top-0 z-50 w-full bg-white shadow-[0px_1px_2px_rgba(0,0,0,0.05)]">
         <div className="container-wrapper">
           <div className="container-content">
             <div className="container-inner">
@@ -134,6 +131,5 @@ export function Header() {
           </div>
         </div>
       </header>
-    </>
   );
 }
