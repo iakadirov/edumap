@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { UsersTable } from '@/components/admin/users/UsersTable';
+import { getCurrentUser } from '@/lib/auth/middleware';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
@@ -15,6 +16,7 @@ export default async function AdminUsersPage({
 }) {
   noStore(); // Отключаем кэширование для админ-панели
   const supabase = await createClient();
+  const currentUser = await getCurrentUser();
   const params = await searchParams;
   
   const page = parseInt(params.page || '1');
@@ -122,6 +124,8 @@ export default async function AdminUsersPage({
               totalPages={totalPages}
               search={search}
               role={role}
+              currentUserRole={currentUser?.role || 'user'}
+              currentUserId={currentUser?.id || ''}
             />
           </CardContent>
         </Card>

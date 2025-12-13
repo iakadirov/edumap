@@ -3,8 +3,9 @@ import { UserForm } from '@/components/admin/users/UserForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
+import { getCurrentUser } from '@/lib/auth/middleware';
 
 // Админ-панель всегда динамическая (не кэшируется)
 export const dynamic = 'force-dynamic';
@@ -17,6 +18,7 @@ export default async function EditUserPage({
   noStore();
   const { id } = await params;
   const supabase = await createClient();
+  const currentUser = await getCurrentUser();
 
   // Получаем пользователя
   const { data: user, error } = await supabase
@@ -27,6 +29,11 @@ export default async function EditUserPage({
 
   if (error || !user) {
     notFound();
+  }
+
+  // Проверяем права: admin не может редактировать super_admin
+  if (user.role === 'super_admin' && currentUser?.role !== 'super_admin') {
+    redirect('/admin/users?error=cannot_edit_super_admin');
   }
 
   return (

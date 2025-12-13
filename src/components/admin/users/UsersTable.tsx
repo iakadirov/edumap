@@ -48,6 +48,8 @@ interface UsersTableProps {
   totalPages: number;
   search: string;
   role: string;
+  currentUserRole: string;
+  currentUserId: string;
 }
 
 export function UsersTable({
@@ -56,6 +58,8 @@ export function UsersTable({
   totalPages,
   search: initialSearch,
   role: initialRole,
+  currentUserRole,
+  currentUserId,
 }: UsersTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -212,17 +216,25 @@ export function UsersTable({
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/admin/users/${user.id}`} prefetch={false}>Tahrirlash</Link>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(user)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        O'chirish
-                      </Button>
+                      {/* Скрываем кнопки редактирования/удаления для super_admin, если текущий пользователь - admin */}
+                      {!(user.role === 'super_admin' && currentUserRole !== 'super_admin') && (
+                        <>
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link href={`/admin/users/${user.id}`} prefetch={false}>Tahrirlash</Link>
+                          </Button>
+                          {/* Скрываем кнопку удаления для себя */}
+                          {user.id !== currentUserId && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(user)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              O'chirish
+                            </Button>
+                          )}
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
