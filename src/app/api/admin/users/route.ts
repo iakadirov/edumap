@@ -80,7 +80,21 @@ export async function POST(request: Request) {
     }
 
     // Создаем запись в users
-    const { data: newUser, error: userError } = await supabase
+    // Используем service role клиент для обхода RLS, если доступен
+    const clientToUse = serviceRoleKey 
+      ? createAdminClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          serviceRoleKey,
+          {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false,
+            },
+          }
+        )
+      : supabase;
+
+    const { data: newUser, error: userError } = await clientToUse
       .from('users')
       .insert({
         auth_user_id: authUserId,
@@ -97,7 +111,7 @@ export async function POST(request: Request) {
     if (userError) {
       console.error('Error creating user:', userError);
       return NextResponse.json(
-        { error: 'Failed to create user: ' + userError.message },
+        { error: `Foydalanuvchi yaratishda xatolik: ${userError.message}` },
         { status: 500 }
       );
     }
