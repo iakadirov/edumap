@@ -92,7 +92,7 @@ export function RegionSelector() {
 
       {/* Модальное окно выбора области */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="w-[calc(100vw-2rem)] max-w-[760px] sm:w-[760px] px-4 sm:px-6">
+        <DialogContent className="!w-[calc(100vw-2rem)] !max-w-[760px] sm:!w-[760px] px-4 sm:px-6">
           <DialogHeader>
             <DialogTitle className="text-xl sm:text-2xl">Viloyatingizni tanlang</DialogTitle>
             <DialogDescription className="text-sm sm:text-base">
