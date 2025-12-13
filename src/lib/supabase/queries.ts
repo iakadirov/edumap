@@ -159,6 +159,14 @@ export async function getSchoolWithBranches(slug: string) {
 /**
  * Получить школы с фильтрами
  */
+export type SortOption = 
+  | 'rating_desc'
+  | 'rating_asc'
+  | 'price_asc'
+  | 'price_desc'
+  | 'reviews_desc'
+  | 'popularity';
+
 export async function getSchoolsWithFilters(filters: {
   districts?: string[]; // Массив ID районов
   city?: string;
@@ -172,6 +180,7 @@ export async function getSchoolsWithFilters(filters: {
   has_transport?: boolean;
   has_meals?: boolean;
   has_extended_day?: boolean;
+  sort?: SortOption;
 }) {
   const supabase = await createClient();
   
@@ -235,10 +244,25 @@ export async function getSchoolsWithFilters(filters: {
     query = query.gte('overall_rating', minRatingValue);
   }
 
-  const { data, error } = await query.order('overall_rating', {
-    ascending: false,
-    nullsFirst: false,
-  });
+  // Сортировка по умолчанию (по рейтингу, высокий →)
+  const sortOption = filters.sort || 'rating_desc';
+  switch (sortOption) {
+    case 'rating_desc':
+      query = query.order('overall_rating', { ascending: false, nullsFirst: false });
+      break;
+    case 'rating_asc':
+      query = query.order('overall_rating', { ascending: true, nullsFirst: true });
+      break;
+    case 'reviews_desc':
+      query = query.order('reviews_count', { ascending: false, nullsFirst: false });
+      break;
+    default:
+      // Для price и popularity сортируем на клиенте
+      query = query.order('overall_rating', { ascending: false, nullsFirst: false });
+      break;
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw error;
@@ -356,6 +380,30 @@ export async function getSchoolsWithFilters(filters: {
         ? school.school_details[0]
         : school.school_details;
       return details && details.has_extended_day === true;
+    });
+  }
+
+  // Применяем сортировку на клиенте для price и popularity
+  if (filters.sort === 'price_asc' || filters.sort === 'price_desc') {
+    filteredData.sort((a: any, b: any) => {
+      const aDetails = Array.isArray(a.school_details) ? a.school_details[0] : a.school_details;
+      const bDetails = Array.isArray(b.school_details) ? b.school_details[0] : b.school_details;
+      
+      const aPrice = aDetails?.fee_monthly_min || aDetails?.fee_monthly_max || 0;
+      const bPrice = bDetails?.fee_monthly_min || bDetails?.fee_monthly_max || 0;
+      
+      if (filters.sort === 'price_asc') {
+        return aPrice - bPrice;
+      } else {
+        return bPrice - aPrice;
+      }
+    });
+  } else if (filters.sort === 'popularity') {
+    // Сортировка по популярности: комбинация рейтинга и количества отзывов
+    filteredData.sort((a: any, b: any) => {
+      const aScore = (a.overall_rating || 0) * 0.7 + (a.reviews_count || 0) * 0.3;
+      const bScore = (b.overall_rating || 0) * 0.7 + (b.reviews_count || 0) * 0.3;
+      return bScore - aScore;
     });
   }
 

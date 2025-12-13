@@ -1,4 +1,4 @@
-import { getDistrictsWithCounts, getCities } from '@/lib/supabase/queries';
+import { getDistrictsWithCounts, getCities, type SortOption } from '@/lib/supabase/queries';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { SchoolsList } from './schools-list';
@@ -32,6 +32,7 @@ interface SchoolsPageProps {
     has_transport?: string;
     has_meals?: string;
     has_extended_day?: string;
+    sort?: SortOption;
   }> | {
     district?: string;
     city?: string;
@@ -45,6 +46,7 @@ interface SchoolsPageProps {
     has_transport?: string;
     has_meals?: string;
     has_extended_day?: string;
+    sort?: SortOption;
   };
 }
 

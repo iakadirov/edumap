@@ -1,5 +1,6 @@
-import { getActiveSchools, getSchoolsWithFilters } from '@/lib/supabase/queries';
+import { getActiveSchools, getSchoolsWithFilters, type SortOption } from '@/lib/supabase/queries';
 import { SchoolCard } from '@/components/schools/SchoolCard';
+import { SortControl } from '@/components/schools/SortControl';
 
 interface SchoolsListProps {
   params: {
@@ -15,6 +16,7 @@ interface SchoolsListProps {
     has_transport?: string;
     has_meals?: string;
     has_extended_day?: string;
+    sort?: SortOption;
   };
 }
 
@@ -51,6 +53,7 @@ export async function SchoolsList({ params }: SchoolsListProps) {
       has_transport: params.has_transport === 'true',
       has_meals: params.has_meals === 'true',
       has_extended_day: params.has_extended_day === 'true',
+      sort: params.sort || 'rating_desc',
     };
     schools = await getSchoolsWithFilters(filters);
   } else {
@@ -68,9 +71,14 @@ export async function SchoolsList({ params }: SchoolsListProps) {
 
   return (
     <div>
-      <p className="text-muted-foreground mb-6">
-        Topilgan maktablar: <span className="font-semibold text-foreground">{schools.length}</span>
-      </p>
+      {/* Заголовок с количеством и сортировкой */}
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-muted-foreground">
+          Topilgan maktablar: <span className="font-semibold text-foreground">{schools.length}</span>
+        </p>
+        <SortControl currentSort={params.sort as SortOption} />
+      </div>
+
       <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         {schools.map((school: any) => (
           <SchoolCard key={school.id} school={school} />
