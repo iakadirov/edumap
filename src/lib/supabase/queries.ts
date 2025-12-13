@@ -1,11 +1,10 @@
-import { createClient } from './server';
 import { unstable_cache } from 'next/cache';
+import { createClient } from './server';
 import type { Database } from '@/types/database';
 
 type Organization = Database['public']['Tables']['organizations']['Row'];
 type SchoolDetails = Database['public']['Tables']['school_details']['Row'];
 
-// Тип для школы с деталями (результат SELECT с JOIN)
 type SchoolWithDetails = Organization & {
   school_details: SchoolDetails | SchoolDetails[] | null;
 };
@@ -86,6 +85,7 @@ export async function getSchoolBySlug(slug: string): Promise<SchoolWithDetails> 
   return data as SchoolWithDetails;
 }
 
+
 /**
  * Получить филиалы школы
  */
@@ -122,7 +122,6 @@ export async function getSchoolById(id: string): Promise<SchoolWithDetails> {
       school_details (*)
     `)
     .eq('id', id)
-    .eq('status', 'active')
     .single();
 
   if (error) {
@@ -151,6 +150,7 @@ export async function getSchoolWithBranches(slug: string) {
   
   // Если это главная школа, получаем филиалы
   const branches = await getSchoolBranches(school.id);
+
   return {
     main: school,
     current: school,
@@ -200,6 +200,7 @@ export async function getSchoolsWithFilters(filters: {
       short_description,
       status,
       overall_rating,
+      reviews_count,
       city,
       district,
       region_id,
@@ -284,7 +285,7 @@ export async function getSchoolsWithFilters(filters: {
   }
 
   // Фильтрация на клиенте для сложных фильтров
-  let filteredData = data;
+  let filteredData = [...data];
 
   // School type
   if (filters.school_type) {
@@ -304,43 +305,40 @@ export async function getSchoolsWithFilters(filters: {
         : school.school_details;
       if (!details) return false;
       
-      const min = details.fee_monthly_min;
-      const max = details.fee_monthly_max;
+      const minPrice = details.fee_monthly_min || 0;
+      const maxPrice = details.fee_monthly_max || 0;
       
-      if (filters.price_min !== undefined && max !== null && max < filters.price_min) {
+      if (filters.price_min !== undefined && maxPrice < filters.price_min) {
         return false;
       }
-      if (filters.price_max !== undefined && min !== null && min > filters.price_max) {
+      if (filters.price_max !== undefined && minPrice > filters.price_max) {
         return false;
       }
       return true;
     });
   }
 
-  // Grade - проверяем, что школа принимает в этот класс
-  if (filters.grade && filters.grade !== 'any' && filters.grade !== 'preschool') {
+  // Grade - фильтр по классу
+  if (filters.grade) {
     filteredData = filteredData.filter((school: any) => {
       const details = Array.isArray(school.school_details)
         ? school.school_details[0]
         : school.school_details;
+      
       if (!details) return false;
       
-      const gradeNum = Number(filters.grade);
-      if (isNaN(gradeNum)) return true; // Если не число, пропускаем
+      // Если grade = "0", проверяем accepts_preparatory
+      if (filters.grade === '0') {
+        return details.accepts_preparatory === true;
+      }
       
-      // Проверяем диапазон классов
-      return (
-        (details.grade_from !== null && gradeNum >= details.grade_from) &&
-        (details.grade_to !== null && gradeNum <= details.grade_to)
-      );
-    });
-  } else if (filters.grade === 'preschool') {
-    // Проверяем подготовительный класс (0 класс)
-    filteredData = filteredData.filter((school: any) => {
-      const details = Array.isArray(school.school_details)
-        ? school.school_details[0]
-        : school.school_details;
-      return details && details.accepts_preparatory === true;
+      const gradeNum = parseInt(filters.grade, 10);
+      if (isNaN(gradeNum)) return true;
+      
+      const gradeFrom = details.grade_from || 1;
+      const gradeTo = details.grade_to || 11;
+      
+      return gradeNum >= gradeFrom && gradeNum <= gradeTo;
     });
   }
 
@@ -410,7 +408,6 @@ export async function getSchoolsWithFilters(filters: {
       }
     });
   } else if (filters.sort === 'popularity') {
-    // Сортировка по популярности: комбинация рейтинга и количества отзывов
     filteredData.sort((a: any, b: any) => {
       const aScore = (a.overall_rating || 0) * 0.7 + (a.reviews_count || 0) * 0.3;
       const bScore = (b.overall_rating || 0) * 0.7 + (b.reviews_count || 0) * 0.3;
@@ -506,78 +503,77 @@ export async function getCities() {
 export async function getDistrictsWithCounts(regionId?: number | null) {
   // Не используем unstable_cache для API endpoint, так как он может кэшировать ошибки
   const supabase = await createClient();
-      
-      // Если выбрана область, получаем районы этой области
-      // Иначе получаем все районы
-      // Таблица districts еще не в типах Supabase (нужно сгенерировать типы через npx supabase gen types)
-      let districtsQuery = (supabase as any)
-        .from('districts')
-        .select(`
-          id,
-          name_uz,
-          name_ru,
-          name_oz,
-          region_id,
-          district_type
-        `);
+  
+  // Если выбрана область, получаем районы этой области
+  // Иначе получаем все районы
+  // Таблица districts еще не в типах Supabase (нужно сгенерировать типы через npx supabase gen types)
+  let districtsQuery = (supabase as any)
+    .from('districts')
+    .select(`
+      id,
+      name_uz,
+      name_ru,
+      name_oz,
+      region_id,
+      district_type
+    `);
 
-      if (regionId !== null && regionId !== undefined) {
-        districtsQuery = districtsQuery.eq('region_id', regionId);
-      }
+  if (regionId !== null && regionId !== undefined) {
+    districtsQuery = districtsQuery.eq('region_id', regionId);
+  }
 
-      const { data: districts, error: districtsError } = await districtsQuery;
+  const { data: districts, error: districtsError } = await districtsQuery;
 
-      if (districtsError) {
-        throw districtsError;
-      }
+  if (districtsError) {
+    console.error('Error fetching districts:', districtsError);
+    throw districtsError;
+  }
 
-      if (!districts || districts.length === 0) {
-        return [];
-      }
+  if (!districts || districts.length === 0) {
+    return [];
+  }
 
-      // Получаем количество школ для каждого района
-      const districtIds = districts.map((d: any) => d.id);
-      const { data: schoolsCount, error: countError } = await supabase
-        .from('organizations')
-        .select('district_id')
-        .eq('org_type', 'school')
-        .eq('status', 'active')
-        .in('district_id', districtIds);
+  // Получаем количество школ для каждого района
+  const districtIds = districts.map((d: any) => d.id);
+  
+  // Если districtIds пуст, пропускаем подсчет
+  let countMap = new Map<number, number>();
+  if (districtIds.length > 0) {
+    const { data: schoolsCount, error: countError } = await supabase
+      .from('organizations')
+      .select('district_id')
+      .eq('org_type', 'school')
+      .eq('status', 'active')
+      .in('district_id', districtIds);
 
-      if (countError) {
-        throw countError;
-      }
-
+    if (countError) {
+      // Если ошибка при подсчете, просто продолжаем без count
+      console.warn('Error counting schools for districts:', countError);
+    } else {
       // Подсчитываем количество школ для каждого района
-      const countMap = new Map<number, number>();
       (schoolsCount || []).forEach((school: any) => {
         if (school.district_id) {
           countMap.set(school.district_id, (countMap.get(school.district_id) || 0) + 1);
         }
       });
-
-      // Формируем результат
-      // ВАЖНО: Показываем ВСЕ районы, даже без школ (district_id может быть не заполнен)
-      // Если нужно показывать только с школами, можно добавить опцию в параметры функции
-      return districts
-        .map((district: any) => ({
-          id: district.id.toString(),
-          name: district.name_uz, // Используем name_uz как основное название
-          name_uz: district.name_uz,
-          name_ru: district.name_ru,
-          count: countMap.get(district.id) || 0,
-        }))
-        // Сортируем: сначала районы со школами, потом остальные
-        .sort((a: any, b: any) => {
-          if (a.count > 0 && b.count === 0) return -1;
-          if (a.count === 0 && b.count > 0) return 1;
-          return b.count - a.count; // Сортировка по количеству школ
-        });
-    },
-    [`districts-with-counts-${regionId || 'all'}`],
-    {
-      revalidate: 3600, // Кэш на 1 час
-      tags: ['districts'],
     }
-  )();
+  }
+
+  // Формируем результат
+  // ВАЖНО: Показываем ВСЕ районы, даже без школ (district_id может быть не заполнен)
+  return districts
+    .map((district: any) => ({
+      id: district.id.toString(),
+      name: district.name_uz, // Используем name_uz как основное название
+      name_uz: district.name_uz,
+      name_ru: district.name_ru,
+      count: countMap.get(district.id) || 0,
+    }))
+    // Сортируем: сначала районы со школами, потом остальные, затем по имени
+    .sort((a: any, b: any) => {
+      if (a.count > 0 && b.count === 0) return -1;
+      if (a.count === 0 && b.count > 0) return 1;
+      if (a.count !== b.count) return b.count - a.count; // Сортировка по количеству школ
+      return a.name_uz.localeCompare(b.name_uz); // Сортировка по имени
+    });
 }
