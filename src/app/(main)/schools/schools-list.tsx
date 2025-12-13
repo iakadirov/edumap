@@ -8,7 +8,7 @@ interface SchoolsListProps {
     school_type?: string;
     price_min?: string;
     price_max?: string;
-    language?: string;
+    language?: string; // В URL это строка с запятыми, парсим в массив
     curriculum?: string;
   };
 }
@@ -34,7 +34,7 @@ export async function SchoolsList({ params }: SchoolsListProps) {
       school_type: params.school_type,
       price_min: params.price_min ? Number(params.price_min) : undefined,
       price_max: params.price_max ? Number(params.price_max) : undefined,
-      language: params.language,
+      language: params.language ? params.language.split(',').filter(Boolean) : undefined,
       curriculum: params.curriculum ? params.curriculum.split(',') : undefined,
     };
     schools = await getSchoolsWithFilters(filters);

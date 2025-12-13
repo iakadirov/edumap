@@ -119,6 +119,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
             fill
             className="object-cover"
             priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1440px"
           />
         </div>
       )}
@@ -134,6 +135,8 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                 alt={school.name}
                 fill
                 className="object-cover"
+                sizes="96px"
+                loading="eager"
               />
             </div>
           )}

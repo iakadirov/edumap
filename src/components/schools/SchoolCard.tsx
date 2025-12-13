@@ -110,7 +110,10 @@ export function SchoolCard({ school }: SchoolCardProps) {
 
         {/* Кнопка "Подробнее" */}
         <Button asChild className="mt-auto w-full" variant="outline">
-          <Link href={`/schools/${school.slug || school.id}`}>
+          <Link 
+            href={`/schools/${school.slug || school.id}`}
+            prefetch={true}
+          >
             Batafsil →
           </Link>
         </Button>

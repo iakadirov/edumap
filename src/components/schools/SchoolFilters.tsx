@@ -34,7 +34,7 @@ export interface FilterValues {
   city?: string;
   school_type?: string;
   price_range?: [number, number];
-  language?: string;
+  language?: string[]; // Изменено на массив для множественного выбора
   curriculum?: string[];
 }
 
@@ -60,7 +60,7 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
         price_range: init.price_min && init.price_max
           ? [Number(init.price_min), Number(init.price_max)]
           : [0, 50000000], // Диапазон по умолчанию: 0 - 50 млн
-        language: init.language || undefined,
+        language: init.language ? init.language.split(',').filter(Boolean) : [],
         curriculum: init.curriculum ? init.curriculum.split(',').filter(Boolean) : [],
       };
     } catch (error) {
@@ -70,7 +70,7 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
         city: undefined,
         school_type: undefined,
         price_range: [0, 50000000],
-        language: undefined,
+        language: [],
         curriculum: [],
       };
     }
@@ -113,7 +113,9 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
     if (updated.price_range && updated.price_range[1] < 50000000) {
       params.set('price_max', updated.price_range[1].toString());
     }
-    if (updated.language) params.set('language', updated.language);
+    if (updated.language && updated.language.length > 0) {
+      params.set('language', updated.language.join(','));
+    }
     if (updated.curriculum && updated.curriculum.length > 0) {
       params.set('curriculum', updated.curriculum.join(','));
     }
@@ -132,8 +134,8 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
       city: undefined,
       school_type: undefined,
       price_range: [0, 50000000],
-      language: undefined,
-      curriculum: [],
+        language: [],
+        curriculum: [],
     });
     try {
       router.push('/schools');
@@ -148,7 +150,7 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
     filters.district ||
     filters.city ||
     filters.school_type ||
-    filters.language ||
+    (filters.language && filters.language.length > 0) ||
     (filters.curriculum && filters.curriculum.length > 0) ||
     (filters.price_range && (filters.price_range[0] > 0 || filters.price_range[1] < 50000000));
 
@@ -248,24 +250,31 @@ export function SchoolFilters({ districts, cities, initialFilters, onFiltersChan
         </div>
 
         {/* Язык обучения */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <label className="text-sm font-medium">Taʼlim tili</label>
-          <Select
-            value={filters.language ? filters.language : 'all'}
-            onValueChange={(value) => updateFilters({ language: value === 'all' ? undefined : value })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Barcha tillar" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Barcha tillar</SelectItem>
-              {languages.map((lang) => (
-                <SelectItem key={lang.value} value={lang.value}>
+          <div className="space-y-2">
+            {languages.map((lang) => (
+              <div key={lang.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`language-${lang.value}`}
+                  checked={filters.language?.includes(lang.value) || false}
+                  onCheckedChange={(checked) => {
+                    const current = filters.language || [];
+                    const updated = checked
+                      ? [...current, lang.value]
+                      : current.filter((l) => l !== lang.value);
+                    updateFilters({ language: updated });
+                  }}
+                />
+                <label
+                  htmlFor={`language-${lang.value}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
                   {lang.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Программа обучения */}

@@ -1,6 +1,39 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+// Простое кэширование в памяти для проверки пользователя (только для middleware)
+// В production лучше использовать Redis или другой кэш
+const userCache = new Map<string, { role: string; is_active: boolean; expires: number }>();
+const CACHE_TTL = 30 * 1000; // 30 секунд
+
+function getCachedUser(userId: string): { role: string; is_active: boolean } | null {
+  const cached = userCache.get(userId);
+  if (cached && cached.expires > Date.now()) {
+    return { role: cached.role, is_active: cached.is_active };
+  }
+  if (cached) {
+    userCache.delete(userId);
+  }
+  return null;
+}
+
+function setCachedUser(userId: string, role: string, is_active: boolean) {
+  userCache.set(userId, {
+    role,
+    is_active,
+    expires: Date.now() + CACHE_TTL,
+  });
+  // Очистка старых записей (простая реализация)
+  if (userCache.size > 1000) {
+    const now = Date.now();
+    for (const [key, value] of userCache.entries()) {
+      if (value.expires <= now) {
+        userCache.delete(key);
+      }
+    }
+  }
+}
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
@@ -44,20 +77,32 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
-    // Проверка роли пользователя (оптимизировано - только нужные поля)
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('role, is_active')
-      .eq('auth_user_id', user.id)
-      .single();
+    // Проверяем кэш перед запросом к БД
+    const cached = getCachedUser(user.id);
+    if (cached) {
+      if (!cached.is_active || !['super_admin', 'admin', 'moderator'].includes(cached.role)) {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+      // Пользователь валиден, пропускаем
+    } else {
+      // Проверка роли пользователя (оптимизировано - только нужные поля)
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('role, is_active')
+        .eq('auth_user_id', user.id)
+        .single();
 
-    if (
-      userError ||
-      !userData ||
-      !userData.is_active ||
-      !['super_admin', 'admin', 'moderator'].includes(userData.role)
-    ) {
-      return NextResponse.redirect(new URL('/', request.url));
+      if (
+        userError ||
+        !userData ||
+        !userData.is_active ||
+        !['super_admin', 'admin', 'moderator'].includes(userData.role)
+      ) {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+
+      // Кэшируем результат
+      setCachedUser(user.id, userData.role, userData.is_active);
     }
   }
 

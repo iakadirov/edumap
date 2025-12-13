@@ -1,10 +1,22 @@
 import { getDistricts, getCities } from '@/lib/supabase/queries';
-import { SchoolFilters } from '@/components/schools/SchoolFilters';
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { SchoolsList } from './schools-list';
 
-// Кэширование на 60 секунд для быстрой загрузки
-export const revalidate = 60;
+// Динамический импорт SchoolFilters для уменьшения bundle size
+// Это client component, поэтому загружаем его только когда нужно
+const SchoolFilters = dynamic(
+  () => import('@/components/schools/SchoolFilters').then((mod) => ({ default: mod.SchoolFilters })),
+  {
+    ssr: true, // Все равно рендерим на сервере для SEO
+    loading: () => (
+      <div className="h-96 bg-muted animate-pulse rounded-lg" />
+    ),
+  }
+);
+
+// Кэширование на 300 секунд (5 минут) для быстрой загрузки
+export const revalidate = 300;
 
 interface SchoolsPageProps {
   searchParams: Promise<{
@@ -51,7 +63,7 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
   }
 
   return (
-    <div className="container-wrapper py-8">
+    <div className="container-wrapper py-8 bg-white">
       <div className="container-content">
         <div className="container-inner">
           {/* Заголовок */}

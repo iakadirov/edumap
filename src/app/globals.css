@@ -140,7 +140,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-white text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
@@ -161,6 +161,11 @@
     margin-right: auto;
     padding-left: var(--container-content-padding);
     padding-right: var(--container-content-padding);
+  }
+  
+  /* Фон для container-content только в main секциях (не в header/footer) */
+  main .container-content {
+    background-color: #f7fcfe;
   }
   
   .container-inner {

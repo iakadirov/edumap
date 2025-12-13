@@ -1,4 +1,5 @@
 import { createClient } from './server';
+import { unstable_cache } from 'next/cache';
 import type { Database } from '@/types/database';
 
 type Organization = Database['public']['Tables']['organizations']['Row'];
@@ -165,7 +166,7 @@ export async function getSchoolsWithFilters(filters: {
   price_min?: number;
   price_max?: number;
   curriculum?: string[];
-  language?: string;
+  language?: string[]; // Изменено на массив для множественного выбора
 }) {
   const supabase = await createClient();
   
@@ -226,8 +227,9 @@ export async function getSchoolsWithFilters(filters: {
     query = query.lte('school_details.fee_monthly_max', filters.price_max);
   }
 
-  if (filters.language) {
-    query = query.eq('school_details.primary_language', filters.language);
+  // Для одного языка используем фильтрацию на уровне БД
+  if (filters.language && filters.language.length === 1) {
+    query = query.eq('school_details.primary_language', filters.language[0]);
   }
 
   const { data, error } = await query.order('overall_rating', {
@@ -239,61 +241,95 @@ export async function getSchoolsWithFilters(filters: {
     throw error;
   }
 
+  // Для множественного выбора языков фильтруем на клиенте
+  // (Supabase не поддерживает .in() для вложенных полей напрямую)
+  if (filters.language && filters.language.length > 1 && data) {
+    return data.filter((school: any) => {
+      const details = Array.isArray(school.school_details)
+        ? school.school_details[0]
+        : school.school_details;
+      return details && filters.language?.includes(details.primary_language);
+    });
+  }
+
   return data;
 }
 
 /**
  * Получить все уникальные районы
+ * Оптимизировано: кэширование на 1 час, так как данные редко меняются
  */
 export async function getDistricts() {
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('organizations')
-    .select('district')
-    .eq('org_type', 'school')
-    .eq('status', 'active')
-    .not('district', 'is', null);
+  return unstable_cache(
+    async () => {
+      const supabase = await createClient();
+      
+      // Используем RPC или прямой SQL для получения DISTINCT значений
+      // Supabase PostgREST не поддерживает DISTINCT напрямую, но мы можем использовать более эффективный запрос
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('district')
+        .eq('org_type', 'school')
+        .eq('status', 'active')
+        .not('district', 'is', null);
 
-  if (error) {
-    throw error;
-  }
+      if (error) {
+        throw error;
+      }
 
-  if (!data) {
-    return [];
-  }
+      if (!data) {
+        return [];
+      }
 
-  const uniqueDistricts = Array.from(
-    new Set(data.map((org: { district: string | null }) => org.district).filter(Boolean))
-  ) as string[];
+      // Фильтруем и получаем уникальные значения
+      const uniqueDistricts = Array.from(
+        new Set(data.map((org: { district: string | null }) => org.district).filter(Boolean))
+      ) as string[];
 
-  return uniqueDistricts.sort();
+      return uniqueDistricts.sort();
+    },
+    ['districts'],
+    {
+      revalidate: 3600, // Кэш на 1 час
+      tags: ['districts'],
+    }
+  )();
 }
 
 /**
  * Получить все уникальные города
+ * Оптимизировано: кэширование на 1 час, так как данные редко меняются
  */
 export async function getCities() {
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('organizations')
-    .select('city')
-    .eq('org_type', 'school')
-    .eq('status', 'active')
-    .not('city', 'is', null);
+  return unstable_cache(
+    async () => {
+      const supabase = await createClient();
+      
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('city')
+        .eq('org_type', 'school')
+        .eq('status', 'active')
+        .not('city', 'is', null);
 
-  if (error) {
-    throw error;
-  }
+      if (error) {
+        throw error;
+      }
 
-  if (!data) {
-    return [];
-  }
+      if (!data) {
+        return [];
+      }
 
-  const uniqueCities = Array.from(
-    new Set(data.map((org: { city: string | null }) => org.city).filter(Boolean))
-  ) as string[];
+      const uniqueCities = Array.from(
+        new Set(data.map((org: { city: string | null }) => org.city).filter(Boolean))
+      ) as string[];
 
-  return uniqueCities.sort();
+      return uniqueCities.sort();
+    },
+    ['cities'],
+    {
+      revalidate: 3600, // Кэш на 1 час
+      tags: ['cities'],
+    }
+  )();
 }
