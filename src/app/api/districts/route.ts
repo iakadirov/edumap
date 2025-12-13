@@ -21,11 +21,20 @@ export async function GET(request: NextRequest) {
 
     const districts = await getDistrictsWithCounts(regionId);
     
-    return NextResponse.json(districts);
-  } catch (error) {
+    return NextResponse.json(districts, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    });
+  } catch (error: any) {
     console.error('Error fetching districts:', error);
+    // Возвращаем более детальную информацию об ошибке для отладки
     return NextResponse.json(
-      { error: 'Failed to fetch districts' },
+      { 
+        error: 'Failed to fetch districts',
+        message: error?.message || 'Unknown error',
+        details: process.env.NODE_ENV === 'development' ? error?.stack : undefined,
+      },
       { status: 500 }
     );
   }

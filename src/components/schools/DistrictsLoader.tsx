@@ -40,7 +40,13 @@ export function DistrictsLoader({ selected, onSelectionChange }: DistrictsLoader
         }
         
         const data = await response.json();
-        setDistricts(data);
+        
+        // Проверяем на ошибку
+        if (data.error) {
+          throw new Error(data.message || data.error);
+        }
+        
+        setDistricts(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error loading districts:', error);
         setDistricts([]);

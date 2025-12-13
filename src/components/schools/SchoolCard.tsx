@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { translateCity, translateDistrict } from '@/lib/utils/translations';
 import type { Database } from '@/types/database';
 
 type Organization = Database['public']['Tables']['organizations']['Row'] & {
@@ -55,7 +56,10 @@ export function SchoolCard({ school }: SchoolCardProps) {
             </CardTitle>
             {(school.district || school.city) && (
               <p className="text-sm text-muted-foreground">
-                {[school.district, school.city].filter(Boolean).join(', ')}
+                {[
+                  school.district ? translateDistrict(school.district) : null,
+                  school.city ? translateCity(school.city) : null
+                ].filter(Boolean).join(', ')}
               </p>
             )}
           </div>

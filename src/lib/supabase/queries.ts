@@ -504,9 +504,8 @@ export async function getCities() {
  * Получить районы с количеством школ в каждом (обновлено для нормализованной структуры)
  */
 export async function getDistrictsWithCounts(regionId?: number | null) {
-  return unstable_cache(
-    async () => {
-      const supabase = await createClient();
+  // Не используем unstable_cache для API endpoint, так как он может кэшировать ошибки
+  const supabase = await createClient();
       
       // Если выбрана область, получаем районы этой области
       // Иначе получаем все районы
@@ -558,16 +557,22 @@ export async function getDistrictsWithCounts(regionId?: number | null) {
       });
 
       // Формируем результат
+      // ВАЖНО: Показываем ВСЕ районы, даже без школ (district_id может быть не заполнен)
+      // Если нужно показывать только с школами, можно добавить опцию в параметры функции
       return districts
         .map((district: any) => ({
           id: district.id.toString(),
-          name: district.name_ru,
+          name: district.name_uz, // Используем name_uz как основное название
           name_uz: district.name_uz,
           name_ru: district.name_ru,
           count: countMap.get(district.id) || 0,
         }))
-        .filter((d: any) => d.count > 0 || regionId === null) // Показываем только районы со школами, если область не выбрана
-        .sort((a: any, b: any) => b.count - a.count); // Сортируем по количеству школ
+        // Сортируем: сначала районы со школами, потом остальные
+        .sort((a: any, b: any) => {
+          if (a.count > 0 && b.count === 0) return -1;
+          if (a.count === 0 && b.count > 0) return 1;
+          return b.count - a.count; // Сортировка по количеству школ
+        });
     },
     [`districts-with-counts-${regionId || 'all'}`],
     {
