@@ -332,7 +332,7 @@ export async function getSchoolsWithFilters(filters: {
         return details.accepts_preparatory === true;
       }
       
-      const gradeNum = parseInt(filters.grade, 10);
+      const gradeNum = parseInt(filters.grade!, 10);
       if (isNaN(gradeNum)) return true;
       
       const gradeFrom = details.grade_from || 1;
