@@ -87,17 +87,22 @@ async function main() {
   console.log(`✅ Найдено ${regionsCount} областей в БД\n`);
 
   // Подготавливаем данные для вставки
+  // ВАЖНО: Загружаем ВСЕ районы, даже если name_ru отсутствует (используем name_uz как fallback)
   const districtsToInsert = districtsData
-    .filter(district => district.name_ru && district.name_ru.trim() !== '') // Фильтруем записи без name_ru
     .map(district => ({
       id: district.id,
       region_id: district.region_id,
       soato_id: district.soato_id,
       name_uz: district.name_uz,
       name_oz: district.name_oz || null,
-      name_ru: district.name_ru || district.name_uz, // Fallback на name_uz если name_ru отсутствует
+      // Используем name_uz как fallback если name_ru отсутствует или пустое
+      name_ru: (district.name_ru && district.name_ru.trim() !== '') 
+        ? district.name_ru 
+        : district.name_uz,
       district_type: determineDistrictType(district.name_uz),
-    }));
+    }))
+    // Фильтруем только записи с пустым name_uz (таких быть не должно, но на всякий случай)
+    .filter(district => district.name_uz && district.name_uz.trim() !== '');
 
   // Вставляем батчами по 100 записей
   const batchSize = 100;
