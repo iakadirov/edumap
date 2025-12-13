@@ -92,7 +92,7 @@ export function RegionSelector() {
 
       {/* Модальное окно выбора области */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="w-[760px] max-w-[760px]">
           <DialogHeader>
             <DialogTitle className="text-2xl">Viloyatingizni tanlang</DialogTitle>
             <DialogDescription>
@@ -110,13 +110,10 @@ export function RegionSelector() {
               )}
               onClick={() => handleSelectRegion(null)}
             >
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
                 <span className="font-semibold text-left">O'zbekiston</span>
               </div>
-              <span className="text-xs text-muted-foreground text-left">
-                Barcha viloyatlar
-              </span>
             </Button>
 
             {/* Список регионов */}
@@ -130,13 +127,10 @@ export function RegionSelector() {
                 )}
                 onClick={() => handleSelectRegion(region)}
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-primary" />
                   <span className="font-semibold text-left">{region.name_uz}</span>
                 </div>
-                <span className="text-xs text-muted-foreground text-left">
-                  {region.name_ru}
-                </span>
               </Button>
             ))}
           </div>
