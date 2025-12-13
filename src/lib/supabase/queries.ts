@@ -566,8 +566,8 @@ export async function getDistrictsWithCounts(regionId?: number | null) {
           name_ru: district.name_ru,
           count: countMap.get(district.id) || 0,
         }))
-        .filter(d => d.count > 0 || regionId === null) // Показываем только районы со школами, если область не выбрана
-        .sort((a, b) => b.count - a.count); // Сортируем по количеству школ
+        .filter((d: any) => d.count > 0 || regionId === null) // Показываем только районы со школами, если область не выбрана
+        .sort((a: any, b: any) => b.count - a.count); // Сортируем по количеству школ
     },
     [`districts-with-counts-${regionId || 'all'}`],
     {
