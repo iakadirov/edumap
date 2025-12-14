@@ -50,7 +50,7 @@ export async function GET(
     // Вычисляем общий прогресс как среднее арифметическое всех разделов
     const sections = progress || [];
     const totalCompleteness =
-      sections.reduce((sum, section) => sum + (section.completeness || 0), 0) /
+      sections.reduce((sum: number, section: any) => sum + (section.completeness || 0), 0) /
       Math.max(sections.length, 1);
 
     const overallProgress = Math.round(totalCompleteness);
