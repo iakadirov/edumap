@@ -143,7 +143,10 @@ export function ResultsForm({ organization, initialResults = [] }: ResultsFormPr
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || `Failed to save: ${response.status} ${response.statusText}`;
+        console.error('Error saving results:', errorMessage, errorData);
+        throw new Error(errorMessage);
       }
 
       await fetch(`/api/admin/schools/${organization.id}/sections/results`, {
