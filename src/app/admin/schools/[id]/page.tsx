@@ -114,14 +114,14 @@ export default async function EditSchoolPage({
     .eq('organization_id', id);
 
   const progressMap = new Map(
-    progressData?.map((p) => [p.section, p.completeness]) || []
+    progressData?.map((p: any) => [p.section, p.completeness]) || []
   );
 
   // Вычисляем общий прогресс
   const overallProgress =
     progressData && progressData.length > 0
       ? Math.round(
-          progressData.reduce((sum, p) => sum + p.completeness, 0) /
+          progressData.reduce((sum: number, p: any) => sum + p.completeness, 0) /
             progressData.length
         )
       : 0;
