@@ -21,14 +21,18 @@ export async function GET(request: NextRequest) {
 
     const districts = await getDistrictsWithCounts(regionId);
     
-    // Преобразуем в формат { id, name_uz, region_id }
+    // Преобразуем в формат { id, name, name_uz, region_id }
     // getDistrictsWithCounts возвращает id как строку, преобразуем в число
-    const formattedDistricts = districts.map((d: any) => ({
-      id: typeof d.id === 'string' ? parseInt(d.id, 10) : d.id,
-      name_uz: d.name_uz || d.name,
-      region_id: d.region_id,
-      count: d.count || 0,
-    }));
+    const formattedDistricts = districts.map((d: any) => {
+      const nameUz = d.name_uz || d.name || '';
+      return {
+        id: typeof d.id === 'string' ? parseInt(d.id, 10) : d.id,
+        name: nameUz, // Для обратной совместимости
+        name_uz: nameUz,
+        region_id: d.region_id,
+        count: d.count || 0,
+      };
+    });
     
     // Возвращаем массив напрямую для удобства использования
     return NextResponse.json(formattedDistricts, {
