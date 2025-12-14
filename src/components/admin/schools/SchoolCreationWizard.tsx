@@ -38,6 +38,7 @@ interface WizardData {
   telegram: string;
   region_id: number | null;
   district_id: number | null;
+  city: string;
   address: string;
   landmark: string;
   lat?: number;
