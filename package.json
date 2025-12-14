@@ -17,7 +17,9 @@
     "db:push": "supabase db push",
     "db:reset-cli": "supabase db reset",
     "db:status": "tsx scripts/check-db-status.ts",
-    "test:storage": "tsx scripts/test-yandex-storage.ts"
+    "test:storage": "tsx scripts/test-yandex-storage.ts",
+    "test:storage-list": "tsx scripts/test-list-buckets.ts",
+    "test:bucket-access": "tsx scripts/test-bucket-access.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.948.0",

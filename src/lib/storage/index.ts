@@ -15,8 +15,8 @@ export {
   getLicensePath,
   getDocumentPath,
   getTempPath,
-  s3Client,
-  BUCKET_NAME,
+  getS3Client,
+  getBucketName,
   type UploadFileOptions,
   type FileInfo,
 } from './yandex-client';

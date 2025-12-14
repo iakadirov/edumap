@@ -14,6 +14,7 @@ function createS3Client() {
   const endpoint = process.env.YANDEX_CLOUD_ENDPOINT || 'https://storage.yandexcloud.net';
   const region = process.env.YANDEX_CLOUD_REGION || 'ru-central1';
 
+  // Для Yandex Cloud лучше использовать path-style URLs с общим endpoint
   return new S3Client({
     endpoint,
     region,
@@ -21,10 +22,8 @@ function createS3Client() {
       accessKeyId,
       secretAccessKey,
     },
-    // Yandex Cloud требует path-style URLs
+    // Yandex Cloud требует path-style URLs (storage.yandexcloud.net/bucket/key)
     forcePathStyle: true,
-    // Отключаем проверку SSL для отладки (можно убрать потом)
-    // Но лучше оставить для production
   });
 }
 
@@ -32,13 +31,15 @@ function createS3Client() {
 let s3Client: S3Client | null = null;
 
 function getS3Client(): S3Client {
-  if (!s3Client) {
-    s3Client = createS3Client();
-  }
-  return s3Client;
+  // Всегда создаем новый клиент, чтобы избежать проблем с кэшированием
+  // при изменении переменных окружения
+  return createS3Client();
 }
 
-const BUCKET_NAME = process.env.YANDEX_CLOUD_BUCKET_NAME || 'edumap-media';
+// Функция для получения имени bucket (для lazy evaluation)
+function getBucketName(): string {
+  return process.env.YANDEX_CLOUD_BUCKET_NAME || 'edumap-media';
+}
 
 export interface UploadFileOptions {
   key: string; // Путь к файлу в bucket (например: 'logos/123/logo.jpg')
@@ -62,7 +63,7 @@ export async function uploadFile(options: UploadFileOptions): Promise<string> {
   const { key, file, contentType, metadata } = options;
 
   const command = new PutObjectCommand({
-    Bucket: BUCKET_NAME,
+    Bucket: getBucketName(),
     Key: key,
     Body: file,
     ContentType: contentType,
@@ -89,7 +90,7 @@ export async function getFileUrl(
 
   // Для приватного bucket используем presigned URL
   const command = new GetObjectCommand({
-    Bucket: BUCKET_NAME,
+    Bucket: getBucketName(),
     Key: key,
   });
 
@@ -102,7 +103,7 @@ export async function getFileUrl(
  */
 export async function deleteFile(key: string): Promise<void> {
   const command = new DeleteObjectCommand({
-    Bucket: BUCKET_NAME,
+    Bucket: getBucketName(),
     Key: key,
   });
 
@@ -115,7 +116,7 @@ export async function deleteFile(key: string): Promise<void> {
 export async function fileExists(key: string): Promise<boolean> {
   try {
     const command = new HeadObjectCommand({
-      Bucket: BUCKET_NAME,
+      Bucket: getBucketName(),
       Key: key,
     });
 
@@ -135,7 +136,7 @@ export async function fileExists(key: string): Promise<boolean> {
 export async function getFileInfo(key: string): Promise<FileInfo | null> {
   try {
     const command = new HeadObjectCommand({
-      Bucket: BUCKET_NAME,
+      Bucket: getBucketName(),
       Key: key,
     });
 
@@ -201,5 +202,5 @@ export function getTempPath(uploadId: string, fileName: string): string {
   return `temp/${uploadId}/${sanitizedFileName}`;
 }
 
-export { getS3Client, BUCKET_NAME };
+export { getS3Client, getBucketName };
 
