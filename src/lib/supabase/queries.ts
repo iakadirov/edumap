@@ -421,11 +421,17 @@ export async function getSchoolsWithFilters(filters: {
 /**
  * Получить все уникальные районы
  * Оптимизировано: кэширование на 1 час, так как данные редко меняются
+ * Использует анонимный клиент, так как не требует авторизации
  */
 export async function getDistricts() {
   return unstable_cache(
     async () => {
-      const supabase = await createClient();
+      // Используем анонимный клиент вместо createClient(), чтобы избежать cookies() внутри cache
+      const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
+      const supabase = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
       
       // Используем RPC или прямой SQL для получения DISTINCT значений
       // Supabase PostgREST не поддерживает DISTINCT напрямую, но мы можем использовать более эффективный запрос
