@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,7 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ user }: AdminHeaderProps) {
   const router = useRouter();
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -29,8 +31,31 @@ export function AdminHeader({ user }: AdminHeaderProps) {
     window.location.href = '/auth/login';
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      // Находим родительский main элемент
+      const mainElement = document.querySelector('main.flex-1.flex.flex-col');
+      if (mainElement) {
+        const scrollTop = mainElement.scrollTop;
+        setIsScrolled(scrollTop > 0);
+      }
+    };
+
+    // Находим родительский main элемент для отслеживания скролла
+    const mainElement = document.querySelector('main.flex-1.flex.flex-col');
+    if (mainElement) {
+      mainElement.addEventListener('scroll', handleScroll);
+      // Проверяем начальное состояние
+      handleScroll();
+      
+      return () => {
+        mainElement.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, []);
+
   return (
-    <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
+    <header className={`h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 transition-all duration-200 ${isScrolled ? 'rounded-t-none' : 'rounded-t-xl'}`}>
       <div className="h-full flex items-center justify-between px-6">
         {/* Search */}
         <div className="flex-1 max-w-md">
