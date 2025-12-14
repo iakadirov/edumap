@@ -174,14 +174,21 @@ export async function PATCH(
 
     // Обновляем прогресс раздела (если передан completeness)
     if (body.completeness !== undefined) {
-      const { error: progressError } = await (supabase as any)
+      console.log(`[PATCH /api/admin/schools/${id}/sections/${section}] Updating progress:`, {
+        organization_id: id,
+        section,
+        completeness: body.completeness,
+      });
+      
+      const { data: progressData, error: progressError } = await (supabase as any)
         .from('school_sections_progress')
         .upsert({
           organization_id: id,
           section,
           completeness: body.completeness,
           last_updated_at: new Date().toISOString(),
-        });
+        })
+        .select();
 
       if (progressError) {
         console.error('Error updating progress:', progressError);
@@ -190,6 +197,8 @@ export async function PATCH(
           { status: 500 }
         );
       }
+
+      console.log(`[PATCH /api/admin/schools/${id}/sections/${section}] Progress updated:`, progressData);
     }
 
     return NextResponse.json({
