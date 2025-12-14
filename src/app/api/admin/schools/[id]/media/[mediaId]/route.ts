@@ -34,7 +34,7 @@ export async function PATCH(
     }
 
     // Проверяем, что медиа принадлежит школе
-    const { data: media, error: mediaError } = await supabase
+    const { data: media, error: mediaError } = await (supabase as any)
       .from('school_media')
       .select('*')
       .eq('id', mediaId)
