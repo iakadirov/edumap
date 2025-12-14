@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
+import { canEditSchool } from '@/lib/auth/permissions';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 
