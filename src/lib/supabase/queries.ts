@@ -63,20 +63,41 @@ export async function getActiveSchools() {
 }
 
 /**
- * Получить школу по slug
+ * Проверка, является ли строка UUID
  */
-export async function getSchoolBySlug(slug: string): Promise<SchoolWithDetails> {
+function isUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
+
+/**
+ * Получить школу по slug или UUID
+ */
+export async function getSchoolBySlug(slugOrId: string): Promise<SchoolWithDetails> {
   const supabase = await createClient();
   
-  const { data, error } = await supabase
+  // Определяем, является ли параметр UUID
+  const isId = isUUID(slugOrId);
+  
+  let query = supabase
     .from('organizations')
     .select(`
       *,
       school_details (*)
-    `)
-    .eq('slug', slug)
-    .eq('status', 'active')
-    .single();
+    `);
+  
+  if (isId) {
+    // Если это UUID, ищем по id
+    query = query.eq('id', slugOrId);
+  } else {
+    // Если это slug, ищем по slug
+    query = query.eq('slug', slugOrId);
+  }
+  
+  // Для публичных страниц показываем только активные или опубликованные школы
+  query = query.in('status', ['active', 'published']);
+  
+  const { data, error } = await query.single();
 
   if (error) {
     throw error;
@@ -99,7 +120,7 @@ export async function getSchoolBranches(parentId: string): Promise<SchoolWithDet
       school_details (*)
     `)
     .eq('parent_organization_id', parentId)
-    .eq('status', 'active')
+    .in('status', ['active', 'published'])
     .order('name');
 
   if (error) {
