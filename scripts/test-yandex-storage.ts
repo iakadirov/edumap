@@ -36,24 +36,28 @@ async function testYandexStorage() {
 
   console.log('✅ Переменные окружения настроены');
   console.log(`   Bucket: ${process.env.YANDEX_CLOUD_BUCKET_NAME}`);
-  console.log(`   Region: ${process.env.YANDEX_CLOUD_REGION || 'ru-central1'}\n`);
+  console.log(`   Region: ${process.env.YANDEX_CLOUD_REGION || 'ru-central1'}`);
+  console.log(`   Endpoint: ${process.env.YANDEX_CLOUD_ENDPOINT || 'https://storage.yandexcloud.net'}`);
+  console.log(`   Access Key ID: ${process.env.YANDEX_CLOUD_ACCESS_KEY_ID ? process.env.YANDEX_CLOUD_ACCESS_KEY_ID.substring(0, 8) + '...' : 'NOT SET'}\n`);
 
-  // Тест 1: Загрузка тестового файла
-  console.log('📤 Тест 1: Загрузка тестового файла...');
-  try {
-    const testKey = `test/connection-test-${Date.now()}.txt`;
-    const testContent = `Test file uploaded at ${new Date().toISOString()}`;
+    // Тест 1: Попытка загрузки тестового файла
+    console.log('📤 Тест 1: Загрузка тестового файла...');
+    try {
+      const testKey = `test/connection-test-${Date.now()}.txt`;
+      const testContent = `Test file uploaded at ${new Date().toISOString()}`;
 
-    await uploadFile({
-      key: testKey,
-      file: Buffer.from(testContent),
-      contentType: 'text/plain',
-      metadata: {
-        test: 'true',
-      },
-    });
+      console.log(`   Пытаемся загрузить в bucket: ${process.env.YANDEX_CLOUD_BUCKET_NAME}`);
+      
+      await uploadFile({
+        key: testKey,
+        file: Buffer.from(testContent),
+        contentType: 'text/plain',
+        metadata: {
+          test: 'true',
+        },
+      });
 
-    console.log(`   ✅ Файл загружен: ${testKey}`);
+      console.log(`   ✅ Файл загружен: ${testKey}`);
 
     // Тест 2: Проверка существования файла
     console.log('🔍 Тест 2: Проверка существования файла...');

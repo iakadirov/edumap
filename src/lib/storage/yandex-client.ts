@@ -1,17 +1,42 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-// Инициализация клиента Yandex Cloud Storage
+// Функция для создания клиента Yandex Cloud Storage
 // Yandex Object Storage совместим с S3 API
-const s3Client = new S3Client({
-  endpoint: process.env.YANDEX_CLOUD_ENDPOINT || 'https://storage.yandexcloud.net',
-  region: process.env.YANDEX_CLOUD_REGION || 'ru-central1',
-  credentials: {
-    accessKeyId: process.env.YANDEX_CLOUD_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.YANDEX_CLOUD_SECRET_ACCESS_KEY || '',
-  },
-  forcePathStyle: true, // Yandex Cloud требует path-style URLs
-});
+function createS3Client() {
+  const accessKeyId = process.env.YANDEX_CLOUD_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.YANDEX_CLOUD_SECRET_ACCESS_KEY;
+
+  if (!accessKeyId || !secretAccessKey) {
+    throw new Error('Yandex Cloud Storage credentials not configured. Please set YANDEX_CLOUD_ACCESS_KEY_ID and YANDEX_CLOUD_SECRET_ACCESS_KEY in environment variables.');
+  }
+
+  const endpoint = process.env.YANDEX_CLOUD_ENDPOINT || 'https://storage.yandexcloud.net';
+  const region = process.env.YANDEX_CLOUD_REGION || 'ru-central1';
+
+  return new S3Client({
+    endpoint,
+    region,
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
+    // Yandex Cloud требует path-style URLs
+    forcePathStyle: true,
+    // Отключаем проверку SSL для отладки (можно убрать потом)
+    // Но лучше оставить для production
+  });
+}
+
+// Lazy initialization клиента
+let s3Client: S3Client | null = null;
+
+function getS3Client(): S3Client {
+  if (!s3Client) {
+    s3Client = createS3Client();
+  }
+  return s3Client;
+}
 
 const BUCKET_NAME = process.env.YANDEX_CLOUD_BUCKET_NAME || 'edumap-media';
 
@@ -44,7 +69,7 @@ export async function uploadFile(options: UploadFileOptions): Promise<string> {
     Metadata: metadata,
   });
 
-  await s3Client.send(command);
+  await getS3Client().send(command);
 
   // Возвращаем ключ файла для сохранения в БД
   return key;
@@ -68,7 +93,7 @@ export async function getFileUrl(
     Key: key,
   });
 
-  const url = await getSignedUrl(s3Client, command, { expiresIn });
+  const url = await getSignedUrl(getS3Client(), command, { expiresIn });
   return url;
 }
 
@@ -81,7 +106,7 @@ export async function deleteFile(key: string): Promise<void> {
     Key: key,
   });
 
-  await s3Client.send(command);
+  await getS3Client().send(command);
 }
 
 /**
@@ -94,7 +119,7 @@ export async function fileExists(key: string): Promise<boolean> {
       Key: key,
     });
 
-    await s3Client.send(command);
+    await getS3Client().send(command);
     return true;
   } catch (error: any) {
     if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
@@ -176,5 +201,5 @@ export function getTempPath(uploadId: string, fileName: string): string {
   return `temp/${uploadId}/${sanitizedFileName}`;
 }
 
-export { s3Client, BUCKET_NAME };
+export { getS3Client, BUCKET_NAME };
 
