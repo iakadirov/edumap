@@ -65,7 +65,7 @@ export async function GET(
     ];
 
     allSections.forEach((section) => {
-      const sectionProgress = progress?.find((p) => p.section === section);
+      const sectionProgress = progress?.find((p: any) => p.section === section);
       sectionsMap[section] = {
         section,
         completeness: sectionProgress?.completeness || 0,

@@ -256,9 +256,11 @@ export function MediaManager({
           {/* Upload Button */}
           <div className="flex items-center gap-4">
             <Label htmlFor={`file-upload-${type}`} className="cursor-pointer">
-              <Button variant="outline" as="span" disabled={uploading}>
-                {uploading ? 'Загрузка...' : `+ Загрузить ${type === 'photo' ? 'фото' : 'видео'}`}
-              </Button>
+              <span>
+                <Button variant="outline" disabled={uploading} type="button">
+                  {uploading ? 'Загрузка...' : `+ Загрузить ${type === 'photo' ? 'фото' : 'видео'}`}
+                </Button>
+              </span>
             </Label>
             <Input
               id={`file-upload-${type}`}

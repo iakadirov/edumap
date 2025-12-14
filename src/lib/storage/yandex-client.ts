@@ -135,12 +135,13 @@ export async function fileExists(key: string): Promise<boolean> {
  */
 export async function getFileInfo(key: string): Promise<FileInfo | null> {
   try {
+    const client = getS3Client();
     const command = new HeadObjectCommand({
       Bucket: getBucketName(),
       Key: key,
     });
 
-    const response = await s3Client.send(command);
+    const response = await client.send(command);
 
     return {
       key,

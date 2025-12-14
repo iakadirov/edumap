@@ -21,7 +21,15 @@ export async function GET(request: NextRequest) {
 
     const districts = await getDistrictsWithCounts(regionId);
     
-    return NextResponse.json(districts, {
+    // Преобразуем в формат { id, name_uz, region_id }
+    // getDistrictsWithCounts возвращает id как строку, преобразуем в число
+    const formattedDistricts = districts.map((d: any) => ({
+      id: typeof d.id === 'string' ? parseInt(d.id, 10) : d.id,
+      name_uz: d.name_uz || d.name,
+      region_id: d.region_id,
+    }));
+    
+    return NextResponse.json({ districts: formattedDistricts }, {
       headers: {
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
       },
