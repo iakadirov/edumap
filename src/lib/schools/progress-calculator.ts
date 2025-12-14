@@ -125,6 +125,10 @@ export function calculateSectionProgress(
   section: Section,
   data: SectionFields
 ): number {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:124',message:'calculateSectionProgress called',data:{section,dataKeys:Object.keys(data),sampleData:{name_uz:data.name_uz,name_ru:data.name_ru,region_id:data.region_id,district_id:data.district_id}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
+
   const requiredFields = REQUIRED_FIELDS[section] || [];
   const importantFields = IMPORTANT_FIELDS[section] || [];
 
@@ -134,19 +138,35 @@ export function calculateSectionProgress(
     let filledRequired = requiredFields.filter((field) => {
       // Для name_uz проверяем, что хотя бы одно название есть
       if (field === 'name_uz') {
-        return (data.name_uz && data.name_uz.trim() !== '') || 
+        const hasName = (data.name_uz && data.name_uz.trim() !== '') || 
                (data.name_ru && data.name_ru.trim() !== '');
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:137',message:'Checking name_uz field',data:{field,hasName,name_uz:data.name_uz,name_ru:data.name_ru}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
+        return hasName;
       }
       const value = data[field];
-      // Для чисел проверяем, что не null/undefined (0 - валидное значение)
+      let isFilled: boolean;
+      // Для чисел проверяем, что не null/undefined (0 - валидное значение для некоторых полей)
       if (typeof value === 'number') {
-        return value !== null && value !== undefined;
+        // Для fee_monthly_min и fee_monthly_max 0 может быть валидным (бесплатная школа)
+        // Но обычно это означает незаполненное поле, поэтому проверяем > 0
+        if (field === 'fee_monthly_min' || field === 'fee_monthly_max') {
+          isFilled = value !== null && value !== undefined && value >= 0;
+        } else {
+          isFilled = value !== null && value !== undefined;
+        }
+      } else if (typeof value === 'string') {
+        // Для строк проверяем, что не пустая
+        isFilled = value !== null && value !== undefined && value.trim() !== '';
+      } else {
+        // Для остальных типов (boolean, object, etc.)
+        isFilled = value !== null && value !== undefined && value !== '';
       }
-      // Для строк проверяем, что не пустая
-      if (typeof value === 'string') {
-        return value !== null && value !== undefined && value.trim() !== '';
-      }
-      return value !== null && value !== undefined && value !== '';
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:155',message:'Checking required field',data:{field,value,valueType:typeof value,isFilled}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
+      return isFilled;
     }).length;
 
     const requiredProgress =
@@ -168,7 +188,11 @@ export function calculateSectionProgress(
         ? (filledImportant / importantFields.length) * 30
         : 0;
 
-    return Math.round(requiredProgress + importantProgress);
+    const totalProgress = Math.round(requiredProgress + importantProgress);
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:171',message:'Progress calculated',data:{section,requiredFieldsCount:requiredFields.length,filledRequired,requiredProgress,importantFieldsCount:importantFields.length,filledImportant,importantProgress,totalProgress}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    return totalProgress;
   }
 
   // Для остальных разделов стандартная логика

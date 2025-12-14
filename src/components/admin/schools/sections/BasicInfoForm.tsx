@@ -32,12 +32,13 @@ export function BasicInfoForm({
   schoolDetails,
   regions,
   districts: initialDistricts,
-  currentProgress,
+  currentProgress: initialProgress,
 }: BasicInfoFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [currentProgress, setCurrentProgress] = useState(initialProgress);
 
   // Основная информация
   const [nameUz, setNameUz] = useState(organization?.name_uz || '');
@@ -109,9 +110,23 @@ export function BasicInfoForm({
     grade_from: parseInt(gradeFrom) || 1,
     grade_to: parseInt(gradeTo) || 11,
     primary_language: primaryLanguage,
-    fee_monthly_min: parseFloat(feeMonthlyMin) || 0,
-    fee_monthly_max: parseFloat(feeMonthlyMax) || 0,
+    // Для fee_monthly_min/max используем null если поле пустое, иначе число (0 - валидное значение для бесплатных школ)
+    fee_monthly_min: feeMonthlyMin === '' ? null : (parseFloat(feeMonthlyMin) || 0),
+    fee_monthly_max: feeMonthlyMax === '' ? null : (parseFloat(feeMonthlyMax) || 0),
   };
+
+  // Пересчитываем прогресс при изменении данных формы
+  useEffect(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:118',message:'Recalculating progress on formData change',data:{formDataKeys:Object.keys(formData),sampleValues:{name_uz:formData.name_uz,region_id:formData.region_id,district_id:formData.district_id,fee_monthly_min:formData.fee_monthly_min,fee_monthly_max:formData.fee_monthly_max}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
+    const calculatedProgress = calculateSectionProgress('basic', formData);
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:122',message:'Progress recalculated',data:{calculatedProgress,previousProgress:currentProgress},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
+    setCurrentProgress(calculatedProgress);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nameUz, nameRu, description, phone, email, regionId, districtId, address, lat, lng, schoolType, gradeFrom, gradeTo, primaryLanguage, feeMonthlyMin, feeMonthlyMax]);
 
   // Функция сохранения
   const saveData = async (data: any) => {
@@ -161,14 +176,27 @@ export function BasicInfoForm({
     }
 
     // Обновляем прогресс
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:164',message:'About to calculate progress',data:{dataKeys:Object.keys(data),sampleData:{name_uz:data.name_uz,region_id:data.region_id,district_id:data.district_id}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     const progress = calculateSectionProgress('basic', data);
-    await fetch(`/api/admin/schools/${organization.id}/sections/basic`, {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:166',message:'Progress calculated, sending to API',data:{progress,organizationId:organization.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+    const progressResponse = await fetch(`/api/admin/schools/${organization.id}/sections/basic`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ completeness: progress }),
     });
+    // #region agent log
+    const progressResponseOk = progressResponse.ok;
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:183',message:'Progress API response',data:{progress,status:progressResponse.status,ok:progressResponseOk},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
+    if (progressResponseOk) {
+      setCurrentProgress(progress);
+    }
   };
 
   const autosave = useAutosave({
