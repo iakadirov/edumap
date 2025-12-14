@@ -26,13 +26,13 @@ export default async function ResultsPage({
     notFound();
   }
 
-  const { data: results } = await supabase
+  const { data: results } = await (supabase as any)
     .from('school_results')
     .select('*')
     .eq('organization_id', id)
     .order('year', { ascending: false });
 
-  const { data: progress } = await supabase
+  const { data: progress } = await (supabase as any)
     .from('school_sections_progress')
     .select('completeness')
     .eq('organization_id', id)

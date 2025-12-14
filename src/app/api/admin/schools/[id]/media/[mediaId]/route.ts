@@ -58,7 +58,7 @@ export async function PATCH(
 
     // Если устанавливаем обложку, снимаем с других
     if (is_cover === true) {
-      await supabase
+      await (supabase as any)
         .from('school_media')
         .update({ is_cover: false })
         .eq('organization_id', id)
@@ -69,7 +69,7 @@ export async function PATCH(
       updateData.is_cover = false;
     }
 
-    const { data: updatedMedia, error: updateError } = await supabase
+    const { data: updatedMedia, error: updateError } = await (supabase as any)
       .from('school_media')
       .update(updateData)
       .eq('id', mediaId)
@@ -128,7 +128,7 @@ export async function DELETE(
     }
 
     // Проверяем, что медиа принадлежит школе
-    const { data: media, error: mediaError } = await supabase
+    const { data: media, error: mediaError } = await (supabase as any)
       .from('school_media')
       .select('*')
       .eq('id', mediaId)
@@ -142,7 +142,7 @@ export async function DELETE(
       );
     }
 
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await (supabase as any)
       .from('school_media')
       .delete()
       .eq('id', mediaId);

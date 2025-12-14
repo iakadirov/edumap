@@ -34,7 +34,7 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { data: staff, error: staffError } = await supabase
+    const { data: staff, error: staffError } = await (supabase as any)
       .from('school_staff')
       .insert({
         organization_id: id,

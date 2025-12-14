@@ -35,7 +35,7 @@ export async function PUT(
     }
 
     // Проверяем, что сотрудник принадлежит школе
-    const { data: existingStaff } = await supabase
+    const { data: existingStaff } = await (supabase as any)
       .from('school_staff')
       .select('id')
       .eq('id', staffId)
@@ -49,7 +49,7 @@ export async function PUT(
       );
     }
 
-    const { data: staff, error: staffError } = await supabase
+    const { data: staff, error: staffError } = await (supabase as any)
       .from('school_staff')
       .update({
         name: body.name,
@@ -116,7 +116,7 @@ export async function DELETE(
     }
 
     // Проверяем, что сотрудник принадлежит школе
-    const { data: existingStaff } = await supabase
+    const { data: existingStaff } = await (supabase as any)
       .from('school_staff')
       .select('id')
       .eq('id', staffId)
@@ -130,7 +130,7 @@ export async function DELETE(
       );
     }
 
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await (supabase as any)
       .from('school_staff')
       .delete()
       .eq('id', staffId);

@@ -34,7 +34,7 @@ export async function GET(
     }
 
     // Получаем прогресс всех разделов
-    const { data: progress, error: progressError } = await supabase
+    const { data: progress, error: progressError } = await (supabase as any)
       .from('school_sections_progress')
       .select('*')
       .eq('organization_id', id)

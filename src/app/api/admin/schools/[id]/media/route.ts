@@ -52,7 +52,7 @@ export async function POST(
 
     // Если это обложка, снимаем обложку с других медиа
     if (is_cover) {
-      await supabase
+      await (supabase as any)
         .from('school_media')
         .update({ is_cover: false })
         .eq('organization_id', id)
@@ -60,7 +60,7 @@ export async function POST(
     }
 
     // Вставляем новое медиа
-    const { data: media, error: mediaError } = await supabase
+    const { data: media, error: mediaError } = await (supabase as any)
       .from('school_media')
       .insert({
         organization_id: id,
@@ -125,7 +125,7 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type'); // 'photo' или 'video'
 
-    let query = supabase
+    let query = (supabase as any)
       .from('school_media')
       .select('*')
       .eq('organization_id', id);

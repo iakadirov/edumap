@@ -34,7 +34,7 @@ export default async function BasicInfoPage({
     .single();
 
   // Получаем прогресс раздела
-  const { data: progress } = await supabase
+  const { data: progress } = await (supabase as any)
     .from('school_sections_progress')
     .select('completeness')
     .eq('organization_id', id)

@@ -58,7 +58,7 @@ export async function GET(
     }
 
     // Получаем прогресс раздела
-    const { data: progress } = await supabase
+    const { data: progress } = await (supabase as any)
       .from('school_sections_progress')
       .select('*')
       .eq('organization_id', id)
@@ -82,7 +82,7 @@ export async function GET(
     let sectionData: any = {};
 
     if (section === 'teachers') {
-      const { data: staff } = await supabase
+      const { data: staff } = await (supabase as any)
         .from('school_staff')
         .select('*')
         .eq('organization_id', id)
@@ -91,7 +91,7 @@ export async function GET(
     }
 
     if (section === 'results') {
-      const { data: results } = await supabase
+      const { data: results } = await (supabase as any)
         .from('school_results')
         .select('*')
         .eq('organization_id', id)
@@ -101,7 +101,7 @@ export async function GET(
 
     if (section === 'photos' || section === 'videos') {
       const mediaType = section === 'photos' ? 'photo' : 'video';
-      const { data: media } = await supabase
+      const { data: media } = await (supabase as any)
         .from('school_media')
         .select('*')
         .eq('organization_id', id)
@@ -174,7 +174,7 @@ export async function PATCH(
 
     // Обновляем прогресс раздела (если передан completeness)
     if (body.completeness !== undefined) {
-      const { error: progressError } = await supabase
+      const { error: progressError } = await (supabase as any)
         .from('school_sections_progress')
         .upsert({
           organization_id: id,

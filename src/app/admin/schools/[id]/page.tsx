@@ -108,7 +108,7 @@ export default async function EditSchoolPage({
   }
 
   // Получаем прогресс разделов
-  const { data: progressData } = await supabase
+  const { data: progressData } = await (supabase as any)
     .from('school_sections_progress')
     .select('section, completeness')
     .eq('organization_id', id);

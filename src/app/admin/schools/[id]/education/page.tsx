@@ -32,7 +32,7 @@ export default async function EducationPage({
     .eq('organization_id', id)
     .single();
 
-  const { data: progress } = await supabase
+  const { data: progress } = await (supabase as any)
     .from('school_sections_progress')
     .select('completeness')
     .eq('organization_id', id)
