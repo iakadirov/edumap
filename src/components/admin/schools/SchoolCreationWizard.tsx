@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -68,6 +68,10 @@ export function SchoolCreationWizard({
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [regions, setRegions] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<any[]>([]);
+  const [loadingRegions, setLoadingRegions] = useState(false);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
 
   const [data, setData] = useState<WizardData>({
     name_uz: '',
@@ -80,6 +84,7 @@ export function SchoolCreationWizard({
     telegram: '',
     region_id: null,
     district_id: null,
+    city: '',
     address: '',
     landmark: '',
     grade_from: 1,
@@ -92,6 +97,53 @@ export function SchoolCreationWizard({
     currency: 'UZS',
     price_negotiable: false,
   });
+
+  // Загружаем регионы при монтировании
+  useEffect(() => {
+    async function loadRegions() {
+      setLoadingRegions(true);
+      try {
+        const response = await fetch('/data/regions.json');
+        const data = await response.json();
+        setRegions(data);
+      } catch (error) {
+        console.error('Error loading regions:', error);
+      } finally {
+        setLoadingRegions(false);
+      }
+    }
+    if (open) {
+      loadRegions();
+    }
+  }, [open]);
+
+  // Загружаем районы при изменении региона
+  useEffect(() => {
+    if (data.region_id) {
+      setLoadingDistricts(true);
+      fetch(`/api/districts?region=${data.region_id}`)
+        .then((res) => res.json())
+        .then((responseData) => {
+          const districtsList = Array.isArray(responseData) ? responseData : [];
+          setDistricts(districtsList);
+          // Сбрасываем район, если он не принадлежит новому региону
+          if (data.district_id && !districtsList.some((d: any) => d.id === data.district_id)) {
+            updateData('district_id', null);
+          }
+        })
+        .catch((err) => {
+          console.error('Error loading districts:', err);
+          setDistricts([]);
+        })
+        .finally(() => setLoadingDistricts(false));
+    } else {
+      setDistricts([]);
+      if (data.district_id) {
+        updateData('district_id', null);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.region_id]);
 
   const generateSlug = (text: string): string => {
     return text
@@ -380,18 +432,51 @@ export function SchoolCreationWizard({
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="region">Область *</Label>
+                    <Select
+                      value={data.region_id?.toString() || 'all'}
+                      onValueChange={(value) =>
+                        updateData('region_id', value === 'all' ? null : parseInt(value))
+                      }
+                      disabled={loadingRegions}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={loadingRegions ? "Загрузка..." : "Выберите область"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Все области</SelectItem>
+                        {regions.map((region) => (
+                          <SelectItem key={region.id} value={region.id.toString()}>
+                            {region.name_uz}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
                     <Label htmlFor="district">Район *</Label>
                     <Select
                       value={data.district_id?.toString() || ''}
                       onValueChange={(value) =>
-                        updateData('district_id', parseInt(value))
+                        updateData('district_id', value ? parseInt(value) : null)
                       }
+                      disabled={!data.region_id || loadingDistricts}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Выберите район" />
+                        <SelectValue placeholder={
+                          !data.region_id 
+                            ? "Сначала выберите область" 
+                            : loadingDistricts 
+                            ? "Загрузка..." 
+                            : "Выберите район"
+                        } />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* Здесь нужно загрузить районы через API */}
+                        {districts.map((district) => (
+                          <SelectItem key={district.id} value={district.id.toString()}>
+                            {district.name_uz || district.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -399,9 +484,9 @@ export function SchoolCreationWizard({
                     <Label htmlFor="city">Город *</Label>
                     <Input
                       id="city"
-                      value="Ташкент"
-                      disabled
-                      className="bg-muted"
+                      value={data.city || ''}
+                      onChange={(e) => updateData('city', e.target.value)}
+                      placeholder="Ташкент"
                     />
                   </div>
                   <div className="space-y-2 md:col-span-2">
