@@ -248,11 +248,16 @@ export function SchoolCreationWizard({
         lng: data.lng || null,
       };
 
+      // Если grade_from = 0, это означает подготовительный класс
+      // В БД grade_from должен быть >= 1, поэтому если выбран 0, используем 1 и устанавливаем accepts_preparatory
+      const gradeFrom = data.grade_from === 0 ? 1 : data.grade_from;
+      const acceptsPreparatory = data.grade_from === 0 || data.accepts_preparatory;
+
       const schoolDetailsData = {
         school_type: data.school_type,
-        grade_from: data.grade_from,
+        grade_from: gradeFrom,
         grade_to: data.grade_to,
-        accepts_preparatory: data.accepts_preparatory,
+        accepts_preparatory: acceptsPreparatory,
         primary_language: data.primary_language,
         curriculum: data.curriculum.length > 0 ? data.curriculum : null,
         fee_monthly_min: data.fee_monthly_min,
