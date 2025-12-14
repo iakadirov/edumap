@@ -27,31 +27,51 @@ export default async function BasicInfoPage({
     notFound();
   }
 
-  const { data: schoolDetails } = await supabase
+  // Получаем данные школы (может не быть)
+  const { data: schoolDetails, error: schoolDetailsError } = await supabase
     .from('school_details')
     .select('*')
     .eq('organization_id', id)
-    .single();
+    .maybeSingle();
 
-  // Получаем прогресс раздела
-  const { data: progress } = await (supabase as any)
+  if (schoolDetailsError) {
+    console.error('Error fetching school details:', schoolDetailsError);
+  }
+
+  // Получаем прогресс раздела (может не быть)
+  const { data: progress, error: progressError } = await (supabase as any)
     .from('school_sections_progress')
     .select('completeness')
     .eq('organization_id', id)
     .eq('section', 'basic')
-    .single();
+    .maybeSingle();
+  
+  if (progressError) {
+    console.error('Error fetching progress:', progressError);
+  }
+  
+  // Логируем загруженный прогресс
+  console.log('[BasicInfoPage] Loaded progress from DB:', progress?.completeness || 0);
 
   // Получаем регионы и районы
-  const { data: regions } = await (supabase as any)
+  const { data: regions, error: regionsError } = await (supabase as any)
     .from('regions')
     .select('*')
     .order('name_uz');
 
-  const { data: districts } = await (supabase as any)
+  if (regionsError) {
+    console.error('Error fetching regions:', regionsError);
+  }
+
+  const { data: districts, error: districtsError } = await (supabase as any)
     .from('districts')
     .select('*')
     .eq('region_id', (organization as any).region_id || 0)
     .order('name_uz');
+
+  if (districtsError) {
+    console.error('Error fetching districts:', districtsError);
+  }
 
   return (
     <div className="flex-1 overflow-auto">
