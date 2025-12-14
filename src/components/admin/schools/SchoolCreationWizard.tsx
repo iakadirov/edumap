@@ -181,6 +181,10 @@ export function SchoolCreationWizard({
         setError('Viloyat va tuman tanlanishi kerak');
         return false;
       }
+      if (!data.city) {
+        setError('Shahar kiritilishi kerak');
+        return false;
+      }
       if (!data.address) {
         setError('Manzil kiritilishi kerak');
         return false;
