@@ -234,7 +234,7 @@ export function SchoolCreationWizard({
         name_ru: data.name_ru || null,
         slug,
         description: data.description,
-        status: 'draft',
+        status: 'pending', // Используем 'pending' для совместимости (миграция может быть не применена)
         phone: data.phone,
         email: data.email,
         website: data.website || null,
