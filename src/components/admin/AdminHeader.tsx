@@ -55,7 +55,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
   }, []);
 
   return (
-    <header className={`h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 transition-all duration-200 ${isScrolled ? 'rounded-t-none' : 'rounded-t-xl'}`}>
+    <header className={`h-16 border-b bg-[#FFFFFF] sticky top-0 z-40 transition-all duration-200 ${isScrolled ? 'rounded-t-none' : 'rounded-t-xl'}`}>
       <div className="h-full flex items-center justify-between px-6">
         {/* Search */}
         <div className="flex-1 max-w-md">
