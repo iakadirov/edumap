@@ -139,9 +139,11 @@ export function SchoolsTable({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Barchasi</SelectItem>
-            <SelectItem value="active">Faol</SelectItem>
-            <SelectItem value="pending">Kutilmoqda</SelectItem>
-            <SelectItem value="inactive">Nofaol</SelectItem>
+            <SelectItem value="draft">Черновик</SelectItem>
+            <SelectItem value="pending">На модерации</SelectItem>
+            <SelectItem value="published">Опубликована</SelectItem>
+            <SelectItem value="rejected">Отклонена</SelectItem>
+            <SelectItem value="suspended">Приостановлена</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -177,18 +179,28 @@ export function SchoolsTable({
                   <TableCell>
                     <Badge
                       variant={
-                        school.status === 'active'
+                        school.status === 'published'
                           ? 'default'
                           : school.status === 'pending'
                             ? 'secondary'
-                            : 'outline'
+                            : school.status === 'draft'
+                              ? 'outline'
+                              : school.status === 'rejected' || school.status === 'suspended'
+                                ? 'destructive'
+                                : 'outline'
                       }
                     >
-                      {school.status === 'active'
-                        ? 'Faol'
+                      {school.status === 'published'
+                        ? 'Опубликована'
                         : school.status === 'pending'
-                          ? 'Kutilmoqda'
-                          : 'Nofaol'}
+                          ? 'На модерации'
+                          : school.status === 'draft'
+                            ? 'Черновик'
+                            : school.status === 'rejected'
+                              ? 'Отклонена'
+                              : school.status === 'suspended'
+                                ? 'Приостановлена'
+                                : school.status || 'Неизвестно'}
                     </Badge>
                   </TableCell>
                   <TableCell>

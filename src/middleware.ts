@@ -106,6 +106,48 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Проверка авторизации для маршрутов school_admin
+  if (request.nextUrl.pathname.startsWith('/school')) {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      const redirectUrl = new URL('/auth/login', request.url);
+      redirectUrl.searchParams.set('redirect', request.nextUrl.pathname);
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    // Проверяем кэш перед запросом к БД
+    const cached = getCachedUser(user.id);
+    if (cached) {
+      if (!cached.is_active || cached.role !== 'school_admin') {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+      // Пользователь валиден, пропускаем
+    } else {
+      // Проверка роли пользователя
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('role, is_active')
+        .eq('auth_user_id', user.id)
+        .single();
+
+      if (
+        userError ||
+        !userData ||
+        !userData.is_active ||
+        userData.role !== 'school_admin'
+      ) {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+
+      // Кэшируем результат
+      setCachedUser(user.id, userData.role, userData.is_active);
+    }
+  }
+
   return response;
 }
 

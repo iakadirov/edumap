@@ -1,13 +1,91 @@
 import { createClient } from '@/lib/supabase/server';
-import { SchoolForm } from '@/components/admin/schools/SchoolForm';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { SchoolProfileHeader } from '@/components/admin/schools/SchoolProfileHeader';
+import { SectionsGrid } from '@/components/admin/schools/SectionCard';
 import { unstable_noStore as noStore } from 'next/cache';
+import { notFound } from 'next/navigation';
 
 // Админ-панель всегда динамическая (не кэшируется)
 export const dynamic = 'force-dynamic';
+
+const SECTIONS = [
+  {
+    id: 'basic',
+    name: '📝 Базовая информация',
+    description: 'Название, описание, контакты, адрес, цены',
+    href: '/admin/schools/[id]/basic',
+    level: 'required' as const,
+  },
+  {
+    id: 'education',
+    name: '📚 Образовательная программа',
+    description: 'Программа, языки, предметы, кружки',
+    href: '/admin/schools/[id]/education',
+    level: 'important' as const,
+  },
+  {
+    id: 'teachers',
+    name: '👨‍🏫 Педагогический состав',
+    description: 'Учителя, квалификация, руководство',
+    href: '/admin/schools/[id]/teachers',
+    level: 'important' as const,
+  },
+  {
+    id: 'infrastructure',
+    name: '🏗 Инфраструктура',
+    description: 'Здание, классы, спорт, IT, безопасность',
+    href: '/admin/schools/[id]/infrastructure',
+    level: 'important' as const,
+  },
+  {
+    id: 'services',
+    name: '🍽 Услуги и сервисы',
+    description: 'Питание, транспорт, продлёнка',
+    href: '/admin/schools/[id]/services',
+    level: 'important' as const,
+  },
+  {
+    id: 'results',
+    name: '🏆 Результаты и достижения',
+    description: 'Выпускники, экзамены, олимпиады',
+    href: '/admin/schools/[id]/results',
+    level: 'full' as const,
+  },
+  {
+    id: 'admission',
+    name: '📋 Поступление и приём',
+    description: 'Требования, документы, процесс',
+    href: '/admin/schools/[id]/admission',
+    level: 'full' as const,
+  },
+  {
+    id: 'finance',
+    name: '💰 Финансы (подробно)',
+    description: 'Скидки, стипендии, доп. расходы',
+    href: '/admin/schools/[id]/finance',
+    level: 'full' as const,
+  },
+  {
+    id: 'documents',
+    name: '📄 Документы и лицензии',
+    description: 'Лицензия, аккредитации',
+    href: '/admin/schools/[id]/documents',
+    level: 'full' as const,
+  },
+  {
+    id: 'photos',
+    name: '🖼 Фотографии',
+    description: 'Рекомендуем минимум 10 фото',
+    href: '/admin/schools/[id]/photos',
+    level: 'media' as const,
+  },
+  {
+    id: 'videos',
+    name: '🎥 Видео',
+    description: 'Видеоролики о школе',
+    href: '/admin/schools/[id]/videos',
+    level: 'media' as const,
+  },
+];
 
 export default async function EditSchoolPage({
   params,
@@ -29,45 +107,64 @@ export default async function EditSchoolPage({
     notFound();
   }
 
-  const { data: schoolDetails, error: detailsError } = await supabase
-    .from('school_details')
-    .select('*')
-    .eq('organization_id', id)
-    .single();
+  // Получаем прогресс разделов
+  const { data: progressData } = await supabase
+    .from('school_sections_progress')
+    .select('section, completeness')
+    .eq('organization_id', id);
 
-  // Если school_details нет, создаем пустой объект
-  const details = schoolDetails || null;
+  const progressMap = new Map(
+    progressData?.map((p) => [p.section, p.completeness]) || []
+  );
+
+  // Вычисляем общий прогресс
+  const overallProgress =
+    progressData && progressData.length > 0
+      ? Math.round(
+          progressData.reduce((sum, p) => sum + p.completeness, 0) /
+            progressData.length
+        )
+      : 0;
+
+  // Формируем секции с прогрессом
+  const sectionsWithProgress = SECTIONS.map((section) => ({
+    ...section,
+    href: section.href.replace('[id]', id),
+    completeness: progressMap.get(section.id) || 0,
+  }));
+
+  // Группируем по уровням
+  const requiredSections = sectionsWithProgress.filter((s) => s.level === 'required');
+  const importantSections = sectionsWithProgress.filter((s) => s.level === 'important');
+  const fullSections = sectionsWithProgress.filter((s) => s.level === 'full');
+  const mediaSections = sectionsWithProgress.filter((s) => s.level === 'media');
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Maktabni tahrirlash</h1>
-            <p className="text-muted-foreground mt-1">
-              {organization.name_uz || organization.name_ru || organization.name}
-            </p>
-          </div>
-          <Button variant="outline" asChild>
-            <Link href="/admin/schools">Orqaga</Link>
-          </Button>
-        </div>
+      <div className="space-y-6">
+        <SchoolProfileHeader
+          school={organization}
+          overallProgress={overallProgress}
+          basePath="/admin"
+        />
 
-        {/* Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Maktab ma'lumotlari</CardTitle>
-            <CardDescription>
-              Maktab ma'lumotlarini yangilang
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SchoolForm organization={organization} schoolDetails={details} />
-          </CardContent>
-        </Card>
+        <div className="p-6 space-y-6">
+          <h2 className="text-2xl font-bold">РАЗДЕЛЫ ПРОФИЛЯ</h2>
+
+          {requiredSections.length > 0 && (
+            <SectionsGrid sections={requiredSections} schoolId={id} level="required" />
+          )}
+          {importantSections.length > 0 && (
+            <SectionsGrid sections={importantSections} schoolId={id} level="important" />
+          )}
+          {fullSections.length > 0 && (
+            <SectionsGrid sections={fullSections} schoolId={id} level="full" />
+          )}
+          {mediaSections.length > 0 && (
+            <SectionsGrid sections={mediaSections} schoolId={id} level="media" />
+          )}
+        </div>
       </div>
     </div>
   );
 }
-

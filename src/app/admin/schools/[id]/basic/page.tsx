@@ -1,0 +1,81 @@
+import { createClient } from '@/lib/supabase/server';
+import { BasicInfoForm } from '@/components/admin/schools/sections/BasicInfoForm';
+import { notFound } from 'next/navigation';
+import { unstable_noStore as noStore } from 'next/cache';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
+
+export default async function BasicInfoPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  noStore();
+  const { id } = await params;
+  const supabase = await createClient();
+
+  // Получаем данные школы
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (!organization) {
+    notFound();
+  }
+
+  const { data: schoolDetails } = await supabase
+    .from('school_details')
+    .select('*')
+    .eq('organization_id', id)
+    .single();
+
+  // Получаем прогресс раздела
+  const { data: progress } = await supabase
+    .from('school_sections_progress')
+    .select('completeness')
+    .eq('organization_id', id)
+    .eq('section', 'basic')
+    .single();
+
+  // Получаем регионы и районы
+  const { data: regions } = await supabase
+    .from('regions')
+    .select('*')
+    .order('name_uz');
+
+  const { data: districts } = await supabase
+    .from('districts')
+    .select('*')
+    .eq('region_id', organization.region_id || 0)
+    .order('name_uz');
+
+  return (
+    <div className="flex-1 overflow-auto">
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">📝 Базовая информация</h1>
+            <p className="text-muted-foreground mt-1">
+              {organization.name_uz || organization.name_ru || organization.name}
+            </p>
+          </div>
+          <Button variant="outline" asChild>
+            <Link href={`/admin/schools/${id}`}>← Назад к профилю</Link>
+          </Button>
+        </div>
+
+        <BasicInfoForm
+          organization={organization}
+          schoolDetails={schoolDetails}
+          regions={regions || []}
+          districts={districts || []}
+          currentProgress={progress?.completeness || 0}
+        />
+      </div>
+    </div>
+  );
+}

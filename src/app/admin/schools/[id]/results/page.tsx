@@ -1,0 +1,98 @@
+import { createClient } from '@/lib/supabase/server';
+import { ResultsForm } from '@/components/admin/schools/ResultsForm';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Link from 'next/link';
+import { unstable_noStore as noStore } from 'next/cache';
+import { notFound } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
+
+export default async function ResultsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  noStore();
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const { data: organization, error: orgError } = await supabase
+    .from('organizations')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (orgError || !organization) {
+    notFound();
+  }
+
+  const { data: results } = await supabase
+    .from('school_results')
+    .select('*')
+    .eq('organization_id', id)
+    .order('year', { ascending: false });
+
+  const { data: progress } = await supabase
+    .from('school_sections_progress')
+    .select('completeness')
+    .eq('organization_id', id)
+    .eq('section', 'results')
+    .single();
+
+  const completeness = progress?.completeness || 0;
+
+  return (
+    <div className="flex-1 overflow-auto">
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <Link
+              href={`/admin/schools/${id}`}
+              className="text-muted-foreground hover:text-foreground transition-colors mb-2 inline-block"
+            >
+              ← Назад к профилю
+            </Link>
+            <h1 className="text-3xl font-bold">🏆 Результаты и достижения</h1>
+            <p className="text-muted-foreground mt-1">
+              {organization.name_uz || organization.name_ru || organization.name}
+            </p>
+            <p className="text-sm text-yellow-600 mt-2">
+              ⚠️ Этот раздел сильно влияет на рейтинг школы!
+            </p>
+          </div>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Заполненность раздела</CardTitle>
+              <span className="text-2xl font-bold">{completeness}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div
+                className="bg-primary h-2 rounded-full transition-all"
+                style={{ width: `${completeness}%` }}
+              />
+            </div>
+          </CardHeader>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Результаты и достижения</CardTitle>
+            <CardDescription>
+              Выпускники, экзамены, олимпиады
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResultsForm
+              organization={organization}
+              initialResults={results || []}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+

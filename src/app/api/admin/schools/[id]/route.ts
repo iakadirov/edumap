@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
+import { canEditSchool } from '@/lib/auth/permissions';
 
 export async function PUT(
   request: Request,
@@ -8,12 +9,8 @@ export async function PUT(
 ) {
   try {
     const user = await getCurrentUser();
-    
-    if (!user || !['super_admin', 'admin', 'moderator'].includes(user.role)) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
@@ -28,6 +25,19 @@ export async function PUT(
     }
 
     const supabase = await createClient();
+
+    // Проверка прав доступа
+    const hasAccess = await canEditSchool(
+      user.role,
+      user.organization_id,
+      id,
+      user.id,
+      supabase
+    );
+
+    if (!hasAccess) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     // Проверяем существование организации
     const { data: existing, error: checkError } = await supabase
@@ -115,16 +125,17 @@ export async function DELETE(
 ) {
   try {
     const user = await getCurrentUser();
-    
-    if (!user || !['super_admin', 'admin', 'moderator'].includes(user.role)) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
     const supabase = await createClient();
+
+    // Только super_admin и admin могут удалять школы
+    if (!['super_admin', 'admin'].includes(user.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     // Удаляем школу (cascade удалит связанные записи)
     const { error } = await supabase

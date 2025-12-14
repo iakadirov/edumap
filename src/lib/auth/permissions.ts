@@ -77,3 +77,38 @@ export function canCreateReview(userRole: UserRole | null): boolean {
   return userRole !== null; // Любой авторизованный пользователь
 }
 
+/**
+ * Проверка, может ли пользователь редактировать школу
+ */
+export async function canEditSchool(
+  userRole: UserRole,
+  userOrganizationId: string | null,
+  schoolId: string,
+  userId: string,
+  supabase: any
+): Promise<boolean> {
+  // Super admin и admin могут редактировать любую школу
+  if (['super_admin', 'admin', 'moderator'].includes(userRole)) {
+    return true;
+  }
+  
+  // School admin может редактировать только свою школу
+  if (userRole === 'school_admin') {
+    // Проверяем, что schoolId совпадает с organization_id пользователя или admin_user_id
+    const { data: school } = await supabase
+      .from('organizations')
+      .select('id, admin_user_id')
+      .eq('id', schoolId)
+      .single();
+    
+    if (!school) {
+      return false;
+    }
+    
+    // Проверяем либо через organization_id пользователя, либо через admin_user_id
+    return school.id === userOrganizationId || school.admin_user_id === userId;
+  }
+  
+  return false;
+}
+

@@ -6,7 +6,8 @@ export async function POST(request: Request) {
   try {
     const user = await getCurrentUser();
     
-    if (!user || !['super_admin', 'admin', 'moderator'].includes(user.role)) {
+    // Разрешаем создание школы для admin, super_admin и school_admin
+    if (!user || !['super_admin', 'admin', 'school_admin'].includes(user.role)) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -24,6 +25,15 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createClient();
+
+    // Для school_admin устанавливаем статус draft и связываем с пользователем
+    if (user.role === 'school_admin') {
+      organization.status = organization.status || 'draft';
+      organization.admin_user_id = user.id;
+    } else {
+      // Для admin/super_admin можно указать статус, по умолчанию draft
+      organization.status = organization.status || 'draft';
+    }
 
     // Проверяем уникальность slug
     const { data: existing } = await supabase

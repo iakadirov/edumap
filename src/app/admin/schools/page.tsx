@@ -77,21 +77,31 @@ export default async function AdminSchoolsPage({
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Faol maktablar</CardTitle>
+              <CardTitle className="text-sm font-medium">Опубликованные</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {schools?.filter((s) => s.status === 'active').length || 0}
+                {schools?.filter((s) => s.status === 'published').length || 0}
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Kutilayotgan</CardTitle>
+              <CardTitle className="text-sm font-medium">На модерации</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {schools?.filter((s) => s.status === 'pending').length || 0}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Черновики</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {schools?.filter((s) => s.status === 'draft').length || 0}
               </div>
             </CardContent>
           </Card>

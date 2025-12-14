@@ -1,0 +1,310 @@
+/**
+ * Валидаторы для разделов профиля школы
+ */
+
+export type Section =
+  | 'basic'
+  | 'education'
+  | 'teachers'
+  | 'infrastructure'
+  | 'services'
+  | 'results'
+  | 'admission'
+  | 'finance'
+  | 'documents'
+  | 'photos'
+  | 'videos';
+
+export interface ValidationError {
+  field: string;
+  message: string;
+}
+
+export interface ValidationResult {
+  valid: boolean;
+  errors: ValidationError[];
+}
+
+/**
+ * Валидация базовой информации
+ */
+export function validateBasicSection(data: any): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  // Название (обязательно хотя бы одно: name_uz или name_ru)
+  if (!data.name_uz && !data.name_ru) {
+    errors.push({
+      field: 'name',
+      message: 'Kamida bitta nom (uz yoki ru) kiritilishi kerak',
+    });
+  }
+
+  // Тип школы
+  if (!data.school_type || !['private', 'state', 'international'].includes(data.school_type)) {
+    errors.push({
+      field: 'school_type',
+      message: 'Maktab turi tanlanishi kerak',
+    });
+  }
+
+  // Описание
+  if (!data.description || data.description.trim().length < 50) {
+    errors.push({
+      field: 'description',
+      message: 'Tavsif kamida 50 ta belgi bo\'lishi kerak',
+    });
+  }
+
+  // Телефон
+  if (!data.phone) {
+    errors.push({
+      field: 'phone',
+      message: 'Telefon raqami kiritilishi kerak',
+    });
+  } else if (!/^\+998\d{9}$/.test(data.phone.replace(/\s/g, ''))) {
+    errors.push({
+      field: 'phone',
+      message: 'Telefon raqami noto\'g\'ri formatda (masalan: +998901234567)',
+    });
+  }
+
+  // Email
+  if (!data.email) {
+    errors.push({
+      field: 'email',
+      message: 'Email kiritilishi kerak',
+    });
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    errors.push({
+      field: 'email',
+      message: 'Email noto\'g\'ri formatda',
+    });
+  }
+
+  // Город
+  if (!data.city) {
+    errors.push({
+      field: 'city',
+      message: 'Shahar kiritilishi kerak',
+    });
+  }
+
+  // Адрес
+  if (!data.address) {
+    errors.push({
+      field: 'address',
+      message: 'Manzil kiritilishi kerak',
+    });
+  }
+
+  // Координаты
+  if (!data.lat || !data.lng) {
+    errors.push({
+      field: 'coordinates',
+      message: 'Karta orqali joylashuvni belgilash kerak',
+    });
+  }
+
+  // Классы
+  if (data.grade_from === undefined || data.grade_from === null) {
+    errors.push({
+      field: 'grade_from',
+      message: 'Boshlang\'ich sinf tanlanishi kerak',
+    });
+  }
+
+  if (data.grade_to === undefined || data.grade_to === null) {
+    errors.push({
+      field: 'grade_to',
+      message: 'Yakuniy sinf tanlanishi kerak',
+    });
+  }
+
+  if (
+    data.grade_from !== undefined &&
+    data.grade_to !== undefined &&
+    data.grade_from > data.grade_to
+  ) {
+    errors.push({
+      field: 'grades',
+      message: 'Boshlang\'ich sinf yakuniy sinfdan kichik bo\'lishi kerak',
+    });
+  }
+
+  // Цены
+  if (data.fee_monthly_min === undefined || data.fee_monthly_min === null) {
+    errors.push({
+      field: 'fee_monthly_min',
+      message: 'Minimal oylik to\'lov kiritilishi kerak',
+    });
+  }
+
+  if (data.fee_monthly_max === undefined || data.fee_monthly_max === null) {
+    errors.push({
+      field: 'fee_monthly_max',
+      message: 'Maksimal oylik to\'lov kiritilishi kerak',
+    });
+  }
+
+  if (
+    data.fee_monthly_min !== undefined &&
+    data.fee_monthly_max !== undefined &&
+    data.fee_monthly_min > data.fee_monthly_max
+  ) {
+    errors.push({
+      field: 'fees',
+      message: 'Minimal to\'lov maksimaldan kichik bo\'lishi kerak',
+    });
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Валидация образовательной программы
+ */
+export function validateEducationSection(data: any): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  // Учебная программа
+  if (!data.curriculum || data.curriculum.length === 0) {
+    errors.push({
+      field: 'curriculum',
+      message: 'Kamida bitta o\'quv dasturi tanlanishi kerak',
+    });
+  }
+
+  // Основной язык обучения
+  if (!data.primary_language) {
+    errors.push({
+      field: 'primary_language',
+      message: 'Asosiy til tanlanishi kerak',
+    });
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Валидация педагогического состава
+ */
+export function validateTeachersSection(data: any): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  // Количество учителей
+  if (data.total_teachers !== undefined && data.total_teachers < 1) {
+    errors.push({
+      field: 'total_teachers',
+      message: 'O\'qituvchilar soni 1 dan katta bo\'lishi kerak',
+    });
+  }
+
+  // Средний опыт
+  if (data.avg_experience_years !== undefined && data.avg_experience_years < 0) {
+    errors.push({
+      field: 'avg_experience_years',
+      message: 'O\'rtacha tajriba manfiy bo\'lishi mumkin emas',
+    });
+  }
+
+  // Проценты должны быть от 0 до 100
+  const percentFields = [
+    'percent_with_higher_education',
+    'percent_with_pedagogical_education',
+    'percent_with_masters',
+    'percent_with_phd',
+  ];
+
+  percentFields.forEach((field) => {
+    if (
+      data[field] !== undefined &&
+      (data[field] < 0 || data[field] > 100)
+    ) {
+      errors.push({
+        field,
+        message: `${field} 0 va 100 orasida bo\'lishi kerak`,
+      });
+    }
+  });
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Валидация результатов
+ */
+export function validateResultsSection(data: any): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  // Если есть результаты за год, проверяем валидность
+  if (data.results && Array.isArray(data.results)) {
+    data.results.forEach((result: any, index: number) => {
+      // Год
+      if (!result.year || result.year < 2000 || result.year > 2100) {
+        errors.push({
+          field: `results[${index}].year`,
+          message: 'Yil 2000 va 2100 orasida bo\'lishi kerak',
+        });
+      }
+
+      // IELTS балл (0-9.0)
+      if (
+        result.avg_ielts_score !== undefined &&
+        (result.avg_ielts_score < 0 || result.avg_ielts_score > 9.0)
+      ) {
+        errors.push({
+          field: `results[${index}].avg_ielts_score`,
+          message: 'IELTS балл 0 va 9.0 orasida bo\'lishi kerak',
+        });
+      }
+
+      // SAT балл (400-1600)
+      if (
+        result.avg_sat_score !== undefined &&
+        (result.avg_sat_score < 400 || result.avg_sat_score > 1600)
+      ) {
+        errors.push({
+          field: `results[${index}].avg_sat_score`,
+          message: 'SAT балл 400 va 1600 orasida bo\'lishi kerak',
+        });
+      }
+    });
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Основная функция валидации раздела
+ */
+export function validateSection(
+  section: Section,
+  data: any
+): ValidationResult {
+  switch (section) {
+    case 'basic':
+      return validateBasicSection(data);
+    case 'education':
+      return validateEducationSection(data);
+    case 'teachers':
+      return validateTeachersSection(data);
+    case 'results':
+      return validateResultsSection(data);
+    default:
+      // Для остальных разделов нет строгой валидации
+      return { valid: true, errors: [] };
+  }
+}
+

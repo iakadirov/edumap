@@ -17,7 +17,7 @@ interface AdminSidebarProps {
   user: AuthUser;
 }
 
-const navigation = [
+const adminNavigation = [
   {
     name: 'Dashboard',
     href: '/admin/dashboard',
@@ -75,17 +75,30 @@ const navigation = [
   },
 ];
 
+const schoolAdminNavigation = [
+  {
+    name: 'Mening maktablarim',
+    href: '/school/dashboard',
+    icon: (
+      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+    ),
+  },
+];
+
 export function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname();
+  const navigation = user.role === 'school_admin' ? schoolAdminNavigation : adminNavigation;
 
   return (
     <aside className="w-64 bg-[#F4F4F6] flex flex-col h-screen sticky top-0">
       {/* Logo */}
       <div className="h-16 flex items-center px-6">
-        <Link href="/admin/dashboard" className="flex items-center gap-2">
+        <Link href={user.role === 'school_admin' ? '/school/dashboard' : '/admin/dashboard'} className="flex items-center gap-2">
           <span className="text-xl font-bold text-primary">EduMap.uz</span>
           <span className="text-xs text-muted-foreground bg-primary/10 px-2 py-0.5 rounded">
-            Admin
+            {user.role === 'school_admin' ? 'Maktab' : 'Admin'}
           </span>
         </Link>
       </div>
