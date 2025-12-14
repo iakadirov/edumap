@@ -108,14 +108,22 @@ export default async function EditSchoolPage({
   }
 
   // Получаем прогресс разделов
-  const { data: progressData } = await (supabase as any)
+  const { data: progressData, error: progressError } = await (supabase as any)
     .from('school_sections_progress')
     .select('section, completeness')
     .eq('organization_id', id);
 
+  if (progressError) {
+    console.error('Error fetching progress:', progressError);
+  }
+
+  console.log('[EditSchoolPage] Progress data:', progressData);
+
   const progressMap = new Map<string, number>(
     progressData?.map((p: any) => [p.section, p.completeness]) || []
   );
+
+  console.log('[EditSchoolPage] Progress map:', Array.from(progressMap.entries()));
 
   // Вычисляем общий прогресс
   const overallProgress =
@@ -125,6 +133,8 @@ export default async function EditSchoolPage({
             progressData.length
         )
       : 0;
+
+  console.log('[EditSchoolPage] Overall progress:', overallProgress);
 
   // Формируем секции с прогрессом
   const sectionsWithProgress = SECTIONS.map((section) => ({
