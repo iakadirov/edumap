@@ -33,29 +33,31 @@ export function AdminHeader({ user }: AdminHeaderProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Находим скроллируемый контейнер (внутренний div с overflow-auto)
-      const scrollContainer = document.querySelector('main.flex-1.flex.flex-col > div.flex-1.overflow-auto');
-      if (scrollContainer) {
-        const scrollTop = scrollContainer.scrollTop;
+      // Находим родительский main элемент (скроллируемый контейнер)
+      const mainElement = document.querySelector('main.flex-1.flex.flex-col.overflow-auto');
+      if (mainElement) {
+        const scrollTop = mainElement.scrollTop;
         setIsScrolled(scrollTop > 0);
       }
     };
 
-    // Находим скроллируемый контейнер для отслеживания скролла
-    const scrollContainer = document.querySelector('main.flex-1.flex.flex-col > div.flex-1.overflow-auto');
-    if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', handleScroll);
+    // Находим родительский main элемент для отслеживания скролла
+    const mainElement = document.querySelector('main.flex-1.flex.flex-col.overflow-auto');
+    if (mainElement) {
+      mainElement.addEventListener('scroll', handleScroll);
       // Проверяем начальное состояние
       handleScroll();
       
       return () => {
-        scrollContainer.removeEventListener('scroll', handleScroll);
+        mainElement.removeEventListener('scroll', handleScroll);
       };
     }
   }, []);
 
   return (
-    <header className={`h-16 border-b bg-[#FFFFFF] sticky top-0 z-40 transition-all duration-200 ${isScrolled ? 'rounded-t-none' : 'rounded-t-xl'}`}>
+    <header 
+      style={{ position: 'sticky', top: 0 }}
+      className={`h-16 border-b bg-[#FFFFFF] z-40 transition-all duration-200 ${isScrolled ? 'rounded-t-none' : 'rounded-t-xl'}`}>
       <div className="h-full flex items-center justify-between px-6">
         {/* Search */}
         <div className="flex-1 max-w-md">
