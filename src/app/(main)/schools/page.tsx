@@ -75,6 +75,8 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
     // В случае ошибки просто используем пустой массив
     console.error('Error loading cities:', e);
     cities = [];
+    // Если ошибка критическая, выбрасываем её дальше
+    throw e;
   }
 
   return (

@@ -107,7 +107,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // Проверка авторизации для маршрутов school_admin
-  if (request.nextUrl.pathname.startsWith('/school')) {
+  // Используем /school/ чтобы не перехватывать /schools
+  if (request.nextUrl.pathname.startsWith('/school/')) {
     const {
       data: { user },
       error: authError,
