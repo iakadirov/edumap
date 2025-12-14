@@ -114,10 +114,18 @@ export default async function EditSchoolPage({
     .eq('organization_id', id);
 
   if (progressError) {
-    console.error('Error fetching progress:', progressError);
+    console.error('[EditSchoolPage] Error fetching progress:', {
+      error: progressError,
+      errorMessage: progressError?.message,
+      errorCode: progressError?.code,
+      errorDetails: progressError?.details,
+      errorHint: progressError?.hint,
+      organizationId: id,
+    });
   }
 
   console.log('[EditSchoolPage] Progress data:', progressData);
+  console.log('[EditSchoolPage] Progress error:', progressError);
 
   const progressMap = new Map<string, number>(
     progressData?.map((p: any) => [p.section, p.completeness]) || []
