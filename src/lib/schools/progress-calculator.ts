@@ -24,17 +24,15 @@ export interface SectionFields {
  */
 const REQUIRED_FIELDS: Record<Section, string[]> = {
   basic: [
-    'name',
+    // Хотя бы одно название должно быть (проверяется отдельно)
     'name_uz',
     'school_type',
     'description',
     'phone',
     'email',
-    'city',
-    'district',
+    'region_id',
+    'district_id',
     'address',
-    'lat',
-    'lng',
     'grade_from',
     'grade_to',
     'primary_language',
@@ -63,11 +61,15 @@ const REQUIRED_FIELDS: Record<Section, string[]> = {
  */
 const IMPORTANT_FIELDS: Record<Section, string[]> = {
   basic: [
+    'name_ru',
     'short_description',
     'logo_url',
     'website',
     'telegram',
+    'city',
     'landmark',
+    'lat',
+    'lng',
   ],
   education: [
     'accreditations',
