@@ -179,27 +179,6 @@ export function calculateSectionProgress(
         : 0;
 
     const totalProgress = Math.round(requiredProgress + importantProgress);
-    // #region agent log
-    const logDataProgress = {
-      location: 'progress-calculator.ts:171',
-      message: 'Progress calculated',
-      data: {
-        section: section,
-        requiredFieldsCount: requiredFields.length,
-        filledRequired: filledRequired,
-        requiredProgress: requiredProgress,
-        importantFieldsCount: importantFields.length,
-        filledImportant: filledImportant,
-        importantProgress: importantProgress,
-        totalProgress: totalProgress
-      },
-      timestamp: Date.now(),
-      sessionId: 'debug-session',
-      runId: 'run1',
-      hypothesisId: 'A'
-    };
-    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logDataProgress)}).catch(()=>{});
-    // #endregion
     return totalProgress;
   }
 
