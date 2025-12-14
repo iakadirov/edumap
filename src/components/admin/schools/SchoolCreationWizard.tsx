@@ -17,6 +17,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -240,6 +241,9 @@ export function SchoolCreationWizard({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Добавить школу</DialogTitle>
+          <DialogDescription>
+            Заполните форму для добавления новой школы
+          </DialogDescription>
         </DialogHeader>
 
         {/* Progress Steps */}
@@ -388,7 +392,6 @@ export function SchoolCreationWizard({
                       </SelectTrigger>
                       <SelectContent>
                         {/* Здесь нужно загрузить районы через API */}
-                        <SelectItem value="">Выберите район</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

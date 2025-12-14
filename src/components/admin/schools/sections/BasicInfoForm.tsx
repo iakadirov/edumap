@@ -379,14 +379,14 @@ export function BasicInfoForm({
               <div className="space-y-2">
                 <Label htmlFor="region">Область *</Label>
                 <Select
-                  value={regionId?.toString() || ''}
-                  onValueChange={(value) => setRegionId(value ? parseInt(value) : null)}
+                  value={regionId?.toString() || 'all'}
+                  onValueChange={(value) => setRegionId(value === 'all' ? null : parseInt(value))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Выберите область" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Все области</SelectItem>
+                    <SelectItem value="all">Все области</SelectItem>
                     {regions.map((region) => (
                       <SelectItem key={region.id} value={region.id.toString()}>
                         {region.name_uz}
