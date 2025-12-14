@@ -11,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Separator } from '@/components/ui/separator';
 import type { AuthUser } from '@/lib/auth/middleware';
 
 interface AdminSidebarProps {
@@ -80,9 +79,9 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 border-r bg-background flex flex-col h-screen sticky top-0">
+    <aside className="w-64 bg-background flex flex-col h-screen sticky top-0">
       {/* Logo */}
-      <div className="h-16 border-b flex items-center px-6">
+      <div className="h-16 flex items-center px-6">
         <Link href="/admin/dashboard" className="flex items-center gap-2">
           <span className="text-xl font-bold text-primary">EduMap.uz</span>
           <span className="text-xs text-muted-foreground bg-primary/10 px-2 py-0.5 rounded">
@@ -119,7 +118,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       </nav>
 
       {/* User Profile */}
-      <div className="border-t p-4">
+      <div className="p-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-3 w-full rounded-lg p-2 hover:bg-muted transition-colors">
@@ -148,7 +147,6 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
               <p className="text-sm font-medium">{user.full_name || 'Foydalanuvchi'}</p>
               <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
-            <Separator />
             <DropdownMenuItem asChild>
               <Link href="/admin/settings">Sozlamalar</Link>
             </DropdownMenuItem>
