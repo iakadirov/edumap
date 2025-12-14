@@ -78,9 +78,11 @@ export function BasicInfoForm({
       fetch(`/api/districts?region=${regionId}`)
         .then((res) => res.json())
         .then((data) => {
-          setDistricts(data.districts || []);
+          // API возвращает массив напрямую
+          const districtsList = Array.isArray(data) ? data : [];
+          setDistricts(districtsList);
           // Сбрасываем район, если он не принадлежит новому региону
-          if (districtId && !data.districts?.some((d: any) => d.id === districtId)) {
+          if (districtId && !districtsList.some((d: any) => d.id === districtId)) {
             setDistrictId(null);
           }
         })
@@ -89,7 +91,8 @@ export function BasicInfoForm({
       setDistricts([]);
       setDistrictId(null);
     }
-  }, [regionId, districtId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [regionId]);
 
   // Формируем данные для автосохранения
   const formData = {
