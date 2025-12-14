@@ -141,7 +141,7 @@ export function calculateSectionProgress(
         const hasName = (data.name_uz && data.name_uz.trim() !== '') || 
                (data.name_ru && data.name_ru.trim() !== '');
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:137',message:'Checking name_uz field',data:{field,hasName,name_uz:data.name_uz,name_ru:data.name_ru}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:137',message:'Checking name_uz field',data:{field:field,hasName:hasName,name_uz:data.name_uz,name_ru:data.name_ru}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
         // #endregion
         return hasName;
       }
