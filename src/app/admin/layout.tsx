@@ -32,7 +32,7 @@ export default async function AdminLayout({
       <AdminSidebar user={user} />
       <div className="flex-1 flex flex-col">
         <AdminHeader user={user} />
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto m-3 rounded-xl border border-red-500 bg-[#e4e4e8]">
           <Suspense fallback={<AdminLoading />}>
             {children}
           </Suspense>
