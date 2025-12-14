@@ -49,9 +49,6 @@ export default async function BasicInfoPage({
   if (progressError) {
     console.error('Error fetching progress:', progressError);
   }
-  
-  // Логируем загруженный прогресс
-  console.log('[BasicInfoPage] Loaded progress from DB:', progress?.completeness || 0);
 
   // Получаем регионы и районы
   const { data: regions, error: regionsError } = await (supabase as any)

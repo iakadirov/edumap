@@ -125,28 +125,6 @@ export function calculateSectionProgress(
   section: Section,
   data: SectionFields
 ): number {
-  // #region agent log
-    const logDataEntry = {
-      location: 'progress-calculator.ts:124',
-      message: 'calculateSectionProgress called',
-      data: {
-        section: section,
-        dataKeys: Object.keys(data),
-        sampleData: {
-          name_uz: data.name_uz,
-          name_ru: data.name_ru,
-          region_id: data.region_id,
-          district_id: data.district_id
-        }
-      },
-      timestamp: Date.now(),
-      sessionId: 'debug-session',
-      runId: 'run1',
-      hypothesisId: 'A'
-    };
-    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logDataEntry)}).catch(()=>{});
-  // #endregion
-
   const requiredFields = REQUIRED_FIELDS[section] || [];
   const importantFields = IMPORTANT_FIELDS[section] || [];
 
@@ -158,23 +136,6 @@ export function calculateSectionProgress(
       if (field === 'name_uz') {
         const hasName = (data.name_uz && data.name_uz.trim() !== '') || 
                (data.name_ru && data.name_ru.trim() !== '');
-        // #region agent log
-        const logData = {
-          location: 'progress-calculator.ts:137',
-          message: 'Checking name_uz field',
-          data: {
-            field: field,
-            hasName: hasName,
-            name_uz: data.name_uz,
-            name_ru: data.name_ru
-          },
-          timestamp: Date.now(),
-          sessionId: 'debug-session',
-          runId: 'run1',
-          hypothesisId: 'A'
-        };
-        fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logData)}).catch(()=>{});
-        // #endregion
         return hasName;
       }
       const value = data[field];
@@ -195,23 +156,6 @@ export function calculateSectionProgress(
         // Для остальных типов (boolean, object, etc.)
         isFilled = value !== null && value !== undefined && value !== '';
       }
-      // #region agent log
-      const logDataField = {
-        location: 'progress-calculator.ts:155',
-        message: 'Checking required field',
-        data: {
-          field: field,
-          value: value,
-          valueType: typeof value,
-          isFilled: isFilled
-        },
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: 'run1',
-        hypothesisId: 'A'
-      };
-      fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logDataField)}).catch(()=>{});
-      // #endregion
       return isFilled;
     }).length;
 
