@@ -89,7 +89,7 @@ export async function SchoolsList({ params }: SchoolsListProps) {
         <SortControl currentSort={params.sort as SortOption} />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="flex flex-col gap-5">
         {schools.map((school: any) => (
           <SchoolCard key={school.id} school={school} />
         ))}

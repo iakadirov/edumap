@@ -63,10 +63,16 @@ export function DistrictMultiSelect({
     selected.includes(option.id)
   );
 
+  const MAX_DISTRICTS = 4;
+  
   const toggleDistrict = (districtId: string) => {
     if (selected.includes(districtId)) {
       onSelectionChange(selected.filter((id) => id !== districtId));
     } else {
+      // Проверяем лимит на количество выбранных районов
+      if (selected.length >= MAX_DISTRICTS) {
+        return; // Не добавляем, если уже выбрано максимальное количество
+      }
       onSelectionChange([...selected, districtId]);
     }
   };
@@ -126,21 +132,34 @@ export function DistrictMultiSelect({
               </div>
             ) : (
               <div className="p-1">
+                {selected.length >= MAX_DISTRICTS && (
+                  <div className="p-2 text-xs text-muted-foreground bg-muted rounded-sm mb-1">
+                    Maksimal {MAX_DISTRICTS} tuman tanlash mumkin
+                  </div>
+                )}
                 {filteredOptions.map((option) => {
                   const isSelected = selected.includes(option.id);
+                  const isDisabled = !isSelected && selected.length >= MAX_DISTRICTS;
                   return (
                     <div
                       key={option.id}
-                      className="flex items-center gap-2 p-2 rounded-sm hover:bg-accent cursor-pointer transition-colors"
-                      onClick={() => toggleDistrict(option.id)}
+                      className={cn(
+                        "flex items-center gap-2 p-2 rounded-sm transition-colors",
+                        isDisabled 
+                          ? "opacity-50 cursor-not-allowed" 
+                          : "hover:bg-accent cursor-pointer"
+                      )}
+                      onClick={() => !isDisabled && toggleDistrict(option.id)}
                       role="option"
                       aria-selected={isSelected}
+                      aria-disabled={isDisabled}
                     >
                       <Checkbox
                         checked={isSelected}
-                        onCheckedChange={() => toggleDistrict(option.id)}
+                        onCheckedChange={() => !isDisabled && toggleDistrict(option.id)}
                         onClick={(e) => e.stopPropagation()}
                         className="pointer-events-none"
+                        disabled={isDisabled}
                       />
                       <span className="flex-1 text-sm">
                         {option.name_uz || option.name}

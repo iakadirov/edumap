@@ -21,7 +21,7 @@ export function SortControl({ currentSort }: { currentSort?: SortOption }) {
       params.set('sort', value);
     }
 
-    router.push(`/schools?${params.toString()}`, { scroll: false });
+    router.push(`/schools/list?${params.toString()}`, { scroll: false });
   };
 
   return (

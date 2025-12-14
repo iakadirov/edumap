@@ -58,10 +58,10 @@ export function SchoolsTopBar() {
           <Link
             href="/schools"
             className={cn(
-              'px-2 py-[6px] rounded-xl flex items-center gap-1 transition-all',
+              'px-2 py-[6px] flex items-center gap-1 transition-all',
               pathname.startsWith('/schools')
-                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-blue-600'
-                : 'hover:bg-white/50'
+                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-blue-600 rounded-lg'
+                : 'rounded-xl hover:bg-white/50'
             )}
           >
             <BookOpen className={cn(

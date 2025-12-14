@@ -23,8 +23,23 @@ import { getCurrentUser } from '@/lib/auth/middleware';
 // Максимальный размер файла: 10MB
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-// Разрешенные типы файлов
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+// Разрешенные типы файлов для изображений (логотипы, обложки, галерея)
+// Поддерживаем: PNG, JPG, JPEG, SVG, WebP, GIF, BMP, TIFF, ICO
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg', // Некоторые браузеры отправляют image/jpg
+  'image/png',
+  'image/svg+xml', // SVG
+  'image/webp',
+  'image/gif',
+  'image/bmp',
+  'image/tiff',
+  'image/x-icon',
+  'image/vnd.microsoft.icon',
+  'image/x-ms-bmp',
+  'image/pjpeg', // Альтернативный MIME для JPEG
+  'image/x-png', // Альтернативный MIME для PNG
+];
 const ALLOWED_DOCUMENT_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
 export async function POST(request: NextRequest) {
@@ -66,20 +81,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Проверка типа файла
-    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
+    // Для SVG некоторые браузеры могут отправлять разные MIME типы, поэтому проверяем и по расширению
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const isSvgByExtension = fileExtension === 'svg';
+    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type) || (isSvgByExtension && file.type.startsWith('image/'));
     const isDocument = ALLOWED_DOCUMENT_TYPES.includes(file.type);
 
     if (!isImage && !isDocument) {
       return NextResponse.json(
-        { error: 'Invalid file type. Allowed types: images (JPEG, PNG, WebP, GIF) or documents (PDF, DOC, DOCX)' },
+        { error: 'Invalid file type. Allowed types: images (PNG, JPG, JPEG, SVG, WebP, GIF, BMP, TIFF, ICO) or documents (PDF, DOC, DOCX)' },
         { status: 400 }
       );
     }
 
     // Проверка соответствия типа файла и типа загрузки
-    if ((type === 'logo' || type === 'gallery') && !isImage) {
+    if ((type === 'logo' || type === 'gallery' || type === 'cover') && !isImage) {
       return NextResponse.json(
-        { error: 'Logo and gallery files must be images' },
+        { error: 'Logo, gallery and cover files must be images' },
         { status: 400 }
       );
     }
@@ -102,6 +120,8 @@ export async function POST(request: NextRequest) {
     let key: string;
     if (type === 'logo' && organizationId) {
       key = `logos/${organizationId}/logo.${extension}`;
+    } else if (type === 'cover' && organizationId) {
+      key = `covers/${organizationId}/cover.${extension}`;
     } else if (type === 'gallery' && organizationId) {
       // Для галереи используем timestamp для уникальности
       const timestamp = Date.now();

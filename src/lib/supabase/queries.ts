@@ -28,6 +28,8 @@ export async function getActiveSchools() {
       short_description,
       status,
       overall_rating,
+      reviews_count,
+      is_verified,
       city,
       district,
       region_id,
@@ -37,6 +39,8 @@ export async function getActiveSchools() {
       email,
       website,
       logo_url,
+      cover_image_url,
+      is_verified,
       org_type,
       school_details (
         id,
@@ -45,13 +49,14 @@ export async function getActiveSchools() {
         grade_to,
         accepts_preparatory,
         primary_language,
+        additional_languages,
         fee_monthly_min,
         fee_monthly_max,
         curriculum
       )
     `)
     .eq('org_type', 'school')
-    .eq('status', 'active')
+    .in('status', ['active', 'published']) // Поддержка старых и новых статусов
     .order('overall_rating', { ascending: false, nullsFirst: false })
     .limit(100); // Ограничиваем для производительности
 
@@ -222,6 +227,7 @@ export async function getSchoolsWithFilters(filters: {
       status,
       overall_rating,
       reviews_count,
+      is_verified,
       city,
       district,
       region_id,
@@ -231,6 +237,8 @@ export async function getSchoolsWithFilters(filters: {
       email,
       website,
       logo_url,
+      cover_image_url,
+      is_verified,
       org_type,
       school_details (
         id,
@@ -239,6 +247,7 @@ export async function getSchoolsWithFilters(filters: {
         grade_to,
         accepts_preparatory,
         primary_language,
+        additional_languages,
         fee_monthly_min,
         fee_monthly_max,
         curriculum,
@@ -248,12 +257,16 @@ export async function getSchoolsWithFilters(filters: {
       )
     `)
     .eq('org_type', 'school')
-    .eq('status', 'active')
+    .in('status', ['active', 'published']) // Поддержка старых и новых статусов
     .limit(100); // Ограничиваем для производительности
 
   // Фильтр по области (region_id)
   if (filters.region !== null && filters.region !== undefined) {
-    query = query.eq('region_id', filters.region);
+    // Преобразуем в число, если нужно
+    const regionId = typeof filters.region === 'string' ? parseInt(filters.region, 10) : filters.region;
+    if (!isNaN(regionId)) {
+      query = query.eq('region_id', regionId);
+    }
   }
 
   // Districts (multi-select) - фильтруем по district_id
@@ -460,7 +473,7 @@ export async function getDistricts() {
         .from('organizations')
         .select('district')
         .eq('org_type', 'school')
-        .eq('status', 'active')
+        .in('status', ['active', 'published']) // Поддержка старых и новых статусов
         .not('district', 'is', null);
 
       if (error) {
@@ -505,7 +518,7 @@ export async function getCities() {
         .from('organizations')
         .select('city')
         .eq('org_type', 'school')
-        .eq('status', 'active')
+        .in('status', ['active', 'published']) // Поддержка старых и новых статусов
         .not('city', 'is', null);
 
       if (error) {
@@ -576,7 +589,7 @@ export async function getDistrictsWithCounts(regionId?: number | null) {
       .from('organizations')
       .select('district_id')
       .eq('org_type', 'school')
-      .eq('status', 'active')
+      .in('status', ['active', 'published']) // Поддержка старых и новых статусов
       .in('district_id', districtIds);
 
     if (countError) {

@@ -152,6 +152,14 @@
     margin-right: auto;
     padding-left: var(--container-wrapper-padding);
     padding-right: var(--container-wrapper-padding);
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  
+  /* Гарантируем, что py-0 всегда применяется к container-wrapper с приоритетом */
+  .container-wrapper.py-0 {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
   
   .container-content {
@@ -161,6 +169,14 @@
     margin-right: auto;
     padding-left: var(--container-content-padding);
     padding-right: var(--container-content-padding);
+    padding-top: 32px;
+    padding-bottom: 24px;
+    border-radius: 24px;
+  }
+  
+  /* Убираем верхний отступ для container-content внутри container-wrapper (например, на странице списка школ) */
+  .container-wrapper .container-content {
+    padding-top: 0;
   }
   
   /* Фон для container-content только в main секциях (не в header/footer) */
@@ -173,6 +189,8 @@
     max-width: var(--container-inner);
     margin-left: auto;
     margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
   }
   
   /* Bento card стиль - тени */

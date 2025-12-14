@@ -26,7 +26,7 @@ export default async function AdminSchoolsPage({
   // Построение запроса (оптимизировано - только нужные поля)
   let query = supabase
     .from('organizations')
-    .select('id, name, name_uz, name_ru, status, created_at, city, district', { count: 'exact' });
+    .select('id, slug, name, name_uz, name_ru, status, created_at, city, district', { count: 'exact' });
 
   // Фильтр по поиску
   if (search) {

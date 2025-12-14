@@ -8,6 +8,7 @@ import { ProgressIndicator } from './ProgressIndicator';
 interface SchoolProfileHeaderProps {
   school: {
     id: string;
+    slug?: string | null;
     name: string;
     name_uz?: string | null;
     name_ru?: string | null;
@@ -63,7 +64,7 @@ export function SchoolProfileHeader({
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/schools/${school.id}`} target="_blank">
+            <Link href={`/schools/${school.slug || school.id}`} target="_blank">
               👁 Просмотр на сайте
             </Link>
           </Button>

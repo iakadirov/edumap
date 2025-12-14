@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <div className="relative">
       {/* Hero Section */}
-      <section className="container-wrapper py-24 md:py-32">
+      <section className="container-wrapper py-0">
         <div className="container-content">
           <div className="container-inner">
             <div className="mx-auto max-w-4xl text-center">

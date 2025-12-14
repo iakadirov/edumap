@@ -15,6 +15,9 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressIndicator } from '../ProgressIndicator';
+import { LogoUpload } from '../LogoUpload';
+import { CoverImageUpload } from '../CoverImageUpload';
+import { useToast } from '@/contexts/ToastContext';
 import { useAutosave, formatAutosaveStatus } from '@/lib/schools/autosave';
 import { validateBasicSection } from '@/lib/schools/section-validators';
 import { calculateSectionProgress } from '@/lib/schools/progress-calculator';
@@ -35,6 +38,7 @@ export function BasicInfoForm({
   currentProgress: initialProgress,
 }: BasicInfoFormProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -61,6 +65,14 @@ export function BasicInfoForm({
   const [landmark, setLandmark] = useState(organization?.landmark || '');
   const [lat, setLat] = useState(organization?.lat || null);
   const [lng, setLng] = useState(organization?.lng || null);
+
+  // Логотип
+  const [logoUrl, setLogoUrl] = useState(organization?.logo_url || null);
+  const [logoKey, setLogoKey] = useState<string | null>(null);
+
+  // Обложка
+  const [coverImageUrl, setCoverImageUrl] = useState(organization?.cover_image_url || null);
+  const [coverImageKey, setCoverImageKey] = useState<string | null>(null);
 
   // School Details
   const [schoolType, setSchoolType] = useState(schoolDetails?.school_type || 'private');
@@ -129,6 +141,8 @@ export function BasicInfoForm({
       name_ru: data.name_ru || null,
       description: data.description || null,
       short_description: shortDescription || null,
+      logo_url: logoUrl || null, // Добавляем логотип
+      cover_image_url: coverImageUrl || null, // Добавляем обложку
       phone: data.phone || null,
       phone_admission: phoneAdmission || null,
       email: data.email || null,
@@ -185,7 +199,25 @@ export function BasicInfoForm({
 
   const autosave = useAutosave({
     data: formData,
-    onSave: saveData,
+    onSave: async (data) => {
+      try {
+        await saveData(data);
+        showToast({
+          type: 'success',
+          title: 'Данные сохранены',
+          description: 'Изменения автоматически сохранены',
+          duration: 3000,
+        });
+      } catch (err: any) {
+        showToast({
+          type: 'error',
+          title: 'Ошибка сохранения',
+          description: err.message || 'Не удалось сохранить данные',
+          duration: 5000,
+        });
+        throw err;
+      }
+    },
     interval: 30000,
     debounceMs: 2000,
     enabled: true,
@@ -194,6 +226,14 @@ export function BasicInfoForm({
   const handleManualSave = async () => {
     setLoading(true);
     setError(null);
+    
+    // Показываем уведомление о сохранении
+    showToast({
+      type: 'warning',
+      title: 'Сохранение...',
+      description: 'Пожалуйста, подождите',
+      duration: 2000,
+    });
 
     // Валидация
     const validation = validateBasicSection(formData);
@@ -204,6 +244,12 @@ export function BasicInfoForm({
       });
       setValidationErrors(errors);
       setLoading(false);
+      showToast({
+        type: 'error',
+        title: 'Ошибка валидации',
+        description: 'Пожалуйста, исправьте ошибки в форме',
+        duration: 5000,
+      });
       return;
     }
 
@@ -212,8 +258,21 @@ export function BasicInfoForm({
     try {
       await saveData(formData);
       router.refresh();
+      showToast({
+        type: 'success',
+        title: 'Данные сохранены',
+        description: 'Все изменения успешно сохранены',
+        duration: 3000,
+      });
     } catch (err: any) {
-      setError(err.message || 'Xatolik yuz berdi');
+      const errorMessage = err.message || 'Xatolik yuz berdi';
+      setError(errorMessage);
+      showToast({
+        type: 'error',
+        title: 'Ошибка сохранения',
+        description: errorMessage,
+        duration: 5000,
+      });
     } finally {
       setLoading(false);
     }
@@ -254,6 +313,111 @@ export function BasicInfoForm({
           {/* Основная информация */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Основная информация</h2>
+            
+            {/* Загрузка логотипа */}
+            <LogoUpload
+              organizationId={organization.id}
+              currentLogoUrl={logoUrl}
+              onUploadSuccess={async (url, key) => {
+                setLogoUrl(url);
+                setLogoKey(key);
+                try {
+                  // Сохраняем сразу после загрузки
+                  await saveData({ ...formData, logo_url: url });
+                  showToast({
+                    type: 'success',
+                    title: 'Логотип загружен',
+                    description: 'Логотип успешно сохранен',
+                    duration: 3000,
+                  });
+                } catch (err: any) {
+                  const errorMessage = err.message || 'Ошибка сохранения логотипа';
+                  setError(errorMessage);
+                  showToast({
+                    type: 'error',
+                    title: 'Ошибка сохранения',
+                    description: errorMessage,
+                    duration: 5000,
+                  });
+                }
+              }}
+              onRemove={async () => {
+                setLogoUrl(null);
+                setLogoKey(null);
+                try {
+                  // Сохраняем удаление
+                  await saveData({ ...formData, logo_url: null });
+                  showToast({
+                    type: 'success',
+                    title: 'Логотип удален',
+                    description: 'Логотип успешно удален',
+                    duration: 3000,
+                  });
+                } catch (err: any) {
+                  const errorMessage = err.message || 'Ошибка удаления логотипа';
+                  setError(errorMessage);
+                  showToast({
+                    type: 'error',
+                    title: 'Ошибка удаления',
+                    description: errorMessage,
+                    duration: 5000,
+                  });
+                }
+              }}
+            />
+
+            {/* Загрузка обложки */}
+            <CoverImageUpload
+              organizationId={organization.id}
+              currentCoverUrl={coverImageUrl}
+              onUploadSuccess={async (url, key) => {
+                setCoverImageUrl(url);
+                setCoverImageKey(key);
+                try {
+                  // Сохраняем сразу после загрузки
+                  await saveData({ ...formData, cover_image_url: url });
+                  showToast({
+                    type: 'success',
+                    title: 'Обложка загружена',
+                    description: 'Обложка успешно сохранена',
+                    duration: 3000,
+                  });
+                } catch (err: any) {
+                  const errorMessage = err.message || 'Ошибка сохранения обложки';
+                  setError(errorMessage);
+                  showToast({
+                    type: 'error',
+                    title: 'Ошибка сохранения',
+                    description: errorMessage,
+                    duration: 5000,
+                  });
+                }
+              }}
+              onRemove={async () => {
+                setCoverImageUrl(null);
+                setCoverImageKey(null);
+                try {
+                  // Сохраняем удаление
+                  await saveData({ ...formData, cover_image_url: null });
+                  showToast({
+                    type: 'success',
+                    title: 'Обложка удалена',
+                    description: 'Обложка успешно удалена',
+                    duration: 3000,
+                  });
+                } catch (err: any) {
+                  const errorMessage = err.message || 'Ошибка удаления обложки';
+                  setError(errorMessage);
+                  showToast({
+                    type: 'error',
+                    title: 'Ошибка удаления',
+                    description: errorMessage,
+                    duration: 5000,
+                  });
+                }
+              }}
+            />
+
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="nameUz">

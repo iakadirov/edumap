@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -32,9 +32,31 @@ import {
 
 import { getCityDistrict } from '@/lib/utils/translations';
 import { formatDate } from '@/lib/utils/date';
+import { useToast } from '@/contexts/ToastContext';
+
+// Вспомогательные функции для статусов
+const getStatusLabel = (status: string) => {
+  const labels: Record<string, string> = {
+    draft: 'Черновик',
+    pending: 'На модерации',
+    published: 'Опубликована',
+    rejected: 'Отклонена',
+    suspended: 'Приостановлена',
+  };
+  return labels[status] || status;
+};
+
+const getStatusVariant = (status: string) => {
+  if (status === 'published') return 'default';
+  if (status === 'pending') return 'secondary';
+  if (status === 'draft') return 'outline';
+  if (status === 'rejected' || status === 'suspended') return 'destructive';
+  return 'outline';
+};
 
 interface School {
   id: string;
+  slug: string | null;
   name: string;
   name_uz: string | null;
   name_ru: string | null;
@@ -50,6 +72,93 @@ interface SchoolsTableProps {
   totalPages: number;
   search: string;
   status: string;
+}
+
+// Компонент для выбора статуса школы
+function StatusSelect({
+  schoolId,
+  currentStatus,
+  onStatusChange,
+}: {
+  schoolId: string;
+  currentStatus: string;
+  onStatusChange: () => void;
+}) {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(currentStatus);
+
+  // Синхронизируем статус с пропсами
+  useEffect(() => {
+    setStatus(currentStatus);
+  }, [currentStatus]);
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (newStatus === status) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/admin/schools/${schoolId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        let errorMessage = error.details || error.error || 'Ошибка изменения статуса';
+        
+        // Если ошибка связана с constraint, показываем более понятное сообщение
+        if (errorMessage.includes('check constraint') || errorMessage.includes('organizations_status_check')) {
+          errorMessage = 'Ошибка: статус не поддерживается. Убедитесь, что миграция базы данных применена.';
+        }
+        
+        console.error('Status update error:', error);
+        throw new Error(errorMessage);
+      }
+
+      setStatus(newStatus);
+      showToast({
+        type: 'success',
+        title: 'Статус изменен',
+        description: `Статус школы изменен на "${getStatusLabel(newStatus)}"`,
+        duration: 3000,
+      });
+      onStatusChange();
+    } catch (err: any) {
+      showToast({
+        type: 'error',
+        title: 'Ошибка',
+        description: err.message || 'Не удалось изменить статус',
+        duration: 5000,
+      });
+      // Возвращаем предыдущий статус при ошибке
+      setStatus(currentStatus);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Select
+      value={status}
+      onValueChange={handleStatusChange}
+      disabled={loading}
+    >
+      <SelectTrigger className="w-[140px] h-8">
+        <SelectValue placeholder="Изменить..." />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="draft">Черновик</SelectItem>
+        <SelectItem value="pending">На модерации</SelectItem>
+        <SelectItem value="published">Опубликована</SelectItem>
+        <SelectItem value="rejected">Отклонена</SelectItem>
+        <SelectItem value="suspended">Приостановлена</SelectItem>
+      </SelectContent>
+    </Select>
+  );
 }
 
 export function SchoolsTable({
@@ -177,31 +286,19 @@ export function SchoolsTable({
                     {getCityDistrict(school.city, school.district)}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        school.status === 'published'
-                          ? 'default'
-                          : school.status === 'pending'
-                            ? 'secondary'
-                            : school.status === 'draft'
-                              ? 'outline'
-                              : school.status === 'rejected' || school.status === 'suspended'
-                                ? 'destructive'
-                                : 'outline'
-                      }
-                    >
-                      {school.status === 'published'
-                        ? 'Опубликована'
-                        : school.status === 'pending'
-                          ? 'На модерации'
-                          : school.status === 'draft'
-                            ? 'Черновик'
-                            : school.status === 'rejected'
-                              ? 'Отклонена'
-                              : school.status === 'suspended'
-                                ? 'Приостановлена'
-                                : school.status || 'Неизвестно'}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={getStatusVariant(school.status || 'draft') as any} className="text-xs">
+                        {getStatusLabel(school.status || 'draft')}
+                      </Badge>
+                      <StatusSelect
+                        schoolId={school.id}
+                        currentStatus={school.status || 'draft'}
+                        onStatusChange={() => {
+                          // Обновляем данные после изменения статуса
+                          router.refresh();
+                        }}
+                      />
+                    </div>
                   </TableCell>
                   <TableCell>
                     {formatDate(school.created_at)}

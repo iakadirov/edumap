@@ -12,7 +12,7 @@ export default function SchoolsLoading() {
             <div className="h-5 w-48 bg-muted animate-pulse rounded" />
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
+          <div className="grid gap-8 lg:grid-cols-[321px_1fr]">
             {/* Filters Skeleton */}
             <div className="space-y-6">
               <Card>

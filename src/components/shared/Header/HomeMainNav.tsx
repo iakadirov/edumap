@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Search, Plus } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -23,9 +24,14 @@ export function HomeMainNav() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
         {/* Логотип */}
         <Link href="/" className="flex items-center">
-          <div className="w-32 h-8 bg-blue-600 flex items-center justify-center rounded">
-            <span className="text-xl font-bold text-white">edumap</span>
-          </div>
+          <Image
+            src="/images/logo/logo.svg"
+            alt="EduMap.uz"
+            width={128}
+            height={32}
+            className="h-8 w-auto"
+            priority
+          />
         </Link>
 
         {/* Основная навигация */}

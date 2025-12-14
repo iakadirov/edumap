@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -122,21 +122,33 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
 
   // Debounced обновление URL
   const updateURL = useDebouncedCallback((updatedFilters: FilterValues) => {
-    const params = new URLSearchParams();
+    // Берем текущие параметры из URL, чтобы сохранить другие фильтры (например, region)
+    // Используем window.location.search для получения актуальных параметров
+    const currentParams = typeof window !== 'undefined' 
+      ? new URLSearchParams(window.location.search)
+      : new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(currentParams.toString());
 
     // Districts (multi-select)
     if (updatedFilters.districts && updatedFilters.districts.length > 0) {
       params.set('district', updatedFilters.districts.join(','));
+    } else {
+      // Удаляем параметр district, если районы не выбраны
+      params.delete('district');
     }
 
     // City
     if (updatedFilters.city) {
       params.set('city', updatedFilters.city);
+    } else {
+      params.delete('city');
     }
 
     // School type
     if (updatedFilters.school_type) {
       params.set('school_type', updatedFilters.school_type);
+    } else {
+      params.delete('school_type');
     }
 
     // Price range
@@ -154,35 +166,49 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
     // Language (comma-separated)
     if (updatedFilters.language && updatedFilters.language.length > 0) {
       params.set('language', updatedFilters.language.join(','));
+    } else {
+      params.delete('language');
     }
 
     // Curriculum (comma-separated)
     if (updatedFilters.curriculum && updatedFilters.curriculum.length > 0) {
       params.set('curriculum', updatedFilters.curriculum.join(','));
+    } else {
+      params.delete('curriculum');
     }
 
     // Grade
     if (updatedFilters.grade) {
       params.set('grade', updatedFilters.grade);
+    } else {
+      params.delete('grade');
     }
 
     // Rating
     if (updatedFilters.rating_min) {
       params.set('rating_min', updatedFilters.rating_min.toString());
+    } else {
+      params.delete('rating_min');
     }
 
     // Services
     if (updatedFilters.has_transport) {
       params.set('has_transport', 'true');
+    } else {
+      params.delete('has_transport');
     }
     if (updatedFilters.has_meals) {
       params.set('has_meals', 'true');
+    } else {
+      params.delete('has_meals');
     }
     if (updatedFilters.has_extended_day) {
       params.set('has_extended_day', 'true');
+    } else {
+      params.delete('has_extended_day');
     }
 
-    const newUrl = params.toString() ? `/schools?${params.toString()}` : '/schools';
+    const newUrl = params.toString() ? `/schools/list?${params.toString()}` : '/schools/list';
     router.push(newUrl, { scroll: false });
   }, 300);
 

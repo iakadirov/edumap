@@ -4,7 +4,12 @@
 -- Старые статусы: 'active', 'inactive', 'pending'
 -- Новые статусы: 'draft', 'pending', 'published', 'rejected', 'suspended'
 
--- Сначала обновляем существующие данные
+-- ВАЖНО: Сначала удаляем constraint, потом обновляем данные, потом добавляем новый constraint
+
+-- Шаг 1: Удаляем старый CHECK constraint
+ALTER TABLE organizations DROP CONSTRAINT IF EXISTS organizations_status_check;
+
+-- Шаг 2: Обновляем существующие данные (теперь constraint удален, можем обновлять)
 -- active -> published
 UPDATE organizations SET status = 'published' WHERE status = 'active';
 
@@ -13,14 +18,12 @@ UPDATE organizations SET status = 'suspended' WHERE status = 'inactive';
 
 -- pending остается pending (это статус "на модерации")
 
--- Теперь удаляем старый CHECK constraint и добавляем новый
-ALTER TABLE organizations DROP CONSTRAINT IF EXISTS organizations_status_check;
-
+-- Шаг 3: Добавляем новый CHECK constraint
 ALTER TABLE organizations 
   ADD CONSTRAINT organizations_status_check 
   CHECK (status IN ('draft', 'pending', 'published', 'rejected', 'suspended'));
 
--- Обновляем значение по умолчанию на 'draft' (для новых школ)
+-- Шаг 4: Обновляем значение по умолчанию на 'draft' (для новых школ)
 ALTER TABLE organizations ALTER COLUMN status SET DEFAULT 'draft';
 
 -- Комментарий

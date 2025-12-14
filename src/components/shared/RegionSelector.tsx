@@ -23,20 +23,66 @@ import { cn } from '@/lib/utils';
  */
 const REGION_CHOICE_MADE_KEY = 'edumap_region_choice_made';
 
+interface RegionWithCount extends Region {
+  count?: number;
+}
+
 export function RegionSelector() {
   const { selectedRegion, setSelectedRegion, isLoading } = useRegion();
-  const [regions, setRegions] = useState<Region[]>([]);
+  const [regions, setRegions] = useState<RegionWithCount[]>([]);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoadingCounts, setIsLoadingCounts] = useState(true);
 
-  // Загружаем список регионов
+  // Загружаем список регионов и количество школ
   useEffect(() => {
     async function loadRegions() {
       try {
-        const response = await fetch('/data/regions.json');
-        const data = await response.json();
-        setRegions(data);
+        const [regionsResponse, countsResponse] = await Promise.all([
+          fetch('/data/regions.json'),
+          fetch('/api/regions/counts').catch(() => null), // Ловим ошибки, но не прерываем загрузку
+        ]);
+
+        const regionsData = await regionsResponse.json();
+        
+        // Если счетчики не загрузились, просто используем регионы без счетчиков
+        if (!countsResponse || !countsResponse.ok) {
+          setRegions(regionsData);
+          setIsLoadingCounts(false);
+          return;
+        }
+
+        const countsData = await countsResponse.json();
+
+        // Проверяем, что данные валидны
+        if (!countsData || typeof countsData !== 'object') {
+          setRegions(regionsData);
+          setIsLoadingCounts(false);
+          return;
+        }
+
+        // Объединяем регионы с количеством школ
+        const regionsWithCounts: RegionWithCount[] = regionsData.map((region: Region) => ({
+          ...region,
+          count: countsData.byRegion && typeof countsData.byRegion === 'object' 
+            ? (countsData.byRegion[region.id] || 0)
+            : 0,
+        }));
+
+        setRegions(regionsWithCounts);
+        setTotalCount(typeof countsData.total === 'number' ? countsData.total : 0);
+        setIsLoadingCounts(false);
       } catch (error) {
         console.error('Error loading regions:', error);
+        // В случае ошибки просто загружаем регионы без счетчиков
+        try {
+          const response = await fetch('/data/regions.json');
+          const data = await response.json();
+          setRegions(data);
+        } catch (fetchError) {
+          console.error('Error fetching regions.json:', fetchError);
+        }
+        setIsLoadingCounts(false);
       }
     }
     loadRegions();
@@ -107,13 +153,20 @@ export function RegionSelector() {
             <Button
               variant="outline"
               className={cn(
-                'h-auto p-3 sm:p-4 flex items-center justify-start hover:bg-accent transition-colors',
+                'h-auto p-3 sm:p-4 flex items-center justify-between hover:bg-accent transition-colors',
                 !selectedRegion && 'ring-2 ring-primary bg-accent'
               )}
               onClick={() => handleSelectRegion(null)}
             >
-              <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-              <span className="font-semibold text-left ml-2">O'zbekiston</span>
+              <div className="flex items-center">
+                <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                <span className="font-semibold text-left ml-2">O'zbekiston</span>
+              </div>
+              {!isLoadingCounts && totalCount !== null && (
+                <span className="text-sm text-muted-foreground ml-2">
+                  ({totalCount})
+                </span>
+              )}
             </Button>
 
             {/* Список регионов */}
@@ -122,13 +175,20 @@ export function RegionSelector() {
                 key={region.id}
                 variant="outline"
                 className={cn(
-                  'h-auto p-3 sm:p-4 flex items-center justify-start hover:bg-accent transition-colors',
+                  'h-auto p-3 sm:p-4 flex items-center justify-between hover:bg-accent transition-colors',
                   selectedRegion?.id === region.id && 'ring-2 ring-primary bg-accent'
                 )}
                 onClick={() => handleSelectRegion(region)}
               >
-                <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                <span className="font-semibold text-left ml-2">{region.name_uz}</span>
+                <div className="flex items-center">
+                  <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="font-semibold text-left ml-2">{region.name_uz}</span>
+                </div>
+                {!isLoadingCounts && region.count !== undefined && (
+                  <span className="text-sm text-muted-foreground ml-2">
+                    ({region.count})
+                  </span>
+                )}
               </Button>
             ))}
           </div>

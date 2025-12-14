@@ -27,24 +27,23 @@ export async function POST(request: Request) {
     const supabase = await createClient();
 
     // Для school_admin устанавливаем статус и связываем с пользователем
-    // Используем 'pending' если статус не указан (для совместимости с БД)
-    // После применения миграции 024_update_school_statuses.sql можно использовать 'draft'
+    // По умолчанию школы сразу активируются (published)
     if (user.role === 'school_admin') {
       // Проверяем, что статус валидный для текущей БД
       const validStatuses = ['draft', 'pending', 'published', 'rejected', 'suspended'];
       if (organization.status && !validStatuses.includes(organization.status)) {
-        organization.status = 'pending';
+        organization.status = 'published'; // По умолчанию активируем
       } else {
-        organization.status = organization.status || 'pending';
+        organization.status = organization.status || 'published'; // По умолчанию активируем
       }
       organization.admin_user_id = user.id;
     } else {
-      // Для admin/super_admin можно указать статус
+      // Для admin/super_admin можно указать статус, по умолчанию активируем
       const validStatuses = ['draft', 'pending', 'published', 'rejected', 'suspended'];
       if (organization.status && !validStatuses.includes(organization.status)) {
-        organization.status = 'pending';
+        organization.status = 'published'; // По умолчанию активируем
       } else {
-        organization.status = organization.status || 'pending';
+        organization.status = organization.status || 'published'; // По умолчанию активируем
       }
     }
 

@@ -3,6 +3,8 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { SchoolsList } from '../schools-list';
 import { RegionFilterSync } from '@/components/schools/RegionFilterSync';
+import { generateSchoolsListTitle, generateSchoolsListDescription } from '@/lib/utils/page-titles';
+import type { Metadata } from 'next';
 
 // Динамический импорт SchoolFilters для уменьшения bundle size
 // Это client component, поэтому загружаем его только когда нужно
@@ -18,6 +20,42 @@ const SchoolFilters = dynamic(
 
 // Кэширование на 300 секунд (5 минут) для быстрой загрузки
 export const revalidate = 300;
+
+/**
+ * Генерация мета-тегов для страницы каталога школ
+ */
+export async function generateMetadata({ searchParams }: SchoolsListPageProps): Promise<Metadata> {
+  const params = searchParams instanceof Promise ? await searchParams : searchParams;
+  
+  const title = await generateSchoolsListTitle({
+    region: params.region,
+    district: params.district,
+    city: params.city,
+    school_type: params.school_type,
+  });
+  
+  const description = await generateSchoolsListDescription({
+    region: params.region,
+    district: params.district,
+    city: params.city,
+    school_type: params.school_type,
+  });
+  
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
+  };
+}
 
 interface SchoolsListPageProps {
   searchParams: Promise<{
@@ -79,52 +117,64 @@ export default async function SchoolsListPage({ searchParams }: SchoolsListPageP
     cities = [];
   }
 
+  // Генерируем динамический заголовок
+  const pageTitle = await generateSchoolsListTitle({
+    region: params.region,
+    district: params.district,
+    city: params.city,
+    school_type: params.school_type,
+  });
+
   return (
-    <div className="container-wrapper py-8 bg-white">
+    <div className="container-wrapper bg-white">
       {/* Синхронизация выбранной области с URL */}
       <RegionFilterSync />
-      <div className="container-content">
+      <div className="container-content pt-8">
         <div className="container-inner">
-          {/* Заголовок */}
-          <div className="mb-8">
-            <h1 className="mb-2 text-4xl font-bold">Maktablar katalogi</h1>
-          </div>
+          {/* Основной контейнер */}
+          <div className="w-full flex flex-col gap-5">
+            {/* Заголовок */}
+            <h1 className="text-xl sm:text-2xl font-semibold text-black">
+              Maktablar katalogi
+            </h1>
 
-          <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
-            {/* Панель фильтров - загружается сразу */}
-            <aside className="lg:sticky lg:top-4 lg:h-fit">
-              <SchoolFilters 
-                cities={cities}
-                initialFilters={{
-                  district: params.district,
-                  city: params.city,
-                  school_type: params.school_type,
-                  price_min: params.price_min,
-                  price_max: params.price_max,
-                  language: params.language,
-                  curriculum: params.curriculum,
-                  grade: params.grade,
-                  rating_min: params.rating_min,
-                  has_transport: params.has_transport,
-                  has_meals: params.has_meals,
-                  has_extended_day: params.has_extended_day,
-                }}
-              />
-            </aside>
+            {/* Адаптивная сетка: фильтры слева, список справа */}
+            <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] xl:grid-cols-[360px_1fr] gap-4 lg:gap-6">
+              {/* Панель фильтров */}
+              <aside className="lg:sticky lg:top-4 lg:h-fit order-2 lg:order-1">
+                <SchoolFilters 
+                  cities={cities}
+                  initialFilters={{
+                    district: params.district,
+                    city: params.city,
+                    school_type: params.school_type,
+                    price_min: params.price_min,
+                    price_max: params.price_max,
+                    language: params.language,
+                    curriculum: params.curriculum,
+                    grade: params.grade,
+                    rating_min: params.rating_min,
+                    has_transport: params.has_transport,
+                    has_meals: params.has_meals,
+                    has_extended_day: params.has_extended_day,
+                  }}
+                />
+              </aside>
 
-            {/* Список школ - загружается отдельно через Suspense для streaming */}
-            <div className="space-y-6">
-              <Suspense 
-                fallback={
-                  <div className="space-y-4">
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                      <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
-                    ))}
-                  </div>
-                }
-              >
-                <SchoolsList params={params} />
-              </Suspense>
+              {/* Список школ - загружается отдельно через Suspense для streaming */}
+              <div className="flex-1 flex flex-col gap-4 sm:gap-5 order-1 lg:order-2">
+                <Suspense 
+                  fallback={
+                    <div className="space-y-4 sm:space-y-5 w-full">
+                      {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div key={i} className="h-48 sm:h-[242px] bg-muted animate-pulse rounded-[20px]" />
+                      ))}
+                    </div>
+                  }
+                >
+                  <SchoolsList params={params} />
+                </Suspense>
+              </div>
             </div>
           </div>
         </div>
