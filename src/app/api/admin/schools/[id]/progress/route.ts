@@ -57,7 +57,7 @@ export async function GET(
 
     return NextResponse.json({
       overall: overallProgress,
-      sections: sections.reduce((acc: any, section) => {
+      sections: sections.reduce((acc: any, section: any) => {
         acc[section.section] = section.completeness;
         return acc;
       }, {}),
