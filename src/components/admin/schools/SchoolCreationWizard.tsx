@@ -241,6 +241,7 @@ export function SchoolCreationWizard({
         telegram: data.telegram || null,
         region_id: data.region_id,
         district_id: data.district_id,
+        city: data.city || null,
         address: data.address,
         landmark: data.landmark || null,
         lat: data.lat || null,
