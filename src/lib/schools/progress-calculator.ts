@@ -126,7 +126,7 @@ export function calculateSectionProgress(
   data: SectionFields
 ): number {
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:124',message:'calculateSectionProgress called',data:{section,dataKeys:Object.keys(data),sampleData:{name_uz:data.name_uz,name_ru:data.name_ru,region_id:data.region_id,district_id:data.district_id}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:124',message:'calculateSectionProgress called',data:{section:section,dataKeys:Object.keys(data),sampleData:{name_uz:data.name_uz,name_ru:data.name_ru,region_id:data.region_id,district_id:data.district_id}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
   // #endregion
 
   const requiredFields = REQUIRED_FIELDS[section] || [];
@@ -164,7 +164,7 @@ export function calculateSectionProgress(
         isFilled = value !== null && value !== undefined && value !== '';
       }
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:155',message:'Checking required field',data:{field,value,valueType:typeof value,isFilled}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+      fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:155',message:'Checking required field',data:{field:field,value:value,valueType:typeof value,isFilled:isFilled}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
       // #endregion
       return isFilled;
     }).length;
@@ -190,7 +190,7 @@ export function calculateSectionProgress(
 
     const totalProgress = Math.round(requiredProgress + importantProgress);
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:171',message:'Progress calculated',data:{section,requiredFieldsCount:requiredFields.length,filledRequired,requiredProgress,importantFieldsCount:importantFields.length,filledImportant,importantProgress,totalProgress}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'progress-calculator.ts:171',message:'Progress calculated',data:{section:section,requiredFieldsCount:requiredFields.length,filledRequired:filledRequired,requiredProgress:requiredProgress,importantFieldsCount:importantFields.length,filledImportant:filledImportant,importantProgress:importantProgress,totalProgress:totalProgress}},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
     // #endregion
     return totalProgress;
   }

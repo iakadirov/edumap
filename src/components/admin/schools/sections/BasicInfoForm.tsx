@@ -122,7 +122,7 @@ export function BasicInfoForm({
     // #endregion
     const calculatedProgress = calculateSectionProgress('basic', formData);
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:122',message:'Progress recalculated',data:{calculatedProgress,previousProgress:currentProgress},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:122',message:'Progress recalculated',data:{calculatedProgress:calculatedProgress,previousProgress:currentProgress},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
     // #endregion
     setCurrentProgress(calculatedProgress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -181,7 +181,7 @@ export function BasicInfoForm({
     // #endregion
     const progress = calculateSectionProgress('basic', data);
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:166',message:'Progress calculated, sending to API',data:{progress,organizationId:organization.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:166',message:'Progress calculated, sending to API',data:{progress:progress,organizationId:organization.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
     // #endregion
     const progressResponse = await fetch(`/api/admin/schools/${organization.id}/sections/basic`, {
       method: 'PATCH',
@@ -192,7 +192,7 @@ export function BasicInfoForm({
     });
     // #region agent log
     const progressResponseOk = progressResponse.ok;
-    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:183',message:'Progress API response',data:{progress,status:progressResponse.status,ok:progressResponseOk},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'BasicInfoForm.tsx:183',message:'Progress API response',data:{progress:progress,status:progressResponse.status,ok:progressResponseOk},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
     // #endregion
     if (progressResponseOk) {
       setCurrentProgress(progress);
