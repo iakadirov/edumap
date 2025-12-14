@@ -462,11 +462,17 @@ export async function getDistricts() {
 /**
  * Получить все уникальные города
  * Оптимизировано: кэширование на 1 час, так как данные редко меняются
+ * Использует анонимный клиент, так как не требует авторизации
  */
 export async function getCities() {
   return unstable_cache(
     async () => {
-      const supabase = await createClient();
+      // Используем анонимный клиент вместо createClient(), чтобы избежать cookies() внутри cache
+      const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
+      const supabase = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
       
       const { data, error } = await supabase
         .from('organizations')
