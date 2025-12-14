@@ -2,8 +2,17 @@
 -- Дата: Декабрь 2025
 -- Описание: Политики доступа для таблицы прогресса разделов
 
--- Включаем RLS для таблицы
-ALTER TABLE school_sections_progress ENABLE ROW LEVEL SECURITY;
+-- Проверяем, включен ли RLS, и включаем если нет
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_tables 
+    WHERE tablename = 'school_sections_progress' 
+    AND rowsecurity = true
+  ) THEN
+    ALTER TABLE school_sections_progress ENABLE ROW LEVEL SECURITY;
+  END IF;
+END $$;
 
 -- SELECT: Админы и school_admin могут видеть прогресс
 CREATE POLICY "Admins and school_admin can view progress"
