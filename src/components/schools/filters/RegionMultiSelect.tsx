@@ -53,9 +53,11 @@ export function RegionMultiSelect({
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
     
+    const name = option.name?.toLowerCase() || '';
+    const nameUz = option.name_uz?.toLowerCase() || '';
     return (
-      option.name.toLowerCase().includes(query) ||
-      option.name_uz.toLowerCase().includes(query)
+      name.includes(query) ||
+      nameUz.includes(query)
     );
   });
 

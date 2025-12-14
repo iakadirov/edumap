@@ -50,9 +50,11 @@ export function DistrictMultiSelect({
   // Фильтруем опции по поисковому запросу
   const filteredOptions = options.filter((option) => {
     const query = searchQuery.toLowerCase();
+    const name = option.name?.toLowerCase() || '';
+    const nameUz = option.name_uz?.toLowerCase() || '';
     return (
-      option.name.toLowerCase().includes(query) ||
-      option.name_uz.toLowerCase().includes(query)
+      name.includes(query) ||
+      nameUz.includes(query)
     );
   });
 
