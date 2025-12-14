@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Onest } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const onest = Onest({
@@ -33,6 +34,7 @@ export default function RootLayout({
         className={`${onest.variable} font-sans antialiased`}
       >
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
