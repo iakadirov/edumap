@@ -113,7 +113,7 @@ export default async function EditSchoolPage({
     .select('section, completeness')
     .eq('organization_id', id);
 
-  const progressMap = new Map(
+  const progressMap = new Map<string, number>(
     progressData?.map((p: any) => [p.section, p.completeness]) || []
   );
 
@@ -130,7 +130,7 @@ export default async function EditSchoolPage({
   const sectionsWithProgress = SECTIONS.map((section) => ({
     ...section,
     href: section.href.replace('[id]', id),
-    completeness: progressMap.get(section.id) || 0,
+    completeness: progressMap.get(section.id) ?? 0,
   }));
 
   // Группируем по уровням
