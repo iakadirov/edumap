@@ -17,31 +17,20 @@ export function RegionFilterSync() {
   const { selectedRegion } = useRegion();
 
   useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RegionFilterSync:19',message:'RegionFilterSync effect started',data:{pathname,selectedRegion:selectedRegion?.id,hasSelectedRegion:!!selectedRegion},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-    
     // Обновляем URL только если мы на странице /schools
-    if (pathname !== '/schools') {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RegionFilterSync:25',message:'pathname is not /schools, exiting',data:{pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
+    if (!pathname.startsWith('/schools')) {
       return;
     }
     
     if (!selectedRegion) {
       // Если область не выбрана, удаляем параметр region из URL
       const currentRegion = searchParams.get('region');
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RegionFilterSync:33',message:'no selectedRegion, checking currentRegion',data:{currentRegion,hasCurrentRegion:!!currentRegion},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       if (currentRegion) {
         const params = new URLSearchParams(searchParams.toString());
         params.delete('region');
-        const newUrl = params.toString() ? `/schools?${params.toString()}` : '/schools';
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RegionFilterSync:40',message:'router.push removing region param',data:{newUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
+        // Сохраняем текущий путь (может быть /schools/list или /schools)
+        const basePath = pathname;
+        const newUrl = params.toString() ? `${basePath}?${params.toString()}` : basePath;
         // router.push автоматически обновит useSearchParams в DistrictsLoader
         router.push(newUrl, { scroll: false });
       }
@@ -52,17 +41,12 @@ export function RegionFilterSync() {
     const currentRegion = searchParams.get('region');
     const regionId = selectedRegion.id.toString();
 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RegionFilterSync:53',message:'selectedRegion exists, comparing with currentRegion',data:{currentRegion,regionId,shouldUpdate:currentRegion !== regionId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-
     if (currentRegion !== regionId) {
       const params = new URLSearchParams(searchParams.toString());
       params.set('region', regionId);
-      const newUrl = `/schools?${params.toString()}`;
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/fcd63747-9f96-4dfa-bdcd-f4eb869a2f67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RegionFilterSync:60',message:'router.push adding region param',data:{newUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
+      // Сохраняем текущий путь (может быть /schools/list или /schools)
+      const basePath = pathname;
+      const newUrl = `${basePath}?${params.toString()}`;
       // router.push автоматически обновит useSearchParams в DistrictsLoader
       router.push(newUrl, { scroll: false });
     }

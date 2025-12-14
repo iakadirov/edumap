@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { MapPin } from 'lucide-react';
+import { MapPin, ChevronDown } from 'lucide-react';
 import { useRegion, type Region } from '@/contexts/RegionContext';
 import { cn } from '@/lib/utils';
 
@@ -77,17 +77,19 @@ export function RegionSelector() {
       <Button
         variant="outline"
         onClick={() => setIsDialogOpen(true)}
+        data-region-selector
         className={cn(
-          'gap-2 h-12 px-4 rounded-2xl',
-          'bg-[#F3F6F8] hover:bg-[#E8EDF1]',
+          'gap-1 h-11 px-4 py-3 rounded-xl',
+          'bg-gray-100 hover:bg-gray-200',
           'border-none',
           !selectedRegion && 'text-muted-foreground'
         )}
       >
-        <MapPin className="h-6 w-6" />
-        <span className="text-[17px] font-medium leading-[22px] text-[#1A2438]">
+        <MapPin className="h-5 w-5 text-slate-600" />
+        <span className="text-base font-medium text-slate-600">
           {displayName}
         </span>
+        <ChevronDown className="h-3 w-3 text-slate-600" />
       </Button>
 
       {/* Модальное окно выбора области */}

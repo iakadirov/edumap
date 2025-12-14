@@ -91,7 +91,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
           {/* Кнопка назад */}
           <div className="mb-6">
         <Button variant="ghost" asChild>
-          <Link href="/schools">← Katalogga qaytish</Link>
+          <Link href="/schools/list">← Katalogga qaytish</Link>
         </Button>
       </div>
 

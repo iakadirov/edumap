@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DistrictMultiSelect } from './filters/DistrictMultiSelect';
 
@@ -24,6 +24,7 @@ export function DistrictsLoader({ selected, onSelectionChange }: DistrictsLoader
   const searchParams = useSearchParams();
   const [districts, setDistricts] = useState<DistrictOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const prevRegionIdRef = useRef<string | null>(null);
 
   const regionId = searchParams.get('region');
 
@@ -49,6 +50,20 @@ export function DistrictsLoader({ selected, onSelectionChange }: DistrictsLoader
         // API возвращает массив районов напрямую
         const districtsArray = Array.isArray(data) ? data : [];
         setDistricts(districtsArray);
+        
+        // Если область изменилась, сбрасываем выбранные районы
+        // так как они могут не принадлежать новой области
+        if (prevRegionIdRef.current !== null && prevRegionIdRef.current !== regionId) {
+          // Проверяем, что выбранные районы существуют в новом списке
+          const validSelected = selected.filter(id => 
+            districtsArray.some(d => d.id.toString() === id)
+          );
+          if (validSelected.length !== selected.length) {
+            onSelectionChange(validSelected);
+          }
+        }
+        
+        prevRegionIdRef.current = regionId;
       } catch (error) {
         console.error('Error loading districts:', error);
         setDistricts([]);
@@ -58,6 +73,7 @@ export function DistrictsLoader({ selected, onSelectionChange }: DistrictsLoader
     }
 
     loadDistricts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [regionId]);
 
   if (loading) {

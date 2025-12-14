@@ -1,7 +1,7 @@
 import { getCities, type SortOption } from '@/lib/supabase/queries';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-import { SchoolsList } from './schools-list';
+import { SchoolsList } from '../schools-list';
 import { RegionFilterSync } from '@/components/schools/RegionFilterSync';
 
 // Динамический импорт SchoolFilters для уменьшения bundle size
@@ -19,7 +19,7 @@ const SchoolFilters = dynamic(
 // Кэширование на 300 секунд (5 минут) для быстрой загрузки
 export const revalidate = 300;
 
-interface SchoolsPageProps {
+interface SchoolsListPageProps {
   searchParams: Promise<{
     region?: string; // ID области
     district?: string;
@@ -54,7 +54,9 @@ interface SchoolsPageProps {
 }
 
 /**
- * Страница списка школ
+ * Страница каталога школ
+ * 
+ * URL: /schools/list
  * 
  * Features:
  * - Отображение всех активных школ из Supabase
@@ -62,7 +64,7 @@ interface SchoolsPageProps {
  * - Обработка состояний: loading, error, empty
  * - Streaming SSR с Suspense для быстрой загрузки
  */
-export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
+export default async function SchoolsListPage({ searchParams }: SchoolsListPageProps) {
   // В Next.js 16 searchParams может быть Promise, проверяем
   const params = searchParams instanceof Promise ? await searchParams : searchParams;
   let cities: string[] = [];
@@ -130,3 +132,4 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
     </div>
   );
 }
+

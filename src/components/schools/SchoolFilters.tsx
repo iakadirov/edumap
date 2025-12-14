@@ -204,7 +204,7 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
       curriculum: [],
     };
     setFilters(reset);
-    router.push('/schools');
+    router.push('/schools/list');
     onFiltersChange?.(reset);
   };
 

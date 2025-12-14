@@ -41,7 +41,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/schools"
+                  href="/schools/list"
                   className="text-muted-foreground transition-colors hover:text-primary"
                 >
                   Maktablar katalogi
