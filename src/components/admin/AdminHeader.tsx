@@ -33,8 +33,8 @@ export function AdminHeader({ user }: AdminHeaderProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Находим родительский main элемент
-      const mainElement = document.querySelector('main.flex-1.flex.flex-col');
+      // Находим родительский main элемент (скроллируемый контейнер)
+      const mainElement = document.querySelector('main.flex-1.flex.flex-col.overflow-auto');
       if (mainElement) {
         const scrollTop = mainElement.scrollTop;
         setIsScrolled(scrollTop > 0);
@@ -42,7 +42,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
     };
 
     // Находим родительский main элемент для отслеживания скролла
-    const mainElement = document.querySelector('main.flex-1.flex.flex-col');
+    const mainElement = document.querySelector('main.flex-1.flex.flex-col.overflow-auto');
     if (mainElement) {
       mainElement.addEventListener('scroll', handleScroll);
       // Проверяем начальное состояние
