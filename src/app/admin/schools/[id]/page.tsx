@@ -108,24 +108,39 @@ export default async function EditSchoolPage({
   }
 
   // Получаем прогресс разделов
-  const { data: progressData, error: progressError } = await (supabase as any)
+  console.log('[EditSchoolPage] Fetching progress for organization:', id);
+  
+  const progressQuery = (supabase as any)
     .from('school_sections_progress')
     .select('section, completeness')
     .eq('organization_id', id);
+  
+  const { data: progressData, error: progressError, status, statusText } = await progressQuery;
+
+  console.log('[EditSchoolPage] Progress query result:', {
+    hasData: !!progressData,
+    dataLength: progressData?.length || 0,
+    hasError: !!progressError,
+    errorType: typeof progressError,
+    errorKeys: progressError ? Object.keys(progressError) : [],
+    status,
+    statusText,
+  });
 
   if (progressError) {
     console.error('[EditSchoolPage] Error fetching progress:', {
       error: progressError,
+      errorString: JSON.stringify(progressError),
       errorMessage: progressError?.message,
       errorCode: progressError?.code,
       errorDetails: progressError?.details,
       errorHint: progressError?.hint,
+      errorStack: progressError?.stack,
       organizationId: id,
     });
   }
 
   console.log('[EditSchoolPage] Progress data:', progressData);
-  console.log('[EditSchoolPage] Progress error:', progressError);
 
   const progressMap = new Map<string, number>(
     progressData?.map((p: any) => [p.section, p.completeness]) || []
