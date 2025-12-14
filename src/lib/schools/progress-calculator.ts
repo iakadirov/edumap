@@ -128,7 +128,50 @@ export function calculateSectionProgress(
   const requiredFields = REQUIRED_FIELDS[section] || [];
   const importantFields = IMPORTANT_FIELDS[section] || [];
 
-  // Считаем заполненные обязательные поля (вес 70%)
+  // Специальная обработка для basic раздела
+  if (section === 'basic') {
+    // Для name проверяем, что хотя бы одно поле (name_uz или name_ru) заполнено
+    let filledRequired = requiredFields.filter((field) => {
+      // Для name_uz проверяем, что хотя бы одно название есть
+      if (field === 'name_uz') {
+        return (data.name_uz && data.name_uz.trim() !== '') || 
+               (data.name_ru && data.name_ru.trim() !== '');
+      }
+      const value = data[field];
+      // Для чисел проверяем, что не null/undefined (0 - валидное значение)
+      if (typeof value === 'number') {
+        return value !== null && value !== undefined;
+      }
+      // Для строк проверяем, что не пустая
+      if (typeof value === 'string') {
+        return value !== null && value !== undefined && value.trim() !== '';
+      }
+      return value !== null && value !== undefined && value !== '';
+    }).length;
+
+    const requiredProgress =
+      requiredFields.length > 0
+        ? (filledRequired / requiredFields.length) * 70
+        : 0;
+
+    // Считаем заполненные важные поля (вес 30%)
+    const filledImportant = importantFields.filter((field) => {
+      const value = data[field];
+      if (typeof value === 'string') {
+        return value !== null && value !== undefined && value.trim() !== '';
+      }
+      return value !== null && value !== undefined && value !== '';
+    }).length;
+
+    const importantProgress =
+      importantFields.length > 0
+        ? (filledImportant / importantFields.length) * 30
+        : 0;
+
+    return Math.round(requiredProgress + importantProgress);
+  }
+
+  // Для остальных разделов стандартная логика
   const filledRequired = requiredFields.filter((field) => {
     const value = data[field];
     return value !== null && value !== undefined && value !== '';
