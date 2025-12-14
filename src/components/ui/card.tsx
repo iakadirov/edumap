@@ -12,6 +12,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
       )}
       style={{
         boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+        border: '1px solid #eaeaea',
       }}
       {...props}
     />
