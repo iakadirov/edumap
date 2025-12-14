@@ -91,8 +91,7 @@ export function BasicInfoForm({
       setDistricts([]);
       setDistrictId(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [regionId]);
+  }, [regionId, districtId]);
 
   // Формируем данные для автосохранения
   const formData = {
