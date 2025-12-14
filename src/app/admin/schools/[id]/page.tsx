@@ -110,37 +110,50 @@ export default async function EditSchoolPage({
   // Получаем прогресс разделов
   console.log('[EditSchoolPage] Fetching progress for organization:', id);
   
-  const progressQuery = (supabase as any)
-    .from('school_sections_progress')
-    .select('section, completeness')
-    .eq('organization_id', id);
+  let progressData: any[] | null = null;
+  let progressError: any = null;
   
-  const { data: progressData, error: progressError, status, statusText } = await progressQuery;
+  try {
+    const progressQuery = (supabase as any)
+      .from('school_sections_progress')
+      .select('section, completeness')
+      .eq('organization_id', id);
+    
+    const result = await progressQuery;
+    progressData = result.data;
+    progressError = result.error;
 
-  console.log('[EditSchoolPage] Progress query result:', {
-    hasData: !!progressData,
-    dataLength: progressData?.length || 0,
-    hasError: !!progressError,
-    errorType: typeof progressError,
-    errorKeys: progressError ? Object.keys(progressError) : [],
-    status,
-    statusText,
-  });
-
-  if (progressError) {
-    console.error('[EditSchoolPage] Error fetching progress:', {
-      error: progressError,
-      errorString: JSON.stringify(progressError),
-      errorMessage: progressError?.message,
-      errorCode: progressError?.code,
-      errorDetails: progressError?.details,
-      errorHint: progressError?.hint,
-      errorStack: progressError?.stack,
-      organizationId: id,
+    console.log('[EditSchoolPage] Progress query result:', {
+      hasData: !!progressData,
+      dataLength: progressData?.length || 0,
+      hasError: !!progressError,
+      errorType: typeof progressError,
+      errorKeys: progressError ? Object.keys(progressError) : [],
+      status: result.status,
+      statusText: result.statusText,
     });
+
+    if (progressError) {
+      console.error('[EditSchoolPage] Error fetching progress:', {
+        error: progressError,
+        errorString: JSON.stringify(progressError),
+        errorMessage: progressError?.message,
+        errorCode: progressError?.code,
+        errorDetails: progressError?.details,
+        errorHint: progressError?.hint,
+        errorStack: progressError?.stack,
+        organizationId: id,
+      });
+      // Если ошибка RLS, продолжаем с пустым прогрессом
+      progressData = null;
+    }
+  } catch (err) {
+    console.error('[EditSchoolPage] Exception fetching progress:', err);
+    progressError = err;
+    progressData = null;
   }
 
-  console.log('[EditSchoolPage] Progress data:', progressData);
+  console.log('[EditSchoolPage] Progress data (final):', progressData);
 
   const progressMap = new Map<string, number>(
     progressData?.map((p: any) => [p.section, p.completeness]) || []
