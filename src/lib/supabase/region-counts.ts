@@ -25,6 +25,7 @@ export async function getRegionCounts(): Promise<Map<number, number>> {
   const supabase = createAnonymousClient();
   
   // Оптимизированный запрос: получаем только region_id для опубликованных школ
+  // Используем type assertion, так как поле может быть в БД, но не в типах
   const { data, error } = await supabase
     .from('organizations')
     .select('region_id')
@@ -40,11 +41,13 @@ export async function getRegionCounts(): Promise<Map<number, number>> {
   const countMap = new Map<number, number>();
   
   if (data && data.length > 0) {
-    data.forEach((org: { region_id: number | null }) => {
-      if (org.region_id !== null && org.region_id !== undefined) {
+    // Используем type assertion для работы с region_id, который может быть в БД
+    data.forEach((org: any) => {
+      const regionId = (org as { region_id?: number | null }).region_id;
+      if (regionId !== null && regionId !== undefined && typeof regionId === 'number') {
         countMap.set(
-          org.region_id,
-          (countMap.get(org.region_id) || 0) + 1
+          regionId,
+          (countMap.get(regionId) || 0) + 1
         );
       }
     });

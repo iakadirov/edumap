@@ -77,6 +77,7 @@ export interface FilterValues {
  */
 export function SchoolFilters({ cities, initialFilters, onFiltersChange }: SchoolFiltersProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Инициализируем фильтры из пропсов
   const [filters, setFilters] = useState<FilterValues>(() => {
