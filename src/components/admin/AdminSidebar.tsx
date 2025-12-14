@@ -79,7 +79,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-background flex flex-col h-screen sticky top-0">
+    <aside className="w-64 bg-[#F4F4F6] flex flex-col h-screen sticky top-0">
       {/* Logo */}
       <div className="h-16 flex items-center px-6">
         <Link href="/admin/dashboard" className="flex items-center gap-2">
