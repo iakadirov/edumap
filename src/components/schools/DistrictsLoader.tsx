@@ -46,7 +46,9 @@ export function DistrictsLoader({ selected, onSelectionChange }: DistrictsLoader
           throw new Error(data.message || data.error);
         }
         
-        setDistricts(Array.isArray(data) ? data : []);
+        // API возвращает массив районов напрямую
+        const districtsArray = Array.isArray(data) ? data : [];
+        setDistricts(districtsArray);
       } catch (error) {
         console.error('Error loading districts:', error);
         setDistricts([]);

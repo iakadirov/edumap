@@ -27,9 +27,11 @@ export async function GET(request: NextRequest) {
       id: typeof d.id === 'string' ? parseInt(d.id, 10) : d.id,
       name_uz: d.name_uz || d.name,
       region_id: d.region_id,
+      count: d.count || 0,
     }));
     
-    return NextResponse.json({ districts: formattedDistricts }, {
+    // Возвращаем массив напрямую для удобства использования
+    return NextResponse.json(formattedDistricts, {
       headers: {
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
       },
