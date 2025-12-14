@@ -33,23 +33,23 @@ export function AdminHeader({ user }: AdminHeaderProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Находим родительский main элемент (скроллируемый контейнер)
-      const mainElement = document.querySelector('main.flex-1.flex.flex-col.overflow-auto');
-      if (mainElement) {
-        const scrollTop = mainElement.scrollTop;
+      // Находим скроллируемый контейнер (внутренний div с overflow-auto)
+      const scrollContainer = document.querySelector('main.flex-1.flex.flex-col > div.flex-1.overflow-auto');
+      if (scrollContainer) {
+        const scrollTop = scrollContainer.scrollTop;
         setIsScrolled(scrollTop > 0);
       }
     };
 
-    // Находим родительский main элемент для отслеживания скролла
-    const mainElement = document.querySelector('main.flex-1.flex.flex-col.overflow-auto');
-    if (mainElement) {
-      mainElement.addEventListener('scroll', handleScroll);
+    // Находим скроллируемый контейнер для отслеживания скролла
+    const scrollContainer = document.querySelector('main.flex-1.flex.flex-col > div.flex-1.overflow-auto');
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
       // Проверяем начальное состояние
       handleScroll();
       
       return () => {
-        mainElement.removeEventListener('scroll', handleScroll);
+        scrollContainer.removeEventListener('scroll', handleScroll);
       };
     }
   }, []);
