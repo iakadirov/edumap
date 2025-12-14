@@ -38,7 +38,7 @@ export async function SchoolsList({ params }: SchoolsListProps) {
     params.has_meals ||
     params.has_extended_day;
 
-  let schools;
+  let schools: any[] = [];
   
   try {
     if (hasFilters) {
