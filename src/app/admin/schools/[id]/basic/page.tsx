@@ -50,7 +50,7 @@ export default async function BasicInfoPage({
   const { data: districts } = await (supabase as any)
     .from('districts')
     .select('*')
-    .eq('region_id', organization.region_id || 0)
+    .eq('region_id', (organization as any).region_id || 0)
     .order('name_uz');
 
   return (
