@@ -42,12 +42,12 @@ export default async function BasicInfoPage({
     .single();
 
   // Получаем регионы и районы
-  const { data: regions } = await supabase
+  const { data: regions } = await (supabase as any)
     .from('regions')
     .select('*')
     .order('name_uz');
 
-  const { data: districts } = await supabase
+  const { data: districts } = await (supabase as any)
     .from('districts')
     .select('*')
     .eq('region_id', organization.region_id || 0)
