@@ -40,29 +40,35 @@ export async function SchoolsList({ params }: SchoolsListProps) {
 
   let schools;
   
-  if (hasFilters) {
-    // Используем фильтры
-    const regionId = params.region ? parseInt(params.region, 10) : undefined;
-    const filters = {
-      region: isNaN(regionId as number) ? undefined : regionId,
-      districts: params.district ? params.district.split(',').filter(Boolean) : undefined,
-      city: params.city,
-      school_type: params.school_type,
-      price_min: params.price_min ? Number(params.price_min) : undefined,
-      price_max: params.price_max ? Number(params.price_max) : undefined,
-      language: params.language ? params.language.split(',').filter(Boolean) : undefined,
-      curriculum: params.curriculum ? params.curriculum.split(',').filter(Boolean) : undefined,
-      grade: params.grade,
-      rating_min: params.rating_min ? Number(params.rating_min) : undefined,
-      has_transport: params.has_transport === 'true',
-      has_meals: params.has_meals === 'true',
-      has_extended_day: params.has_extended_day === 'true',
-      sort: params.sort || 'rating_desc',
-    };
-    schools = await getSchoolsWithFilters(filters);
-  } else {
-    // Получаем все школы
-    schools = await getActiveSchools();
+  try {
+    if (hasFilters) {
+      // Используем фильтры
+      const regionId = params.region ? parseInt(params.region, 10) : undefined;
+      const filters = {
+        region: isNaN(regionId as number) ? undefined : regionId,
+        districts: params.district ? params.district.split(',').filter(Boolean) : undefined,
+        city: params.city,
+        school_type: params.school_type,
+        price_min: params.price_min ? Number(params.price_min) : undefined,
+        price_max: params.price_max ? Number(params.price_max) : undefined,
+        language: params.language ? params.language.split(',').filter(Boolean) : undefined,
+        curriculum: params.curriculum ? params.curriculum.split(',').filter(Boolean) : undefined,
+        grade: params.grade,
+        rating_min: params.rating_min ? Number(params.rating_min) : undefined,
+        has_transport: params.has_transport === 'true',
+        has_meals: params.has_meals === 'true',
+        has_extended_day: params.has_extended_day === 'true',
+        sort: params.sort || 'rating_desc',
+      };
+      schools = await getSchoolsWithFilters(filters);
+    } else {
+      // Получаем все школы
+      schools = await getActiveSchools();
+    }
+  } catch (error) {
+    console.error('Error loading schools:', error);
+    // В случае ошибки показываем пустой список
+    schools = [];
   }
 
   if (!schools || schools.length === 0) {

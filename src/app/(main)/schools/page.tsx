@@ -73,6 +73,7 @@ export default async function SchoolsPage({ searchParams }: SchoolsPageProps) {
     cities = await getCities();
   } catch (e) {
     // В случае ошибки просто используем пустой массив
+    console.error('Error loading cities:', e);
     cities = [];
   }
 
