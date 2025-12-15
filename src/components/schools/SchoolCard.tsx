@@ -157,19 +157,6 @@ export function SchoolCard({ school }: SchoolCardProps) {
                 className="object-cover"
                 sizes="64px"
                 loading="lazy"
-                onError={async () => {
-                  // Если изображение не загрузилось, пытаемся обновить URL
-                  if (school.logo_url) {
-                    try {
-                      const newUrl = await refreshImageUrl(school.logo_url);
-                      setLogoUrl(newUrl);
-                    } catch (error) {
-                      console.error('Failed to refresh logo URL:', error);
-                      // Если не удалось обновить, скрываем логотип
-                      setLogoUrl(null);
-                    }
-                  }
-                }}
               />
             </div>
           )}

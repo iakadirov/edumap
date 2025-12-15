@@ -42,6 +42,45 @@ export function isPresignedUrl(url: string): boolean {
 }
 
 /**
+ * Проверяет, истек ли presigned URL
+ * 
+ * @param url - Presigned URL
+ * @returns true, если URL истек или скоро истечет (менее 5 минут до истечения)
+ */
+export function isPresignedUrlExpired(url: string): boolean {
+  try {
+    const urlObj = new URL(url);
+    const expiresParam = urlObj.searchParams.get('X-Amz-Expires');
+    const dateParam = urlObj.searchParams.get('X-Amz-Date');
+    
+    if (!expiresParam || !dateParam) {
+      return false; // Не presigned URL или нет параметров времени
+    }
+    
+    // X-Amz-Date в формате ISO8601: 20251215T074720Z
+    const year = dateParam.substring(0, 4);
+    const month = dateParam.substring(4, 6);
+    const day = dateParam.substring(6, 8);
+    const hour = dateParam.substring(9, 11);
+    const minute = dateParam.substring(11, 13);
+    const second = dateParam.substring(13, 15);
+    
+    const expirationDate = new Date(
+      `${year}-${month}-${day}T${hour}:${minute}:${second}Z`
+    );
+    expirationDate.setSeconds(expirationDate.getSeconds() + parseInt(expiresParam, 10));
+    
+    // Проверяем, истек ли URL или истечет в течение 5 минут
+    const now = new Date();
+    const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
+    
+    return expirationDate <= fiveMinutesFromNow;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Получает свежий presigned URL для изображения
  * 
  * @param urlOrKey - Старый presigned URL или ключ файла
