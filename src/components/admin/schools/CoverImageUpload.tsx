@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 interface CoverImageUploadProps {
   organizationId: string;
@@ -160,7 +160,7 @@ export function CoverImageUpload({
         {/* Preview */}
         {preview && (
           <div className="relative w-full h-64 rounded-lg border border-gray-200 overflow-hidden bg-gray-50">
-            <Image
+            <OptimizedImage
               src={preview}
               alt="Обложка школы"
               fill

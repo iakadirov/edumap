@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
-import Image from 'next/image';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 // Кэширование на 300 секунд (5 минут) для страниц школ
 export const revalidate = 300;
@@ -113,7 +113,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
       {/* Обложка школы */}
       {school.cover_image_url && (
         <div className="relative mb-8 h-64 w-full overflow-hidden rounded-lg">
-          <Image
+          <OptimizedImage
             src={school.cover_image_url}
             alt={school.name}
             fill
@@ -130,7 +130,7 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
           {/* Логотип - используем логотип главной школы, если это филиал */}
           {(school.logo_url || (isBranch && branchesData?.main?.logo_url)) && (
             <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg border">
-              <Image
+              <OptimizedImage
                 src={school.logo_url || branchesData?.main?.logo_url || ''}
                 alt={school.name}
                 fill

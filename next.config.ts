@@ -23,6 +23,12 @@ const nextConfig: NextConfig = {
   // Компрессия
   compress: true,
   // Оптимизация изображений
+  // ВАЖНО: Для presigned URLs из Yandex Cloud Storage оптимизация отключена
+  // через компонент OptimizedImage, так как:
+  // 1. Presigned URLs имеют ограниченное время жизни (обычно 1 час)
+  // 2. Next.js Image Optimization делает запрос от сервера, а не от браузера
+  // 3. Presigned URL может истечь между рендерингом и оптимизацией
+  // 4. Сервер Next.js не может использовать presigned URL для загрузки изображения
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [

@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { ProgressIndicator } from './ProgressIndicator';
-import Image from 'next/image';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 interface MediaItem {
   id: string;
@@ -287,7 +287,7 @@ export function MediaManager({
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">⭐ Обложка (отображается в карточке)</h3>
             <div className="relative w-full h-64 rounded-lg overflow-hidden border-2 border-primary">
-              <Image
+              <OptimizedImage
                 src={coverMedia.url}
                 alt={coverMedia.caption || 'Cover'}
                 fill
@@ -324,7 +324,7 @@ export function MediaManager({
                     className="relative group aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-colors"
                   >
                     {item.type === 'photo' ? (
-                      <Image
+                      <OptimizedImage
                         src={item.url}
                         alt={item.caption || 'Photo'}
                         fill

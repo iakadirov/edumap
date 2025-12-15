@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { translateCity, translateDistrict } from '@/lib/utils/translations';
 import { Check, Star, Shield, Heart, MoreHorizontal } from 'lucide-react';
 import { refreshImageUrl, isPresignedUrl } from '@/lib/utils/image-url';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import type { Database } from '@/types/database';
 
 type Organization = Database['public']['Tables']['organizations']['Row'] & {
@@ -136,7 +136,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
         {/* Изображение школы - только левые углы скруглены на десктопе, растягивается на всю высоту */}
         <div className="relative w-full sm:w-64 md:w-80 h-48 sm:h-auto sm:self-stretch flex-shrink-0 overflow-hidden rounded-t-[20px] sm:rounded-tl-[20px] sm:rounded-bl-[20px] sm:rounded-tr-none sm:rounded-br-none">
           {school.cover_image_url ? (
-            <Image
+            <OptimizedImage
               src={school.cover_image_url}
               alt={school.name}
               fill
@@ -150,14 +150,13 @@ export function SchoolCard({ school }: SchoolCardProps) {
           {/* Логотип школы поверх изображения - в левом верхнем углу */}
           {logoUrl && (
             <div className="absolute left-4 top-4 sm:left-5 sm:top-5 w-12 h-12 sm:w-16 sm:h-16 rounded-full shadow-[0px_0px_3px_0px_rgba(0,0,0,0.20)] border-2 border-white overflow-hidden bg-white z-10">
-              <Image
+              <OptimizedImage
                 src={logoUrl}
                 alt={`${school.name} logo`}
                 fill
                 className="object-cover"
                 sizes="64px"
                 loading="lazy"
-                unoptimized
                 onError={async () => {
                   // Если изображение не загрузилось, пытаемся обновить URL
                   if (school.logo_url) {
