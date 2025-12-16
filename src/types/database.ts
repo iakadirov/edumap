@@ -18,6 +18,8 @@ export type Database = {
         Row: {
           address: string | null
           admin_user_id: string | null
+          banner_url: string | null
+          brand_id: string | null
           city: string | null
           cover_image_url: string | null
           created_at: string
@@ -44,7 +46,9 @@ export type Database = {
           parent_organization_id: string | null
           phone: string | null
           phone_admission: string | null
+          phone_admission_comment: string | null
           phone_secondary: string | null
+          phone_secondary_comment: string | null
           region: string | null
           reviews_count: number
           short_description: string | null
@@ -60,6 +64,8 @@ export type Database = {
         Insert: {
           address?: string | null
           admin_user_id?: string | null
+          banner_url?: string | null
+          brand_id?: string | null
           city?: string | null
           cover_image_url?: string | null
           created_at?: string
@@ -86,7 +92,9 @@ export type Database = {
           parent_organization_id?: string | null
           phone?: string | null
           phone_admission?: string | null
+          phone_admission_comment?: string | null
           phone_secondary?: string | null
+          phone_secondary_comment?: string | null
           region?: string | null
           reviews_count?: number
           short_description?: string | null
@@ -102,6 +110,8 @@ export type Database = {
         Update: {
           address?: string | null
           admin_user_id?: string | null
+          banner_url?: string | null
+          brand_id?: string | null
           city?: string | null
           cover_image_url?: string | null
           created_at?: string
@@ -128,7 +138,9 @@ export type Database = {
           parent_organization_id?: string | null
           phone?: string | null
           phone_admission?: string | null
+          phone_admission_comment?: string | null
           phone_secondary?: string | null
+          phone_secondary_comment?: string | null
           region?: string | null
           reviews_count?: number
           short_description?: string | null
@@ -150,6 +162,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "organizations_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "school_brands"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "organizations_parent_organization_id_fkey"
             columns: ["parent_organization_id"]
             isOneToOne: false
@@ -160,6 +179,7 @@ export type Database = {
       }
       school_details: {
         Row: {
+          accepted_grades: number[] | null
           accepts_preparatory: boolean
           accreditation_body: string | null
           additional_languages: string[] | null
@@ -176,6 +196,7 @@ export type Database = {
           fee_monthly_min: number | null
           grade_from: number
           grade_to: number
+          pricing_tiers: Json | null
           has_cafeteria: boolean
           has_cctv: boolean
           has_computer_lab: boolean
@@ -220,6 +241,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          accepted_grades?: number[] | null
           accepts_preparatory?: boolean
           accreditation_body?: string | null
           additional_languages?: string[] | null
@@ -236,6 +258,7 @@ export type Database = {
           fee_monthly_min?: number | null
           grade_from: number
           grade_to: number
+          pricing_tiers?: Json | null
           has_cafeteria?: boolean
           has_cctv?: boolean
           has_computer_lab?: boolean
@@ -280,6 +303,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          accepted_grades?: number[] | null
           accepts_preparatory?: boolean
           accreditation_body?: string | null
           additional_languages?: string[] | null
@@ -296,6 +320,7 @@ export type Database = {
           fee_monthly_min?: number | null
           grade_from?: number
           grade_to?: number
+          pricing_tiers?: Json | null
           has_cafeteria?: boolean
           has_cctv?: boolean
           has_computer_lab?: boolean
@@ -348,6 +373,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      school_brands: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          logo_url: string | null
+          website: string | null
+          founder: string | null
+          description: string | null
+          founded_year: number | null
+          phone: string | null
+          email: string | null
+          instagram: string | null
+          facebook: string | null
+          youtube: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          logo_url?: string | null
+          website?: string | null
+          founder?: string | null
+          description?: string | null
+          founded_year?: number | null
+          phone?: string | null
+          email?: string | null
+          instagram?: string | null
+          facebook?: string | null
+          youtube?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          logo_url?: string | null
+          website?: string | null
+          founder?: string | null
+          description?: string | null
+          founded_year?: number | null
+          phone?: string | null
+          email?: string | null
+          instagram?: string | null
+          facebook?: string | null
+          youtube?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       users: {
         Row: {
