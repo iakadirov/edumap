@@ -22,23 +22,30 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
+import { saveTelegram } from '@/lib/utils/telegram';
+import { YandexMap } from './YandexMap';
+
+interface PhoneWithComment {
+  phone: string;
+  comment: string;
+}
 
 interface WizardData {
   // Step 1: Basic
   name_uz: string;
-  name_ru: string;
   school_type: string;
   description: string;
   logo_url?: string;
 
   // Step 2: Contacts
-  phone: string;
+  phone: string; // Основной телефон (колл центр)
+  phone2?: PhoneWithComment; // Дополнительный телефон 1
+  phone3?: PhoneWithComment; // Дополнительный телефон 2
   email: string;
   website: string;
   telegram: string;
   region_id: number | null;
   district_id: number | null;
-  city: string;
   address: string;
   landmark: string;
   lat?: number;
@@ -76,7 +83,6 @@ export function SchoolCreationWizard({
 
   const [data, setData] = useState<WizardData>({
     name_uz: '',
-    name_ru: '',
     school_type: 'private',
     description: '',
     phone: '',
@@ -85,7 +91,6 @@ export function SchoolCreationWizard({
     telegram: '',
     region_id: null,
     district_id: null,
-    city: '',
     address: '',
     landmark: '',
     grade_from: 1,
@@ -159,31 +164,19 @@ export function SchoolCreationWizard({
     setError(null);
 
     if (step === 1) {
-      if (!data.name_uz && !data.name_ru) {
-        setError('Kamida bitta nom (uz yoki ru) kiritilishi kerak');
-        return false;
-      }
-      if (!data.description || data.description.length < 50) {
-        setError('Tavsif kamida 50 ta belgi bo\'lishi kerak');
+      if (!data.name_uz) {
+        setError('Maktab nomi kiritilishi kerak');
         return false;
       }
     }
 
     if (step === 2) {
       if (!data.phone) {
-        setError('Telefon raqami kiritilishi kerak');
-        return false;
-      }
-      if (!data.email) {
-        setError('Email kiritilishi kerak');
+        setError('Asosiy telefon raqami (kolll markaz) kiritilishi kerak');
         return false;
       }
       if (!data.region_id || !data.district_id) {
         setError('Viloyat va tuman tanlanishi kerak');
-        return false;
-      }
-      if (!data.city) {
-        setError('Shahar kiritilishi kerak');
         return false;
       }
       if (!data.address) {
@@ -226,23 +219,28 @@ export function SchoolCreationWizard({
     setError(null);
 
     try {
-      const slug = generateSlug(data.name_uz || data.name_ru || 'school');
+      const slug = generateSlug(data.name_uz || 'school');
+
+      // Нормализуем Telegram
+      const normalizedTelegram = saveTelegram(data.telegram);
 
       const organizationData = {
         org_type: 'school',
-        name: data.name_uz || data.name_ru || 'School',
+        name: data.name_uz || 'School',
         name_uz: data.name_uz || null,
-        name_ru: data.name_ru || null,
         slug,
-        description: data.description,
+        description: data.description || null,
         status: 'published', // Школы сразу активируются
         phone: data.phone,
-        email: data.email,
+        phone_secondary: data.phone2?.phone || null,
+        phone_secondary_comment: data.phone2?.comment || null,
+        phone_admission: data.phone3?.phone || null,
+        phone_admission_comment: data.phone3?.comment || null,
+        email: data.email || null,
         website: data.website || null,
-        telegram: data.telegram || null,
+        telegram: normalizedTelegram,
         region_id: data.region_id,
         district_id: data.district_id,
-        city: data.city || null,
         address: data.address,
         landmark: data.landmark || null,
         lat: data.lat || null,
@@ -296,12 +294,21 @@ export function SchoolCreationWizard({
     key: K,
     value: WizardData[K]
   ) => {
-    setData((prev) => ({ ...prev, [key]: value }));
+    setData((prev) => {
+      if (key === 'phone2' || key === 'phone3') {
+        // Для дополнительных телефонов, если телефон пустой, удаляем объект
+        const phoneData = value as PhoneWithComment | undefined;
+        if (!phoneData?.phone && !phoneData?.comment) {
+          return { ...prev, [key]: undefined };
+        }
+      }
+      return { ...prev, [key]: value };
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[1200px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Добавить школу</DialogTitle>
           <DialogDescription>
@@ -356,15 +363,6 @@ export function SchoolCreationWizard({
                       placeholder="Cambridge School Tashkent"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="name_ru">Название школы (Русский)</Label>
-                    <Input
-                      id="name_ru"
-                      value={data.name_ru}
-                      onChange={(e) => updateData('name_ru', e.target.value)}
-                      placeholder="Cambridge School Tashkent"
-                    />
-                  </div>
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="school_type">Тип школы *</Label>
                     <Select
@@ -382,7 +380,7 @@ export function SchoolCreationWizard({
                     </Select>
                   </div>
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="description">Краткое описание *</Label>
+                    <Label htmlFor="description">Краткое описание</Label>
                     <Textarea
                       id="description"
                       value={data.description}
@@ -402,9 +400,10 @@ export function SchoolCreationWizard({
             {currentStep === 2 && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Контакты и адрес</h3>
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-4">
+                  {/* Основной телефон */}
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Телефон *</Label>
+                    <Label htmlFor="phone">Основной телефон (Колл центр) *</Label>
                     <Input
                       id="phone"
                       type="tel"
@@ -413,8 +412,57 @@ export function SchoolCreationWizard({
                       placeholder="+998901234567"
                     />
                   </div>
+
+                  {/* Дополнительный телефон 1 */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone2">Дополнительный телефон 1</Label>
+                      <Input
+                        id="phone2"
+                        type="tel"
+                        value={data.phone2?.phone || ''}
+                        onChange={(e) => updateData('phone2', { ...data.phone2, phone: e.target.value } as PhoneWithComment)}
+                        placeholder="+998901234567"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone2_comment">Комментарий (например: Приёмная, Директор)</Label>
+                      <Input
+                        id="phone2_comment"
+                        value={data.phone2?.comment || ''}
+                        onChange={(e) => updateData('phone2', { ...data.phone2, phone: data.phone2?.phone || '', comment: e.target.value } as PhoneWithComment)}
+                        placeholder="Приёмная, Директор и т.д."
+                      />
+                    </div>
+                  </div>
+
+                  {/* Дополнительный телефон 2 */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone3">Дополнительный телефон 2</Label>
+                      <Input
+                        id="phone3"
+                        type="tel"
+                        value={data.phone3?.phone || ''}
+                        onChange={(e) => updateData('phone3', { ...data.phone3, phone: e.target.value } as PhoneWithComment)}
+                        placeholder="+998901234567"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone3_comment">Комментарий (например: Приёмная, Директор)</Label>
+                      <Input
+                        id="phone3_comment"
+                        value={data.phone3?.comment || ''}
+                        onChange={(e) => updateData('phone3', { ...data.phone3, phone: data.phone3?.phone || '', comment: e.target.value } as PhoneWithComment)}
+                        placeholder="Приёмная, Директор и т.д."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
@@ -433,14 +481,17 @@ export function SchoolCreationWizard({
                       placeholder="https://"
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="telegram">Telegram</Label>
                     <Input
                       id="telegram"
                       value={data.telegram}
                       onChange={(e) => updateData('telegram', e.target.value)}
-                      placeholder="@"
+                      placeholder="@maktabsalam или https://t.me/maktabsalam или maktabsalam"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Принимается: @maktabsalam, https://t.me/maktabsalam, maktabsalam
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="region">Область *</Label>
@@ -491,23 +542,17 @@ export function SchoolCreationWizard({
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="city">Город *</Label>
-                    <Input
-                      id="city"
-                      value={data.city || ''}
-                      onChange={(e) => updateData('city', e.target.value)}
-                      placeholder="Ташкент"
-                    />
-                  </div>
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="address">Адрес *</Label>
                     <Input
                       id="address"
                       value={data.address}
                       onChange={(e) => updateData('address', e.target.value)}
-                      placeholder="ул. Шота Руставели, 12"
+                      placeholder="Адрес автоматически заполнится с карты или введите вручную"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Адрес автоматически заполнится при выборе точки на карте
+                    </p>
                   </div>
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="landmark">Ориентир</Label>
@@ -516,6 +561,20 @@ export function SchoolCreationWizard({
                       value={data.landmark}
                       onChange={(e) => updateData('landmark', e.target.value)}
                       placeholder="Рядом с..."
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <YandexMap
+                      lat={data.lat}
+                      lng={data.lng}
+                      onCoordinatesChange={(lat, lng) => {
+                        updateData('lat', lat);
+                        updateData('lng', lng);
+                      }}
+                      onAddressChange={(address) => {
+                        updateData('address', address);
+                      }}
+                      height="400px"
                     />
                   </div>
                 </div>

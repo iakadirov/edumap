@@ -31,11 +31,11 @@ export interface ValidationResult {
 export function validateBasicSection(data: any): ValidationResult {
   const errors: ValidationError[] = [];
 
-  // Название (обязательно хотя бы одно: name_uz или name_ru)
-  if (!data.name_uz && !data.name_ru) {
+  // Название (обязательно name_uz)
+  if (!data.name_uz) {
     errors.push({
       field: 'name',
-      message: 'Kamida bitta nom (uz yoki ru) kiritilishi kerak',
+      message: 'Maktab nomi kiritilishi kerak',
     });
   }
 
@@ -47,13 +47,7 @@ export function validateBasicSection(data: any): ValidationResult {
     });
   }
 
-  // Описание
-  if (!data.description || data.description.trim().length < 50) {
-    errors.push({
-      field: 'description',
-      message: 'Tavsif kamida 50 ta belgi bo\'lishi kerak',
-    });
-  }
+  // Описание (опционально, без требований к длине)
 
   // Телефон
   if (!data.phone) {
@@ -68,24 +62,11 @@ export function validateBasicSection(data: any): ValidationResult {
     });
   }
 
-  // Email
-  if (!data.email) {
-    errors.push({
-      field: 'email',
-      message: 'Email kiritilishi kerak',
-    });
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+  // Email (опционально, но если указан - должен быть валидным)
+  if (data.email && data.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     errors.push({
       field: 'email',
       message: 'Email noto\'g\'ri formatda',
-    });
-  }
-
-  // Город
-  if (!data.city) {
-    errors.push({
-      field: 'city',
-      message: 'Shahar kiritilishi kerak',
     });
   }
 

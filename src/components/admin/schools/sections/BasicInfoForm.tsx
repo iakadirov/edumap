@@ -21,6 +21,8 @@ import { useToast } from '@/contexts/ToastContext';
 import { useAutosave, formatAutosaveStatus } from '@/lib/schools/autosave';
 import { validateBasicSection } from '@/lib/schools/section-validators';
 import { calculateSectionProgress } from '@/lib/schools/progress-calculator';
+import { saveTelegram } from '@/lib/utils/telegram';
+import { YandexMap } from '../YandexMap';
 
 interface BasicInfoFormProps {
   organization: any;
@@ -46,13 +48,15 @@ export function BasicInfoForm({
 
   // Основная информация
   const [nameUz, setNameUz] = useState(organization?.name_uz || '');
-  const [nameRu, setNameRu] = useState(organization?.name_ru || '');
   const [shortDescription, setShortDescription] = useState(organization?.short_description || '');
   const [description, setDescription] = useState(organization?.description || '');
 
   // Контакты
   const [phone, setPhone] = useState(organization?.phone || '');
-  const [phoneAdmission, setPhoneAdmission] = useState(organization?.phone_admission || '');
+  const [phone2, setPhone2] = useState(organization?.phone_secondary || '');
+  const [phone2Comment, setPhone2Comment] = useState(organization?.phone_secondary_comment || '');
+  const [phone3, setPhone3] = useState(organization?.phone_admission || '');
+  const [phone3Comment, setPhone3Comment] = useState(organization?.phone_admission_comment || '');
   const [email, setEmail] = useState(organization?.email || '');
   const [emailAdmission, setEmailAdmission] = useState(organization?.email_admission || '');
   const [website, setWebsite] = useState(organization?.website || '');
@@ -109,7 +113,6 @@ export function BasicInfoForm({
   // Формируем данные для автосохранения
   const formData = {
     name_uz: nameUz,
-    name_ru: nameRu,
     description: description,
     phone: phone,
     email: email,
@@ -132,23 +135,25 @@ export function BasicInfoForm({
     const calculatedProgress = calculateSectionProgress('basic', formData);
     setCurrentProgress(calculatedProgress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nameUz, nameRu, description, phone, email, regionId, districtId, address, lat, lng, schoolType, gradeFrom, gradeTo, primaryLanguage, feeMonthlyMin, feeMonthlyMax]);
+  }, [nameUz, description, phone, email, regionId, districtId, address, lat, lng, schoolType, gradeFrom, gradeTo, primaryLanguage, feeMonthlyMin, feeMonthlyMax]);
 
   // Функция сохранения
   const saveData = async (data: any) => {
     const organizationData = {
       name_uz: data.name_uz || null,
-      name_ru: data.name_ru || null,
       description: data.description || null,
       short_description: shortDescription || null,
       logo_url: logoUrl || null, // Добавляем логотип
       cover_image_url: coverImageUrl || null, // Добавляем обложку
       phone: data.phone || null,
-      phone_admission: phoneAdmission || null,
+      phone_secondary: phone2 || null,
+      phone_secondary_comment: phone2Comment || null,
+      phone_admission: phone3 || null,
+      phone_admission_comment: phone3Comment || null,
       email: data.email || null,
       email_admission: emailAdmission || null,
       website: website || null,
-      telegram: telegram || null,
+      telegram: saveTelegram(telegram),
       region_id: data.region_id,
       district_id: data.district_id,
       address: data.address || null,
@@ -434,15 +439,6 @@ export function BasicInfoForm({
                   className={validationErrors.name ? 'border-destructive' : ''}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="nameRu">Название (Русский)</Label>
-                <Input
-                  id="nameRu"
-                  value={nameRu}
-                  onChange={(e) => setNameRu(e.target.value)}
-                  placeholder="Название школы"
-                />
-              </div>
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="shortDescription">Краткое описание</Label>
                 <Input
@@ -455,7 +451,7 @@ export function BasicInfoForm({
               </div>
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="description">
-                  Полное описание *
+                  Полное описание
                   {validationErrors.description && (
                     <span className="text-destructive text-sm ml-2">{validationErrors.description}</span>
                   )}
@@ -476,9 +472,10 @@ export function BasicInfoForm({
           <div className="space-y-4 border-t pt-6">
             <h2 className="text-xl font-semibold">Контакты</h2>
             <div className="grid gap-4 md:grid-cols-2">
+              {/* Основной телефон */}
               <div className="space-y-2">
                 <Label htmlFor="phone">
-                  Телефон *
+                  Основной телефон (Колл центр) *
                   {validationErrors.phone && (
                     <span className="text-destructive text-sm ml-2">{validationErrors.phone}</span>
                   )}
@@ -492,19 +489,56 @@ export function BasicInfoForm({
                   className={validationErrors.phone ? 'border-destructive' : ''}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="phoneAdmission">Телефон приёмной комиссии</Label>
-                <Input
-                  id="phoneAdmission"
-                  type="tel"
-                  value={phoneAdmission}
-                  onChange={(e) => setPhoneAdmission(e.target.value)}
-                  placeholder="+998901234567"
-                />
+
+              {/* Дополнительный телефон 1 */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="phone2">Дополнительный телефон 1</Label>
+                  <Input
+                    id="phone2"
+                    type="tel"
+                    value={phone2}
+                    onChange={(e) => setPhone2(e.target.value)}
+                    placeholder="+998901234567"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone2Comment">Комментарий (например: Приёмная, Директор)</Label>
+                  <Input
+                    id="phone2Comment"
+                    value={phone2Comment}
+                    onChange={(e) => setPhone2Comment(e.target.value)}
+                    placeholder="Приёмная, Директор и т.д."
+                  />
+                </div>
               </div>
+
+              {/* Дополнительный телефон 2 */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="phone3">Дополнительный телефон 2</Label>
+                  <Input
+                    id="phone3"
+                    type="tel"
+                    value={phone3}
+                    onChange={(e) => setPhone3(e.target.value)}
+                    placeholder="+998901234567"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone3Comment">Комментарий (например: Приёмная, Директор)</Label>
+                  <Input
+                    id="phone3Comment"
+                    value={phone3Comment}
+                    onChange={(e) => setPhone3Comment(e.target.value)}
+                    placeholder="Приёмная, Директор и т.д."
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email">
-                  Email *
+                  Email
                   {validationErrors.email && (
                     <span className="text-destructive text-sm ml-2">{validationErrors.email}</span>
                   )}
@@ -544,8 +578,11 @@ export function BasicInfoForm({
                   id="telegram"
                   value={telegram}
                   onChange={(e) => setTelegram(e.target.value)}
-                  placeholder="@school"
+                  placeholder="@maktabsalam или https://t.me/maktabsalam или maktabsalam"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Принимается: @maktabsalam, https://t.me/maktabsalam, maktabsalam
+                </p>
               </div>
             </div>
           </div>
@@ -603,9 +640,12 @@ export function BasicInfoForm({
                   id="address"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Улица, дом"
+                  placeholder="Адрес автоматически заполнится с карты или введите вручную"
                   className={validationErrors.address ? 'border-destructive' : ''}
                 />
+                <p className="text-xs text-muted-foreground">
+                  Адрес автоматически заполнится при выборе точки на карте
+                </p>
               </div>
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="landmark">Ориентир</Label>
@@ -614,6 +654,20 @@ export function BasicInfoForm({
                   value={landmark}
                   onChange={(e) => setLandmark(e.target.value)}
                   placeholder="Рядом с..."
+                />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <YandexMap
+                  lat={lat}
+                  lng={lng}
+                  onCoordinatesChange={(newLat, newLng) => {
+                    setLat(newLat);
+                    setLng(newLng);
+                  }}
+                  onAddressChange={(newAddress) => {
+                    setAddress(newAddress);
+                  }}
+                  height="400px"
                 />
               </div>
             </div>

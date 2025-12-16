@@ -28,7 +28,6 @@ export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {
 
   // Основная информация
   const [nameUz, setNameUz] = useState(organization?.name_uz || '');
-  const [nameRu, setNameRu] = useState(organization?.name_ru || '');
   const [description, setDescription] = useState(organization?.description || '');
   const [shortDescription, setShortDescription] = useState(organization?.short_description || '');
   const [status, setStatus] = useState(organization?.status || 'pending');
@@ -42,8 +41,6 @@ export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {
   const [website, setWebsite] = useState(organization?.website || '');
 
   // Адрес
-  const [city, setCity] = useState(organization?.city || '');
-  const [district, setDistrict] = useState(organization?.district || '');
   const [address, setAddress] = useState(organization?.address || '');
   const [landmark, setLandmark] = useState(organization?.landmark || '');
 
@@ -79,26 +76,19 @@ export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {
 
     try {
       // Валидация
-      if (!nameUz && !nameRu) {
-        setError('Kamida bitta nom (uz yoki ru) kiritilishi kerak');
+      if (!nameUz) {
+        setError('Maktab nomi kiritilishi kerak');
         setLoading(false);
         return;
       }
 
-      if (!city) {
-        setError('Shahar kiritilishi kerak');
-        setLoading(false);
-        return;
-      }
-
-      const slug = isEdit ? organization.slug : generateSlug(nameUz || nameRu || 'school');
+      const slug = isEdit ? organization.slug : generateSlug(nameUz || 'school');
 
       // Подготовка данных
       const organizationData = {
         org_type: 'school',
-        name: nameUz || nameRu || 'School',
+        name: nameUz || 'School',
         name_uz: nameUz || null,
-        name_ru: nameRu || null,
         ...(isEdit ? {} : { slug }),
         description: description || null,
         short_description: shortDescription || null,
@@ -109,8 +99,6 @@ export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {
         email: email || null,
         email_admission: emailAdmission || null,
         website: website || null,
-        city: city || null,
-        district: district || null,
         address: address || null,
         landmark: landmark || null,
       };
@@ -193,15 +181,6 @@ export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {
               value={nameUz}
               onChange={(e) => setNameUz(e.target.value)}
               placeholder="Maktab nomi"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="nameRu">Nomi (Ruscha)</Label>
-            <Input
-              id="nameRu"
-              value={nameRu}
-              onChange={(e) => setNameRu(e.target.value)}
-              placeholder="Название школы"
             />
           </div>
           <div className="space-y-2 md:col-span-2">
@@ -310,16 +289,6 @@ export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Manzil</h2>
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="city">Shahar *</Label>
-            <Input
-              id="city"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="Toshkent"
-              required
-            />
-          </div>
           <div className="space-y-2">
             <Label htmlFor="district">Tuman</Label>
             <Input
