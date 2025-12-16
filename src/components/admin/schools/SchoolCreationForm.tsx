@@ -163,14 +163,7 @@ export function SchoolCreationForm() {
       setError('Manzil kiritilishi kerak');
       return false;
     }
-    if (data.fee_monthly_min <= 0 || data.fee_monthly_max <= 0) {
-      setError('Narxlar kiritilishi kerak');
-      return false;
-    }
-    if (data.fee_monthly_min > data.fee_monthly_max) {
-      setError('Minimal narx maksimaldan katta bo\'lishi mumkin emas');
-      return false;
-    }
+    // Валидация цен не обязательна - цены опциональны (можно добавить тарифы позже)
 
     return true;
   };
