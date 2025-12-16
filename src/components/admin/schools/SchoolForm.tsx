@@ -289,15 +289,6 @@ export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Manzil</h2>
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="district">Tuman</Label>
-            <Input
-              id="district"
-              value={district}
-              onChange={(e) => setDistrict(e.target.value)}
-              placeholder="Yunusobod"
-            />
-          </div>
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="address">To'liq manzil</Label>
             <Input
