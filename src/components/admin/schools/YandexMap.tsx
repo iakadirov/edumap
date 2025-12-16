@@ -256,7 +256,7 @@ export function YandexMap({
       }
 
       const data = await response.json();
-      if (data.address) {
+      if (data.address && onAddressChange) {
         onAddressChange(data.address);
       } else {
         console.warn('Geocoding returned no address:', data);
