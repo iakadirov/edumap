@@ -33,7 +33,8 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
   const [retryCount, setRetryCount] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(isStorageKey);
-  const fetchingRef = useRef<string | null>(null); // Отслеживаем, для какого ключа идет запрос
+  const fetchingKeyRef = useRef<string | null>(null); // Отслеживаем, для какого ключа идет запрос
+  const fetchingPresignedRef = useRef<boolean>(false); // Флаг для presigned URL запросов
   const loadedKeyRef = useRef<string | null>(null); // Отслеживаем, для какого ключа уже загружен URL
   const maxRetries = 2;
 
@@ -45,12 +46,12 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
       setRetryCount(0);
       setIsLoading(false);
       loadedKeyRef.current = null;
-      fetchingRef.current = null;
+      fetchingKeyRef.current = null;
       return;
     }
 
     // Если уже идет запрос для этого ключа, не запускаем новый
-    if (fetchingRef.current === srcString) {
+    if (fetchingKeyRef.current === srcString) {
       return;
     }
 
@@ -60,7 +61,7 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
       return;
     }
 
-    fetchingRef.current = srcString;
+    fetchingKeyRef.current = srcString;
     setIsLoading(true);
     setIsRefreshing(true);
     
@@ -88,20 +89,20 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
       .finally(() => {
         setIsLoading(false);
         setIsRefreshing(false);
-        fetchingRef.current = null;
+        fetchingKeyRef.current = null;
       });
   }, [srcString, isStorageKey]); // Убрали isRefreshing и currentSrc из зависимостей
 
   // Проверяем и обновляем presigned URL, если он истек или скоро истечет
   useEffect(() => {
     // Пропускаем, если это ключ файла (для него уже есть отдельная логика)
-    if (isStorageKey || !isPresignedUrl(srcString) || isRefreshing || fetchingRef.current) {
+    if (isStorageKey || !isPresignedUrl(srcString) || isRefreshing || fetchingPresignedRef.current) {
       return;
     }
 
     // Проверяем, истек ли URL
     if (isPresignedUrlExpired(srcString)) {
-      fetchingRef.current = true;
+      fetchingPresignedRef.current = true;
       setIsRefreshing(true);
       refreshImageUrl(srcString)
         .then((newUrl) => {
@@ -114,7 +115,7 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
         })
         .finally(() => {
           setIsRefreshing(false);
-          fetchingRef.current = false;
+          fetchingPresignedRef.current = false;
         });
     }
   }, [srcString, isStorageKey]); // Убрали isRefreshing из зависимостей

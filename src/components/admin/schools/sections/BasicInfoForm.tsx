@@ -471,7 +471,7 @@ export function BasicInfoForm({
     // Вычисляем min/max цены из тарифов для обратной совместимости
     const prices = data.pricing_tiers
       .map((tier: { grades: number[]; price: number | null }) => tier.price)
-      .filter((price): price is number => price !== null && price > 0);
+      .filter((price: number | null): price is number => price !== null && price > 0);
     const feeMonthlyMin = prices.length > 0 ? Math.min(...prices) : null;
     const feeMonthlyMax = prices.length > 0 ? Math.max(...prices) : null;
 
