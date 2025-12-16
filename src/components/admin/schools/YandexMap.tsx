@@ -177,7 +177,7 @@ export function YandexMap({
     try {
       // Используем встроенный геокодер из JavaScript API
       // Встроенный геокодер работает только если подключен JavaScript API
-      if (window.ymaps && window.ymaps.geocode) {
+      if (window.ymaps && typeof window.ymaps.geocode === 'function') {
         console.log('Using built-in Yandex geocoder for coordinates:', { lat: geocodeLat, lng: geocodeLng });
         
         try {
@@ -245,9 +245,11 @@ export function YandexMap({
         
         // Показываем пользователю понятное сообщение об ошибке
         if (response.status === 403) {
-          const message = 'API ключ не имеет доступа к Геокодеру. Адрес можно ввести вручную.';
-          console.error('⚠️', message);
-          setGeocodingError(message);
+          // 403 означает, что API ключ не имеет доступа к HTTP Геокодеру
+          // Это нормально - встроенный геокодер JavaScript API должен работать
+          const message = 'HTTP Геокодер недоступен. Попробуйте использовать встроенный геокодер или введите адрес вручную.';
+          console.warn('⚠️', message, '- Встроенный геокодер должен работать, если он не сработал, введите адрес вручную');
+          setGeocodingError(null); // Не показываем ошибку, так как это не критично
         } else {
           setGeocodingError('Не удалось получить адрес автоматически. Введите адрес вручную.');
         }
@@ -263,6 +265,7 @@ export function YandexMap({
       }
     } catch (err: any) {
       console.error('API geocoding error:', err);
+      setGeocodingError('Ошибка при получении адреса. Введите адрес вручную.');
     } finally {
       setIsGeocoding(false);
     }
