@@ -1,9 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { ResultsForm } from '@/components/admin/schools/ResultsForm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
 import { notFound } from 'next/navigation';
+import { ExternalLink } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,6 +62,12 @@ export default async function ResultsPage({
               ⚠️ Этот раздел сильно влияет на рейтинг школы!
             </p>
           </div>
+          <Button variant="outline" asChild>
+            <Link href={`/schools/${organization.slug}`} target="_blank">
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Saytda ko'rish
+            </Link>
+          </Button>
         </div>
 
         <Card>

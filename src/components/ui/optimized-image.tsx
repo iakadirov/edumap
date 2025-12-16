@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image, { ImageProps } from 'next/image';
 import { isPresignedUrl, refreshImageUrl, isPresignedUrlExpired } from '@/lib/utils/image-url';
 
@@ -17,28 +17,91 @@ import { isPresignedUrl, refreshImageUrl, isPresignedUrlExpired } from '@/lib/ut
  */
 export function OptimizedImage({ src, ...props }: ImageProps) {
   const srcString = typeof src === 'string' ? src : '';
-  const shouldDisableOptimization = isPresignedUrl(srcString) || 
-    srcString.includes('storage.yandexcloud.net');
   
-  const [currentSrc, setCurrentSrc] = useState(src);
+  // Проверяем, является ли значение ключом файла в storage (не URL)
+  const isStorageKey = srcString && 
+    !srcString.startsWith('http://') && 
+    !srcString.startsWith('https://') && 
+    !srcString.startsWith('/') &&
+    (srcString.includes('/') || srcString.includes('.'));
+
+  const shouldDisableOptimization = isPresignedUrl(srcString) || 
+    srcString.includes('storage.yandexcloud.net') ||
+    isStorageKey;
+  
+  const [currentSrc, setCurrentSrc] = useState<string | undefined>(undefined);
   const [retryCount, setRetryCount] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(isStorageKey);
+  const fetchingRef = useRef<string | null>(null); // Отслеживаем, для какого ключа идет запрос
+  const loadedKeyRef = useRef<string | null>(null); // Отслеживаем, для какого ключа уже загружен URL
   const maxRetries = 2;
 
-  // Обновляем src при изменении исходного src
+  // Получаем presigned URL для ключа файла
   useEffect(() => {
-    setCurrentSrc(src);
-    setRetryCount(0);
-  }, [src]);
+    // Если это не ключ файла, просто устанавливаем src
+    if (!isStorageKey) {
+      setCurrentSrc(srcString || undefined);
+      setRetryCount(0);
+      setIsLoading(false);
+      loadedKeyRef.current = null;
+      fetchingRef.current = null;
+      return;
+    }
+
+    // Если уже идет запрос для этого ключа, не запускаем новый
+    if (fetchingRef.current === srcString) {
+      return;
+    }
+
+    // Если URL уже загружен для этого ключа, не делаем запрос
+    if (loadedKeyRef.current === srcString && currentSrc) {
+      setIsLoading(false);
+      return;
+    }
+
+    fetchingRef.current = srcString;
+    setIsLoading(true);
+    setIsRefreshing(true);
+    
+    fetch(`/api/storage/url?key=${encodeURIComponent(srcString)}&expires=3600`)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error('Failed to get presigned URL');
+      })
+      .then((data) => {
+        if (data.url) {
+          setCurrentSrc(data.url);
+          loadedKeyRef.current = srcString; // Сохраняем, что для этого ключа URL загружен
+        } else {
+          setCurrentSrc(undefined);
+          loadedKeyRef.current = null;
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to get presigned URL for storage key:', error);
+        setCurrentSrc(undefined);
+        loadedKeyRef.current = null;
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setIsRefreshing(false);
+        fetchingRef.current = null;
+      });
+  }, [srcString, isStorageKey]); // Убрали isRefreshing и currentSrc из зависимостей
 
   // Проверяем и обновляем presigned URL, если он истек или скоро истечет
   useEffect(() => {
-    if (!isPresignedUrl(srcString) || isRefreshing) {
+    // Пропускаем, если это ключ файла (для него уже есть отдельная логика)
+    if (isStorageKey || !isPresignedUrl(srcString) || isRefreshing || fetchingRef.current) {
       return;
     }
 
     // Проверяем, истек ли URL
     if (isPresignedUrlExpired(srcString)) {
+      fetchingRef.current = true;
       setIsRefreshing(true);
       refreshImageUrl(srcString)
         .then((newUrl) => {
@@ -51,9 +114,10 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
         })
         .finally(() => {
           setIsRefreshing(false);
+          fetchingRef.current = false;
         });
     }
-  }, [srcString, isRefreshing]);
+  }, [srcString, isStorageKey]); // Убрали isRefreshing из зависимостей
 
   // Обработчик ошибки загрузки изображения
   const handleError = async () => {
@@ -73,6 +137,30 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
       }
     }
   };
+
+  // Если это ключ файла и URL еще не загружен, показываем placeholder или ничего
+  if (isStorageKey && isLoading) {
+    return (
+      <div 
+        className={props.className}
+        style={{ 
+          width: props.width || '100%', 
+          height: props.height || '100%',
+          backgroundColor: '#f3f4f6',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <span className="text-gray-400 text-sm">Yuklanmoqda...</span>
+      </div>
+    );
+  }
+
+  // Если URL не загружен или невалидный, не рендерим изображение
+  if (!currentSrc || (typeof currentSrc === 'string' && !currentSrc.startsWith('http') && !currentSrc.startsWith('/'))) {
+    return null;
+  }
 
   return (
     <Image

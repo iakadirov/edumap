@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { ExternalLink } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,9 +81,17 @@ export default async function BasicInfoPage({
               {organization.name_uz || organization.name_ru || organization.name}
             </p>
           </div>
-          <Button variant="outline" asChild>
-            <Link href={`/admin/schools/${id}`}>← Назад к профилю</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" asChild>
+              <Link href={`/schools/${organization.slug}`} target="_blank">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Saytda ko'rish
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href={`/admin/schools/${id}`}>← Назад к профилю</Link>
+            </Button>
+          </div>
         </div>
 
         <BasicInfoForm

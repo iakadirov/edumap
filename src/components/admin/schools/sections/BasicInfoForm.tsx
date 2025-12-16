@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,16 +13,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressIndicator } from '../ProgressIndicator';
-import { LogoUpload } from '../LogoUpload';
-import { CoverImageUpload } from '../CoverImageUpload';
 import { useToast } from '@/contexts/ToastContext';
 import { useAutosave, formatAutosaveStatus } from '@/lib/schools/autosave';
 import { validateBasicSection } from '@/lib/schools/section-validators';
 import { calculateSectionProgress } from '@/lib/schools/progress-calculator';
 import { saveTelegram } from '@/lib/utils/telegram';
+import { saveInstagram, saveFacebook, saveYouTube } from '@/lib/utils/social-media';
 import { YandexMap } from '../YandexMap';
+import { BrandSearch } from '@/components/admin/brands/BrandSearch';
+import { Upload, X, Loader2, Image as ImageIcon, Phone, Mail, Globe, MessageCircle, Building2, GraduationCap, DollarSign, MapPin, School, BookOpen, Languages, FileText, BookMarked, Coins } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface BasicInfoFormProps {
   organization: any;
@@ -30,6 +33,285 @@ interface BasicInfoFormProps {
   regions: any[];
   districts: any[];
   currentProgress: number;
+}
+
+interface PhoneWithComment {
+  phone: string;
+  comment: string;
+}
+
+interface ImageUploadFieldProps {
+  label: string;
+  value?: string;
+  onChange: (url: string | undefined) => void;
+  type: 'logo' | 'cover';
+  previewSize: string;
+}
+
+function ImageUploadField({
+  label,
+  value,
+  onChange,
+  type,
+  previewSize,
+}: ImageUploadFieldProps) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(value || null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Обновляем preview при изменении value
+  useEffect(() => {
+    const loadImageUrl = async () => {
+      if (!value) {
+        setPreview(null);
+        setError(null);
+        return;
+      }
+
+      // Если это полный URL (начинается с http), используем его напрямую
+      if (value.startsWith('http://') || value.startsWith('https://')) {
+        // Это может быть presigned URL или обычный публичный URL
+        // Используем как есть - если presigned URL истек, onError обработает это
+        setPreview(value);
+        return;
+      }
+
+      // Если это относительный путь (начинается с /), добавляем базовый URL
+      if (value.startsWith('/')) {
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+        setPreview(`${baseUrl}${value}`);
+        return;
+      }
+
+      // Это ключ файла в storage (например, "logos/123/logo.png")
+      // Получаем актуальный presigned URL
+      try {
+        setError(null);
+        const response = await fetch(`/api/storage/url?key=${encodeURIComponent(value)}&expires=3600`);
+        if (response.ok) {
+          const data = await response.json();
+          setPreview(data.url);
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to get presigned URL:', errorText);
+          // Если не удалось получить URL, не показываем ошибку валидации
+          // Просто логируем и оставляем preview пустым
+          // Это не критичная ошибка для валидации формы
+          setPreview(null);
+        }
+      } catch (err) {
+        console.error('Error loading image URL:', err);
+        // Не устанавливаем ошибку валидации - это не блокирует работу формы
+        setPreview(null);
+      }
+    };
+
+    loadImageUrl();
+  }, [value]);
+
+  const ALLOWED_TYPES = [
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
+    'image/svg+xml',
+    'image/webp',
+    'image/gif',
+  ];
+
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setError(null);
+
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const isValidMimeType = ALLOWED_TYPES.includes(file.type);
+    const isSvgFile = fileExtension === 'svg' && file.type.startsWith('image/');
+    const isValidType = isValidMimeType || isSvgFile;
+
+    if (!isValidType) {
+      setError('Faqat rasm fayllari: PNG, JPG, JPEG, SVG, WebP, GIF');
+      return;
+    }
+
+    if (file.size > MAX_SIZE) {
+      setError(`Fayl juda katta. Maksimal: ${MAX_SIZE / 1024 / 1024}MB`);
+      return;
+    }
+
+    // Показываем preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Загружаем файл
+    await uploadFile(file);
+  };
+
+  const uploadFile = async (file: File) => {
+    setUploading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Fayl yuklashda xatolik');
+      }
+
+      const data = await response.json();
+      // Сохраняем key вместо presigned URL, чтобы URL не истекал
+      // Presigned URL будет получаться динамически при загрузке страницы
+      const fileKey = data.key; // Используем key из ответа API
+      if (fileKey) {
+        // Для немедленного отображения получаем presigned URL
+        const urlResponse = await fetch(`/api/storage/url?key=${encodeURIComponent(fileKey)}&expires=3600`);
+        if (urlResponse.ok) {
+          const urlData = await urlResponse.json();
+          setPreview(urlData.url);
+        } else {
+          // Fallback на presigned URL из ответа загрузки
+          setPreview(data.url);
+        }
+        onChange(fileKey); // Сохраняем key в БД
+      } else {
+        // Если key нет, используем старый подход (для обратной совместимости)
+        setPreview(data.url);
+        onChange(data.url);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Fayl yuklanmadi');
+      setPreview(value || null);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemove = () => {
+    setPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    onChange(undefined);
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <div className={cn('border-2 border-dashed rounded-lg p-4 flex items-center justify-center overflow-hidden', previewSize)}>
+        {preview ? (
+          <div className={cn('relative', type === 'logo' ? 'w-32 h-32' : 'w-full h-32')}>
+            <img
+              src={preview}
+              alt={label}
+              className={cn(
+                'w-full h-full rounded',
+                type === 'logo' ? 'rounded-full object-contain' : 'rounded-lg object-cover'
+              )}
+              onError={async (e) => {
+                try {
+                  // onError получает событие, а не объект ошибки
+                  const target = e.target as HTMLImageElement;
+                  const failedSrc = target?.src || preview;
+                  
+                  // Логируем только для отладки, не показываем пользователю
+                  console.warn('Image load error:', {
+                    src: failedSrc,
+                    value: value,
+                  });
+                  
+                  // Если это presigned URL и он истек, пытаемся получить новый по ключу
+                  if (preview?.startsWith('http') && preview.includes('X-Amz-') && value && !value.startsWith('http')) {
+                    // value - это ключ файла, получаем новый presigned URL
+                    try {
+                      const response = await fetch(`/api/storage/url?key=${encodeURIComponent(value)}&expires=3600`);
+                      if (response.ok) {
+                        const data = await response.json();
+                        setPreview(data.url);
+                        setError(null);
+                        return; // Успешно обновили URL
+                      }
+                    } catch (err) {
+                      console.error('Error refreshing presigned URL:', err);
+                    }
+                  }
+                  
+                  // Не устанавливаем ошибку валидации - это не критично для работы формы
+                  // Просто скрываем изображение, если оно не загрузилось
+                  // Пользователь может загрузить новое изображение
+                } catch (err) {
+                  // Игнорируем ошибки в обработчике ошибок
+                  console.error('Error in onError handler:', err);
+                }
+              }}
+              onLoad={() => {
+                // Очищаем ошибку при успешной загрузке
+                setError(null);
+              }}
+            />
+            <Button
+              type="button"
+              variant="destructive"
+              size="icon"
+              className="absolute top-2 right-2 z-10"
+              onClick={handleRemove}
+              disabled={uploading}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center space-y-2 w-full">
+            <ImageIcon className="h-8 w-8 text-muted-foreground" />
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Yuklanmoqda...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Rasm yuklash
+                  </>
+                )}
+              </Button>
+            </div>
+            {error && (
+              <p className="text-sm text-destructive mt-2">{error}</p>
+            )}
+          </div>
+        )}
+      </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+    </div>
+  );
 }
 
 export function BasicInfoForm({
@@ -45,22 +327,31 @@ export function BasicInfoForm({
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [currentProgress, setCurrentProgress] = useState(initialProgress);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
 
   // Основная информация
   const [nameUz, setNameUz] = useState(organization?.name_uz || '');
-  const [shortDescription, setShortDescription] = useState(organization?.short_description || '');
   const [description, setDescription] = useState(organization?.description || '');
+  const [logoUrl, setLogoUrl] = useState(organization?.logo_url || null);
+  const [bannerUrl, setBannerUrl] = useState(organization?.banner_url || organization?.cover_image_url || null);
+  const [schoolType, setSchoolType] = useState(schoolDetails?.school_type || 'private');
 
   // Контакты
   const [phone, setPhone] = useState(organization?.phone || '');
-  const [phone2, setPhone2] = useState(organization?.phone_secondary || '');
-  const [phone2Comment, setPhone2Comment] = useState(organization?.phone_secondary_comment || '');
-  const [phone3, setPhone3] = useState(organization?.phone_admission || '');
-  const [phone3Comment, setPhone3Comment] = useState(organization?.phone_admission_comment || '');
+  const [phone2, setPhone2] = useState<PhoneWithComment>({
+    phone: organization?.phone_secondary || '',
+    comment: organization?.phone_secondary_comment || '',
+  });
+  const [phone3, setPhone3] = useState<PhoneWithComment>({
+    phone: organization?.phone_admission || '',
+    comment: organization?.phone_admission_comment || '',
+  });
   const [email, setEmail] = useState(organization?.email || '');
-  const [emailAdmission, setEmailAdmission] = useState(organization?.email_admission || '');
   const [website, setWebsite] = useState(organization?.website || '');
   const [telegram, setTelegram] = useState(organization?.telegram || '');
+  const [instagram, setInstagram] = useState(organization?.instagram || '');
+  const [facebook, setFacebook] = useState(organization?.facebook || '');
+  const [youtube, setYoutube] = useState(organization?.youtube || '');
 
   // Адрес
   const [regionId, setRegionId] = useState<number | null>(organization?.region_id || null);
@@ -70,43 +361,45 @@ export function BasicInfoForm({
   const [lat, setLat] = useState(organization?.lat || null);
   const [lng, setLng] = useState(organization?.lng || null);
 
-  // Логотип
-  const [logoUrl, setLogoUrl] = useState(organization?.logo_url || null);
-  const [logoKey, setLogoKey] = useState<string | null>(null);
-
-  // Обложка
-  const [coverImageUrl, setCoverImageUrl] = useState(organization?.cover_image_url || null);
-  const [coverImageKey, setCoverImageKey] = useState<string | null>(null);
-
-  // School Details
-  const [schoolType, setSchoolType] = useState(schoolDetails?.school_type || 'private');
-  const [gradeFrom, setGradeFrom] = useState(schoolDetails?.grade_from?.toString() || '1');
-  const [gradeTo, setGradeTo] = useState(schoolDetails?.grade_to?.toString() || '11');
-  const [acceptsPreparatory, setAcceptsPreparatory] = useState(schoolDetails?.accepts_preparatory || false);
-  const [primaryLanguage, setPrimaryLanguage] = useState(schoolDetails?.primary_language || 'uzbek');
-  const [feeMonthlyMin, setFeeMonthlyMin] = useState(schoolDetails?.fee_monthly_min?.toString() || '');
-  const [feeMonthlyMax, setFeeMonthlyMax] = useState(schoolDetails?.fee_monthly_max?.toString() || '');
+  // Образование
+  const [acceptedGrades, setAcceptedGrades] = useState<number[]>(
+    schoolDetails?.accepted_grades || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+  );
+  const [primaryLanguages, setPrimaryLanguages] = useState<string[]>(
+    schoolDetails?.primary_language
+      ? [schoolDetails.primary_language, ...(schoolDetails?.additional_languages || [])].filter(Boolean)
+      : ['uzbek']
+  );
+  const [curriculum, setCurriculum] = useState<string[]>(
+    schoolDetails?.curriculum || ['national']
+  );
+  const [pricingTiers, setPricingTiers] = useState<Array<{ grades: number[]; price: number | null }>>(
+    schoolDetails?.pricing_tiers || []
+  );
+  const [brandId, setBrandId] = useState<string | null>(organization?.brand_id || null);
 
   const [districts, setDistricts] = useState(initialDistricts);
 
   // Загружаем районы при изменении региона
   useEffect(() => {
     if (regionId) {
+      setLoadingDistricts(true);
       fetch(`/api/districts?region=${regionId}`)
         .then((res) => res.json())
         .then((data) => {
-          // API возвращает массив напрямую
           const districtsList = Array.isArray(data) ? data : [];
           setDistricts(districtsList);
-          // Сбрасываем район, если он не принадлежит новому региону
           if (districtId && !districtsList.some((d: any) => d.id === districtId)) {
             setDistrictId(null);
           }
         })
-        .catch((err) => console.error('Error loading districts:', err));
+        .catch((err) => console.error('Error loading districts:', err))
+        .finally(() => setLoadingDistricts(false));
     } else {
       setDistricts([]);
-      setDistrictId(null);
+      if (districtId) {
+        setDistrictId(null);
+      }
     }
   }, [regionId, districtId]);
 
@@ -122,12 +415,10 @@ export function BasicInfoForm({
     lat: lat,
     lng: lng,
     school_type: schoolType,
-    grade_from: parseInt(gradeFrom) || 1,
-    grade_to: parseInt(gradeTo) || 11,
-    primary_language: primaryLanguage,
-    // Для fee_monthly_min/max используем null если поле пустое, иначе число (0 - валидное значение для бесплатных школ)
-    fee_monthly_min: feeMonthlyMin === '' ? null : (parseFloat(feeMonthlyMin) || 0),
-    fee_monthly_max: feeMonthlyMax === '' ? null : (parseFloat(feeMonthlyMax) || 0),
+    accepted_grades: acceptedGrades,
+    primary_languages: primaryLanguages,
+    curriculum: curriculum,
+    pricing_tiers: pricingTiers,
   };
 
   // Пересчитываем прогресс при изменении данных формы
@@ -135,41 +426,73 @@ export function BasicInfoForm({
     const calculatedProgress = calculateSectionProgress('basic', formData);
     setCurrentProgress(calculatedProgress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nameUz, description, phone, email, regionId, districtId, address, lat, lng, schoolType, gradeFrom, gradeTo, primaryLanguage, feeMonthlyMin, feeMonthlyMax]);
+  }, [nameUz, description, phone, email, regionId, districtId, address, lat, lng, schoolType, acceptedGrades, primaryLanguages, curriculum, pricingTiers]);
 
   // Функция сохранения
   const saveData = async (data: any) => {
+    // Нормализуем социальные сети
+    const normalizedTelegram = saveTelegram(telegram);
+    const normalizedInstagram = saveInstagram(instagram);
+    const normalizedFacebook = saveFacebook(facebook);
+    const normalizedYouTube = saveYouTube(youtube);
+
     const organizationData = {
       name_uz: data.name_uz || null,
       description: data.description || null,
-      short_description: shortDescription || null,
-      logo_url: logoUrl || null, // Добавляем логотип
-      cover_image_url: coverImageUrl || null, // Добавляем обложку
+      logo_url: logoUrl || null,
+      banner_url: bannerUrl || null,
+      cover_image_url: bannerUrl || null, // Для обратной совместимости (используем bannerUrl)
       phone: data.phone || null,
-      phone_secondary: phone2 || null,
-      phone_secondary_comment: phone2Comment || null,
-      phone_admission: phone3 || null,
-      phone_admission_comment: phone3Comment || null,
+      phone_secondary: phone2.phone || null,
+      phone_secondary_comment: phone2.comment || null,
+      phone_admission: phone3.phone || null,
+      phone_admission_comment: phone3.comment || null,
       email: data.email || null,
-      email_admission: emailAdmission || null,
       website: website || null,
-      telegram: saveTelegram(telegram),
+      telegram: normalizedTelegram,
+      instagram: normalizedInstagram,
+      facebook: normalizedFacebook,
+      youtube: normalizedYouTube,
       region_id: data.region_id,
       district_id: data.district_id,
       address: data.address || null,
       landmark: landmark || null,
       lat: data.lat,
       lng: data.lng,
+      brand_id: brandId || null,
     };
+
+    // Вычисляем grade_from и grade_to из accepted_grades для обратной совместимости
+    const sortedGrades = [...data.accepted_grades].sort((a, b) => a - b);
+    const gradeFrom = sortedGrades[0] === 0 ? 1 : sortedGrades[0];
+    const gradeTo = sortedGrades[sortedGrades.length - 1];
+    const acceptsPreparatory = data.accepted_grades.includes(0);
+
+    // Вычисляем min/max цены из тарифов для обратной совместимости
+    const prices = data.pricing_tiers
+      .map((tier: { grades: number[]; price: number | null }) => tier.price)
+      .filter((price): price is number => price !== null && price > 0);
+    const feeMonthlyMin = prices.length > 0 ? Math.min(...prices) : null;
+    const feeMonthlyMax = prices.length > 0 ? Math.max(...prices) : null;
+
+    // Первый язык - основной, остальные - дополнительные
+    const primaryLanguage = data.primary_languages.length > 0 ? data.primary_languages[0] : 'uzbek';
+    const additionalLanguages = data.primary_languages.length > 1 
+      ? data.primary_languages.slice(1) 
+      : null;
 
     const schoolDetailsData = {
       school_type: data.school_type,
-      grade_from: data.grade_from,
-      grade_to: data.grade_to,
+      grade_from: gradeFrom,
+      grade_to: gradeTo,
       accepts_preparatory: acceptsPreparatory,
-      primary_language: data.primary_language,
-      fee_monthly_min: data.fee_monthly_min || null,
-      fee_monthly_max: data.fee_monthly_max || null,
+      accepted_grades: data.accepted_grades,
+      primary_language: primaryLanguage,
+      additional_languages: additionalLanguages,
+      curriculum: data.curriculum.length > 0 ? data.curriculum : null,
+      fee_monthly_min: feeMonthlyMin,
+      fee_monthly_max: feeMonthlyMax,
+      pricing_tiers: data.pricing_tiers.length > 0 ? data.pricing_tiers : null,
     };
 
     const response = await fetch(`/api/admin/schools/${organization.id}`, {
@@ -232,7 +555,6 @@ export function BasicInfoForm({
     setLoading(true);
     setError(null);
     
-    // Показываем уведомление о сохранении
     showToast({
       type: 'warning',
       title: 'Сохранение...',
@@ -312,458 +634,573 @@ export function BasicInfoForm({
         </div>
       )}
 
-      {/* Форма */}
+      {/* Section 1: Basic Information */}
       <Card>
-        <CardContent className="p-6 space-y-8">
-          {/* Основная информация */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Основная информация</h2>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="w-5 h-5" />
+            1. Asosiy ma'lumotlar
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="name_uz" className="flex items-center gap-2">
+                <School className="w-4 h-4" />
+                Maktab nomi (O'zbekcha) *
+              </Label>
+              <Input
+                id="name_uz"
+                value={nameUz}
+                onChange={(e) => setNameUz(e.target.value)}
+                placeholder="Cambridge School Tashkent"
+                className={validationErrors.name ? 'border-destructive' : ''}
+              />
+              {validationErrors.name && (
+                <span className="text-destructive text-sm">{validationErrors.name}</span>
+              )}
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="school_type" className="flex items-center gap-2">
+                <Building2 className="w-4 h-4" />
+                Maktab turi *
+              </Label>
+              <Select
+                value={schoolType}
+                onValueChange={setSchoolType}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="private">Xususiy</SelectItem>
+                  <SelectItem value="international">Xalqaro</SelectItem>
+                  <SelectItem value="state">Davlat</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="description" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Qisqa tavsif
+              </Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Xalqaro maktab Cambridge dasturi bilan..."
+                rows={4}
+                maxLength={200}
+              />
+              <p className="text-sm text-muted-foreground">
+                {description.length}/200 belgi
+              </p>
+            </div>
             
-            {/* Загрузка логотипа */}
-            <LogoUpload
-              organizationId={organization.id}
-              currentLogoUrl={logoUrl}
-              onUploadSuccess={async (url, key) => {
-                setLogoUrl(url);
-                setLogoKey(key);
-                try {
-                  // Сохраняем сразу после загрузки
-                  await saveData({ ...formData, logo_url: url });
-                  showToast({
-                    type: 'success',
-                    title: 'Логотип загружен',
-                    description: 'Логотип успешно сохранен',
-                    duration: 3000,
-                  });
-                } catch (err: any) {
-                  const errorMessage = err.message || 'Ошибка сохранения логотипа';
-                  setError(errorMessage);
-                  showToast({
-                    type: 'error',
-                    title: 'Ошибка сохранения',
-                    description: errorMessage,
-                    duration: 5000,
-                  });
-                }
-              }}
-              onRemove={async () => {
-                setLogoUrl(null);
-                setLogoKey(null);
-                try {
-                  // Сохраняем удаление
-                  await saveData({ ...formData, logo_url: null });
-                  showToast({
-                    type: 'success',
-                    title: 'Логотип удален',
-                    description: 'Логотип успешно удален',
-                    duration: 3000,
-                  });
-                } catch (err: any) {
-                  const errorMessage = err.message || 'Ошибка удаления логотипа';
-                  setError(errorMessage);
-                  showToast({
-                    type: 'error',
-                    title: 'Ошибка удаления',
-                    description: errorMessage,
-                    duration: 5000,
-                  });
-                }
-              }}
-            />
-
-            {/* Загрузка обложки */}
-            <CoverImageUpload
-              organizationId={organization.id}
-              currentCoverUrl={coverImageUrl}
-              onUploadSuccess={async (url, key) => {
-                setCoverImageUrl(url);
-                setCoverImageKey(key);
-                try {
-                  // Сохраняем сразу после загрузки
-                  await saveData({ ...formData, cover_image_url: url });
-                  showToast({
-                    type: 'success',
-                    title: 'Обложка загружена',
-                    description: 'Обложка успешно сохранена',
-                    duration: 3000,
-                  });
-                } catch (err: any) {
-                  const errorMessage = err.message || 'Ошибка сохранения обложки';
-                  setError(errorMessage);
-                  showToast({
-                    type: 'error',
-                    title: 'Ошибка сохранения',
-                    description: errorMessage,
-                    duration: 5000,
-                  });
-                }
-              }}
-              onRemove={async () => {
-                setCoverImageUrl(null);
-                setCoverImageKey(null);
-                try {
-                  // Сохраняем удаление
-                  await saveData({ ...formData, cover_image_url: null });
-                  showToast({
-                    type: 'success',
-                    title: 'Обложка удалена',
-                    description: 'Обложка успешно удалена',
-                    duration: 3000,
-                  });
-                } catch (err: any) {
-                  const errorMessage = err.message || 'Ошибка удаления обложки';
-                  setError(errorMessage);
-                  showToast({
-                    type: 'error',
-                    title: 'Ошибка удаления',
-                    description: errorMessage,
-                    duration: 5000,
-                  });
-                }
-              }}
-            />
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="nameUz">
-                  Название (O'zbekcha) *
-                  {validationErrors.name && (
-                    <span className="text-destructive text-sm ml-2">{validationErrors.name}</span>
-                  )}
-                </Label>
-                <Input
-                  id="nameUz"
-                  value={nameUz}
-                  onChange={(e) => setNameUz(e.target.value)}
-                  placeholder="Maktab nomi"
-                  className={validationErrors.name ? 'border-destructive' : ''}
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="shortDescription">Краткое описание</Label>
-                <Input
-                  id="shortDescription"
-                  value={shortDescription}
-                  onChange={(e) => setShortDescription(e.target.value)}
-                  placeholder="Краткое описание (до 160 символов)"
-                  maxLength={160}
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="description">
-                  Полное описание
-                  {validationErrors.description && (
-                    <span className="text-destructive text-sm ml-2">{validationErrors.description}</span>
-                  )}
-                </Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Подробное описание школы"
-                  rows={6}
-                  className={validationErrors.description ? 'border-destructive' : ''}
-                />
-              </div>
+            {/* Logo and Banner Upload */}
+            <div className="grid gap-4 md:grid-cols-2 md:col-span-2">
+              <ImageUploadField
+                label="Logotip"
+                value={logoUrl || undefined}
+                onChange={(url) => setLogoUrl(url || null)}
+                type="logo"
+                previewSize="w-32 h-32"
+              />
+              
+              <ImageUploadField
+                label="Banner"
+                value={bannerUrl || undefined}
+                onChange={(url) => setBannerUrl(url || null)}
+                type="cover"
+                previewSize="w-full h-32"
+              />
+            </div>
+            
+            {/* Brand Search */}
+            <div className="md:col-span-2">
+              <BrandSearch
+                value={brandId}
+                onChange={setBrandId}
+              />
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Контакты */}
-          <div className="space-y-4 border-t pt-6">
-            <h2 className="text-xl font-semibold">Контакты</h2>
+      {/* Section 2: Contacts and Address */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="w-5 h-5" />
+            2. Kontaktlar va manzil
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-4">
+            {/* Основной телефон */}
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="flex items-center gap-2">
+                <Phone className="w-4 h-4" />
+                Asosiy telefon (Koll markaz) *
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+998901234567"
+                className={validationErrors.phone ? 'border-destructive' : ''}
+              />
+              {validationErrors.phone && (
+                <span className="text-destructive text-sm">{validationErrors.phone}</span>
+              )}
+            </div>
+
+            {/* Дополнительный телефон 1 */}
             <div className="grid gap-4 md:grid-cols-2">
-              {/* Основной телефон */}
               <div className="space-y-2">
-                <Label htmlFor="phone">
-                  Основной телефон (Колл центр) *
-                  {validationErrors.phone && (
-                    <span className="text-destructive text-sm ml-2">{validationErrors.phone}</span>
-                  )}
+                <Label htmlFor="phone2" className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  Qo'shimcha telefon 1
                 </Label>
                 <Input
-                  id="phone"
+                  id="phone2"
                   type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  value={phone2.phone}
+                  onChange={(e) => setPhone2({ ...phone2, phone: e.target.value })}
                   placeholder="+998901234567"
-                  className={validationErrors.phone ? 'border-destructive' : ''}
-                />
-              </div>
-
-              {/* Дополнительный телефон 1 */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="phone2">Дополнительный телефон 1</Label>
-                  <Input
-                    id="phone2"
-                    type="tel"
-                    value={phone2}
-                    onChange={(e) => setPhone2(e.target.value)}
-                    placeholder="+998901234567"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone2Comment">Комментарий (например: Приёмная, Директор)</Label>
-                  <Input
-                    id="phone2Comment"
-                    value={phone2Comment}
-                    onChange={(e) => setPhone2Comment(e.target.value)}
-                    placeholder="Приёмная, Директор и т.д."
-                  />
-                </div>
-              </div>
-
-              {/* Дополнительный телефон 2 */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="phone3">Дополнительный телефон 2</Label>
-                  <Input
-                    id="phone3"
-                    type="tel"
-                    value={phone3}
-                    onChange={(e) => setPhone3(e.target.value)}
-                    placeholder="+998901234567"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone3Comment">Комментарий (например: Приёмная, Директор)</Label>
-                  <Input
-                    id="phone3Comment"
-                    value={phone3Comment}
-                    onChange={(e) => setPhone3Comment(e.target.value)}
-                    placeholder="Приёмная, Директор и т.д."
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">
-                  Email
-                  {validationErrors.email && (
-                    <span className="text-destructive text-sm ml-2">{validationErrors.email}</span>
-                  )}
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="info@school.uz"
-                  className={validationErrors.email ? 'border-destructive' : ''}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="emailAdmission">Email приёмной комиссии</Label>
+                <Label htmlFor="phone2_comment">Izoh (masalan: Qabul, Direktor)</Label>
                 <Input
-                  id="emailAdmission"
-                  type="email"
-                  value={emailAdmission}
-                  onChange={(e) => setEmailAdmission(e.target.value)}
-                  placeholder="admission@school.uz"
+                  id="phone2_comment"
+                  value={phone2.comment}
+                  onChange={(e) => setPhone2({ ...phone2, comment: e.target.value })}
+                  placeholder="Qabul, Direktor, va hokazo"
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="website">Сайт</Label>
-                <Input
-                  id="website"
-                  type="url"
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                  placeholder="https://school.uz"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="telegram">Telegram</Label>
-                <Input
-                  id="telegram"
-                  value={telegram}
-                  onChange={(e) => setTelegram(e.target.value)}
-                  placeholder="@maktabsalam или https://t.me/maktabsalam или maktabsalam"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Принимается: @maktabsalam, https://t.me/maktabsalam, maktabsalam
-                </p>
               </div>
             </div>
-          </div>
 
-          {/* Адрес */}
-          <div className="space-y-4 border-t pt-6">
-            <h2 className="text-xl font-semibold">Адрес</h2>
+            {/* Дополнительный телефон 2 */}
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="region">Область *</Label>
-                <Select
-                  value={regionId?.toString() || 'all'}
-                  onValueChange={(value) => setRegionId(value === 'all' ? null : parseInt(value))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Выберите область" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Все области</SelectItem>
-                    {regions.map((region) => (
-                      <SelectItem key={region.id} value={region.id.toString()}>
-                        {region.name_uz}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="district">Район *</Label>
-                <Select
-                  value={districtId?.toString() || ''}
-                  onValueChange={(value) => setDistrictId(value ? parseInt(value) : null)}
-                  disabled={!regionId}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Выберите район" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {districts.map((district) => (
-                      <SelectItem key={district.id} value={district.id.toString()}>
-                        {district.name_uz}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="address">
-                  Полный адрес *
-                  {validationErrors.address && (
-                    <span className="text-destructive text-sm ml-2">{validationErrors.address}</span>
-                  )}
+                <Label htmlFor="phone3" className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  Qo'shimcha telefon 2
                 </Label>
                 <Input
-                  id="address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Адрес автоматически заполнится с карты или введите вручную"
-                  className={validationErrors.address ? 'border-destructive' : ''}
+                  id="phone3"
+                  type="tel"
+                  value={phone3.phone}
+                  onChange={(e) => setPhone3({ ...phone3, phone: e.target.value })}
+                  placeholder="+998901234567"
                 />
-                <p className="text-xs text-muted-foreground">
-                  Адрес автоматически заполнится при выборе точки на карте
-                </p>
               </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="landmark">Ориентир</Label>
+              <div className="space-y-2">
+                <Label htmlFor="phone3_comment">Izoh (masalan: Qabul, Direktor)</Label>
                 <Input
-                  id="landmark"
-                  value={landmark}
-                  onChange={(e) => setLandmark(e.target.value)}
-                  placeholder="Рядом с..."
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <YandexMap
-                  lat={lat}
-                  lng={lng}
-                  onCoordinatesChange={(newLat, newLng) => {
-                    setLat(newLat);
-                    setLng(newLng);
-                  }}
-                  onAddressChange={(newAddress) => {
-                    setAddress(newAddress);
-                  }}
-                  height="400px"
+                  id="phone3_comment"
+                  value={phone3.comment}
+                  onChange={(e) => setPhone3({ ...phone3, comment: e.target.value })}
+                  placeholder="Qabul, Direktor, va hokazo"
                 />
               </div>
             </div>
           </div>
 
-          {/* Основные параметры */}
-          <div className="space-y-4 border-t pt-6">
-            <h2 className="text-xl font-semibold">Основные параметры</h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="schoolType">Тип школы *</Label>
-                <Select value={schoolType} onValueChange={setSchoolType}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="private">Частная</SelectItem>
-                    <SelectItem value="state">Государственная</SelectItem>
-                    <SelectItem value="international">Международная</SelectItem>
-                  </SelectContent>
-                </Select>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="info@school.uz"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="website" className="flex items-center gap-2">
+                <Globe className="w-4 h-4" />
+                Veb-sayt
+              </Label>
+              <Input
+                id="website"
+                type="url"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                placeholder="https://"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="telegram" className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                Telegram
+              </Label>
+              <Input
+                id="telegram"
+                value={telegram}
+                onChange={(e) => setTelegram(e.target.value)}
+                placeholder="@maktabsalam yoki https://t.me/maktabsalam yoki maktabsalam"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="instagram" className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.467.398.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
+                </svg>
+                Instagram
+              </Label>
+              <Input
+                id="instagram"
+                value={instagram}
+                onChange={(e) => setInstagram(e.target.value)}
+                placeholder="@username yoki https://instagram.com/username"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="facebook" className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
+                </svg>
+                Facebook
+              </Label>
+              <Input
+                id="facebook"
+                value={facebook}
+                onChange={(e) => setFacebook(e.target.value)}
+                placeholder="username yoki https://facebook.com/username"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="youtube" className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fillRule="evenodd" d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 0 1-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 0 1-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 0 1 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z" clipRule="evenodd" />
+                </svg>
+                YouTube
+              </Label>
+              <Input
+                id="youtube"
+                value={youtube}
+                onChange={(e) => setYoutube(e.target.value)}
+                placeholder="@channel yoki https://youtube.com/@channel"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="region" className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Viloyat *
+              </Label>
+              <Select
+                value={regionId?.toString() || 'all'}
+                onValueChange={(value) =>
+                  setRegionId(value === 'all' ? null : parseInt(value))
+                }
+                disabled={loadingDistricts}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={loadingDistricts ? "Yuklanmoqda..." : "Viloyatni tanlang"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Barcha viloyatlar</SelectItem>
+                  {regions.map((region) => (
+                    <SelectItem key={region.id} value={region.id.toString()}>
+                      {region.name_uz}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="district" className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Tuman *
+              </Label>
+              <Select
+                value={districtId?.toString() || ''}
+                onValueChange={(value) =>
+                  setDistrictId(value ? parseInt(value) : null)
+                }
+                disabled={!regionId || loadingDistricts}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={
+                    !regionId 
+                      ? "Avval viloyatni tanlang" 
+                      : loadingDistricts 
+                      ? "Yuklanmoqda..." 
+                      : "Tumanni tanlang"
+                  } />
+                </SelectTrigger>
+                <SelectContent>
+                  {districts.map((district) => (
+                    <SelectItem key={district.id} value={district.id.toString()}>
+                      {district.name_uz || district.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="address" className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Manzil *
+              </Label>
+              <Input
+                id="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Manzil avtomatik to'ldiriladi yoki qo'lda kiriting"
+                className={validationErrors.address ? 'border-destructive' : ''}
+              />
+              {validationErrors.address && (
+                <span className="text-destructive text-sm">{validationErrors.address}</span>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Manzil kartadan avtomatik to'ldiriladi yoki qo'lda kiriting
+              </p>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="landmark">Yo'naltiruvchi</Label>
+              <Input
+                id="landmark"
+                value={landmark}
+                onChange={(e) => setLandmark(e.target.value)}
+                placeholder="Yaqinida..."
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <YandexMap
+                lat={lat}
+                lng={lng}
+                onCoordinatesChange={(newLat, newLng) => {
+                  setLat(newLat);
+                  setLng(newLng);
+                }}
+                onAddressChange={(newAddress) => {
+                  setAddress(newAddress);
+                }}
+                height="400px"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Section 3: Education and Pricing */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BookMarked className="w-5 h-5" />
+            3. Ta'lim va narx
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2 md:col-span-2">
+              <Label className="flex items-center gap-2">
+                <GraduationCap className="w-4 h-4" />
+                Qabul sinflari *
+              </Label>
+              <div className="flex flex-wrap gap-2 pt-2">
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((grade) => {
+                  const isSelected = acceptedGrades.includes(grade);
+                  return (
+                    <Button
+                      key={grade}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (isSelected) {
+                          setAcceptedGrades(acceptedGrades.filter((g) => g !== grade));
+                        } else {
+                          setAcceptedGrades([...acceptedGrades, grade].sort((a, b) => a - b));
+                        }
+                      }}
+                      className={cn(
+                        "min-w-[50px]",
+                        isSelected && "bg-primary text-primary-foreground"
+                      )}
+                    >
+                      {grade === 0 ? '0 (Tayyorgarlik)' : grade}
+                    </Button>
+                  );
+                })}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="primaryLanguage">Основной язык *</Label>
-                <Select value={primaryLanguage} onValueChange={setPrimaryLanguage}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="uzbek">O'zbek</SelectItem>
-                    <SelectItem value="russian">Русский</SelectItem>
-                    <SelectItem value="english">English</SelectItem>
-                  </SelectContent>
-                </Select>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label className="flex items-center gap-2">
+                <Languages className="w-4 h-4" />
+                Ta'lim tili *
+              </Label>
+              <div className="flex gap-2 pt-2">
+                {['uzbek', 'russian', 'english'].map((lang) => {
+                  const isSelected = primaryLanguages.includes(lang);
+                  const label = lang === 'uzbek'
+                    ? 'O\'zbek'
+                    : lang === 'russian'
+                      ? 'Rus'
+                      : 'Ingliz';
+                  return (
+                    <Button
+                      key={lang}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (isSelected) {
+                          setPrimaryLanguages(primaryLanguages.filter((l) => l !== lang));
+                        } else {
+                          setPrimaryLanguages([...primaryLanguages, lang]);
+                        }
+                      }}
+                      className={cn(
+                        "min-w-[100px]",
+                        isSelected && "bg-primary text-primary-foreground"
+                      )}
+                    >
+                      {label}
+                    </Button>
+                  );
+                })}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="gradeFrom">Классы (от) *</Label>
-                <Select value={gradeFrom} onValueChange={setGradeFrom}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((grade) => (
-                      <SelectItem key={grade} value={grade.toString()}>
-                        {grade === 0 ? '0 (Подготовительный)' : grade}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                O'quv dasturi *
+              </Label>
+              <div className="flex gap-2 pt-2">
+                {[
+                  { value: 'national', label: 'Milliy' },
+                  { value: 'cambridge', label: 'Cambridge' },
+                  { value: 'ib', label: 'IB' },
+                ].map((prog) => {
+                  const isSelected = curriculum.includes(prog.value);
+                  return (
+                    <Button
+                      key={prog.value}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (isSelected) {
+                          setCurriculum(curriculum.filter((c) => c !== prog.value));
+                        } else {
+                          setCurriculum([...curriculum, prog.value]);
+                        }
+                      }}
+                      className={cn(
+                        "min-w-[120px]",
+                        isSelected && "bg-primary text-primary-foreground"
+                      )}
+                    >
+                      {prog.label}
+                    </Button>
+                  );
+                })}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="gradeTo">Классы (до) *</Label>
-                <Select value={gradeTo} onValueChange={setGradeTo}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((grade) => (
-                      <SelectItem key={grade} value={grade.toString()}>
-                        {grade}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="feeMin">
-                  Стоимость (мин, сум) *
-                  {validationErrors.fee_monthly_min && (
-                    <span className="text-destructive text-sm ml-2">{validationErrors.fee_monthly_min}</span>
-                  )}
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-2">
+                  <Coins className="w-4 h-4" />
+                  Narxlar (so'm)
                 </Label>
-                <Input
-                  id="feeMin"
-                  type="number"
-                  value={feeMonthlyMin}
-                  onChange={(e) => setFeeMonthlyMin(e.target.value)}
-                  placeholder="3000000"
-                  className={validationErrors.fee_monthly_min ? 'border-destructive' : ''}
-                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setPricingTiers([
+                      ...pricingTiers,
+                      { grades: [], price: null },
+                    ]);
+                  }}
+                >
+                  + Prays qo'shish
+                </Button>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="feeMax">
-                  Стоимость (макс, сум) *
-                  {validationErrors.fee_monthly_max && (
-                    <span className="text-destructive text-sm ml-2">{validationErrors.fee_monthly_max}</span>
-                  )}
-                </Label>
-                <Input
-                  id="feeMax"
-                  type="number"
-                  value={feeMonthlyMax}
-                  onChange={(e) => setFeeMonthlyMax(e.target.value)}
-                  placeholder="5000000"
-                  className={validationErrors.fee_monthly_max ? 'border-destructive' : ''}
-                />
+              <div className="space-y-3">
+                {pricingTiers.map((tier, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-3 items-start p-3 border rounded-lg"
+                  >
+                    <div className="flex-1">
+                      <Label className="text-xs text-muted-foreground mb-2 block">
+                        Sinflar
+                      </Label>
+                      <div className="flex flex-wrap gap-2">
+                        {acceptedGrades.map((grade) => (
+                          <div key={grade} className="flex items-center space-x-1">
+                            <Checkbox
+                              id={`tier-${index}-grade-${grade}`}
+                              checked={tier.grades.includes(grade)}
+                              onCheckedChange={(checked) => {
+                                const newTiers = [...pricingTiers];
+                                if (checked) {
+                                  newTiers[index].grades = [
+                                    ...tier.grades,
+                                    grade,
+                                  ].sort((a, b) => a - b);
+                                } else {
+                                  newTiers[index].grades = tier.grades.filter(
+                                    (g) => g !== grade
+                                  );
+                                }
+                                setPricingTiers(newTiers);
+                              }}
+                            />
+                            <Label
+                              htmlFor={`tier-${index}-grade-${grade}`}
+                              className="cursor-pointer text-xs"
+                            >
+                              {grade === 0 ? '0' : grade}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <Label className="text-xs text-muted-foreground mb-2 block">
+                        Narx (so'm)
+                      </Label>
+                      <Input
+                        type="number"
+                        value={tier.price || ''}
+                        onChange={(e) => {
+                          const newTiers = [...pricingTiers];
+                          newTiers[index].price = e.target.value
+                            ? parseFloat(e.target.value)
+                            : null;
+                          setPricingTiers(newTiers);
+                        }}
+                        placeholder="3000000"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setPricingTiers(pricingTiers.filter((_, i) => i !== index));
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                {pricingTiers.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Hozircha narxlar qo'shilmagan
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -782,4 +1219,3 @@ export function BasicInfoForm({
     </div>
   );
 }
-

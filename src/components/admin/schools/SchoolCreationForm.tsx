@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { saveTelegram } from '@/lib/utils/telegram';
 import { saveInstagram, saveFacebook, saveYouTube } from '@/lib/utils/social-media';
 import { YandexMap } from './YandexMap';
+import { BrandSearch } from '@/components/admin/brands/BrandSearch';
 import { Upload, X, Loader2, Image as ImageIcon, Phone, Mail, Globe, MessageCircle, Building2, GraduationCap, DollarSign, MapPin, School, BookOpen, Languages, FileText, BookMarked, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -66,6 +67,8 @@ export function SchoolCreationForm() {
   const [districts, setDistricts] = useState<any[]>([]);
   const [loadingRegions, setLoadingRegions] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
+
+  const [brandId, setBrandId] = useState<string | null>(null);
 
   const [data, setData] = useState<WizardData>({
     name_uz: '',
@@ -211,6 +214,7 @@ export function SchoolCreationForm() {
         lng: data.lng || null,
         logo_url: data.logo_url || null,
         banner_url: data.banner_url || null,
+        brand_id: brandId || null,
       };
 
       // Вычисляем grade_from и grade_to из accepted_grades
@@ -375,6 +379,14 @@ export function SchoolCreationForm() {
                 onChange={(url) => updateData('banner_url', url)}
                 type="cover"
                 previewSize="w-full h-32"
+              />
+            </div>
+            
+            {/* Brand Search */}
+            <div className="md:col-span-2">
+              <BrandSearch
+                value={brandId}
+                onChange={setBrandId}
               />
             </div>
           </div>
@@ -653,30 +665,33 @@ export function SchoolCreationForm() {
                 Qabul sinflari *
               </Label>
               <div className="flex flex-wrap gap-2 pt-2">
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((grade) => (
-                  <div key={grade} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`grade-${grade}`}
-                      checked={data.accepted_grades.includes(grade)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          updateData('accepted_grades', [...data.accepted_grades, grade].sort((a, b) => a - b));
-                        } else {
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((grade) => {
+                  const isSelected = data.accepted_grades.includes(grade);
+                  return (
+                    <Button
+                      key={grade}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (isSelected) {
                           updateData(
                             'accepted_grades',
                             data.accepted_grades.filter((g) => g !== grade)
                           );
+                        } else {
+                          updateData('accepted_grades', [...data.accepted_grades, grade].sort((a, b) => a - b));
                         }
                       }}
-                    />
-                    <Label
-                      htmlFor={`grade-${grade}`}
-                      className="cursor-pointer"
+                      className={cn(
+                        "min-w-[50px]",
+                        isSelected && "bg-primary text-primary-foreground"
+                      )}
                     >
                       {grade === 0 ? '0 (Tayyorgarlik)' : grade}
-                    </Label>
-                  </div>
-                ))}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
             <div className="space-y-2 md:col-span-2">
@@ -684,35 +699,39 @@ export function SchoolCreationForm() {
                 <Languages className="w-4 h-4" />
                 Ta'lim tili *
               </Label>
-              <div className="flex gap-4 pt-2">
-                {['uzbek', 'russian', 'english'].map((lang) => (
-                  <div key={lang} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`lang-${lang}`}
-                      checked={data.primary_languages.includes(lang)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          updateData('primary_languages', [...data.primary_languages, lang]);
-                        } else {
+              <div className="flex gap-2 pt-2">
+                {['uzbek', 'russian', 'english'].map((lang) => {
+                  const isSelected = data.primary_languages.includes(lang);
+                  const label = lang === 'uzbek'
+                    ? 'O\'zbek'
+                    : lang === 'russian'
+                      ? 'Rus'
+                      : 'Ingliz';
+                  return (
+                    <Button
+                      key={lang}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (isSelected) {
                           updateData(
                             'primary_languages',
                             data.primary_languages.filter((l) => l !== lang)
                           );
+                        } else {
+                          updateData('primary_languages', [...data.primary_languages, lang]);
                         }
                       }}
-                    />
-                    <Label
-                      htmlFor={`lang-${lang}`}
-                      className="cursor-pointer capitalize"
+                      className={cn(
+                        "min-w-[100px]",
+                        isSelected && "bg-primary text-primary-foreground"
+                      )}
                     >
-                      {lang === 'uzbek'
-                        ? 'O\'zbek'
-                        : lang === 'russian'
-                          ? 'Rus'
-                          : 'Ingliz'}
-                    </Label>
-                  </div>
-                ))}
+                      {label}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
             <div className="space-y-2 md:col-span-2">
@@ -720,35 +739,38 @@ export function SchoolCreationForm() {
                 <BookOpen className="w-4 h-4" />
                 O'quv dasturi *
               </Label>
-              <div className="flex gap-4 pt-2">
+              <div className="flex gap-2 pt-2">
                 {[
                   { value: 'national', label: 'Milliy' },
                   { value: 'cambridge', label: 'Cambridge' },
                   { value: 'ib', label: 'IB' },
-                ].map((prog) => (
-                  <div key={prog.value} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`curriculum-${prog.value}`}
-                      checked={data.curriculum.includes(prog.value)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          updateData('curriculum', [...data.curriculum, prog.value]);
-                        } else {
+                ].map((prog) => {
+                  const isSelected = data.curriculum.includes(prog.value);
+                  return (
+                    <Button
+                      key={prog.value}
+                      type="button"
+                      variant={isSelected ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (isSelected) {
                           updateData(
                             'curriculum',
                             data.curriculum.filter((c) => c !== prog.value)
                           );
+                        } else {
+                          updateData('curriculum', [...data.curriculum, prog.value]);
                         }
                       }}
-                    />
-                    <Label
-                      htmlFor={`curriculum-${prog.value}`}
-                      className="cursor-pointer"
+                      className={cn(
+                        "min-w-[120px]",
+                        isSelected && "bg-primary text-primary-foreground"
+                      )}
                     >
                       {prog.label}
-                    </Label>
-                  </div>
-                ))}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
             <div className="space-y-2 md:col-span-2">
