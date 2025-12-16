@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +34,7 @@ interface ImageUploadFieldProps {
   label: string;
   value?: string;
   onChange: (url: string | undefined) => void;
+  type: 'logo' | 'cover';
   previewSize: string;
 }
 
@@ -41,12 +42,57 @@ function ImageUploadField({
   label,
   value,
   onChange,
+  type,
   previewSize,
 }: ImageUploadFieldProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(value || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Обновляем preview при изменении value
+  useEffect(() => {
+    const loadImageUrl = async () => {
+      if (!value) {
+        setPreview(null);
+        setError(null);
+        return;
+      }
+
+      // Если это полный URL (начинается с http), используем его напрямую
+      if (value.startsWith('http://') || value.startsWith('https://')) {
+        setPreview(value);
+        return;
+      }
+
+      // Если это относительный путь (начинается с /), добавляем базовый URL
+      if (value.startsWith('/')) {
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+        setPreview(`${baseUrl}${value}`);
+        return;
+      }
+
+      // Это ключ файла в storage (например, "logos/123/logo.png")
+      // Получаем актуальный presigned URL
+      try {
+        setError(null);
+        const response = await fetch(`/api/storage/url?key=${encodeURIComponent(value)}&expires=3600`);
+        if (response.ok) {
+          const data = await response.json();
+          setPreview(data.url);
+        } else {
+          const errorText = await response.text();
+          console.error('Failed to get presigned URL:', errorText);
+          setPreview(null);
+        }
+      } catch (err) {
+        console.error('Error loading image URL:', err);
+        setPreview(null);
+      }
+    };
+
+    loadImageUrl();
+  }, [value]);
 
   const ALLOWED_TYPES = [
     'image/png',
@@ -98,7 +144,7 @@ function ImageUploadField({
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('type', 'logo');
+      formData.append('type', type);
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -111,8 +157,24 @@ function ImageUploadField({
       }
 
       const data = await response.json();
-      setPreview(data.url);
-      onChange(data.url);
+      // Сохраняем key вместо presigned URL, чтобы URL не истекал
+      const fileKey = data.key; // Используем key из ответа API
+      if (fileKey) {
+        // Для немедленного отображения получаем presigned URL
+        const urlResponse = await fetch(`/api/storage/url?key=${encodeURIComponent(fileKey)}&expires=3600`);
+        if (urlResponse.ok) {
+          const urlData = await urlResponse.json();
+          setPreview(urlData.url);
+        } else {
+          // Fallback на presigned URL из ответа загрузки
+          setPreview(data.url);
+        }
+        onChange(fileKey); // Сохраняем key в БД
+      } else {
+        // Если key нет, используем старый подход (для обратной совместимости)
+        setPreview(data.url);
+        onChange(data.url);
+      }
     } catch (err: any) {
       setError(err.message || 'Fayl yuklanmadi');
       setPreview(value || null);
