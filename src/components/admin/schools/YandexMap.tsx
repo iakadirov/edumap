@@ -44,8 +44,6 @@ export function YandexMap({
       return;
     }
 
-    let script: HTMLScriptElement | null = null;
-
     // Проверяем, не загружен ли уже скрипт
     if (window.ymaps) {
       window.ymaps.ready(() => {
@@ -54,9 +52,25 @@ export function YandexMap({
       return;
     }
 
+    // Проверяем, не загружается ли уже скрипт
+    const existingScript = document.querySelector('script[src*="api-maps.yandex.ru"]');
+    if (existingScript) {
+      // Если скрипт уже есть, ждем его загрузки
+      const checkInterval = setInterval(() => {
+        if (window.ymaps) {
+          clearInterval(checkInterval);
+          window.ymaps.ready(() => {
+            initMap();
+          });
+        }
+      }, 100);
+      
+      return () => clearInterval(checkInterval);
+    }
+
     // Загружаем скрипт Яндекс.Карт
     // lang=uz_UZ - узбекский язык
-    script = document.createElement('script');
+    const script = document.createElement('script');
     script.src = `https://api-maps.yandex.ru/2.1/?apikey=${apiKey}&lang=uz_UZ`;
     script.async = true;
     script.onload = () => {

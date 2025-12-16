@@ -56,11 +56,13 @@ export function normalizeInstagram(input: string | null | undefined): SocialMedi
 
 /**
  * Нормализует Facebook username/URL
+ * Принимает любой URL как есть (не валидирует строго)
  * Поддерживает:
  * - https://facebook.com/username
- * - https://www.facebook.com/username
+ * - https://www.facebook.com/profile.php?id=123456
  * - https://fb.com/username
  * - username
+ * - Любой другой валидный URL Facebook
  */
 export function normalizeFacebook(input: string | null | undefined): SocialMediaData | null {
   if (!input || typeof input !== 'string') {
@@ -74,26 +76,60 @@ export function normalizeFacebook(input: string | null | undefined): SocialMedia
 
   let cleaned = trimmed.replace(/\s+/g, '');
 
-  const patterns = [
-    // https://facebook.com/username или https://www.facebook.com/username
-    /^https?:\/\/(?:www\.)?(?:facebook|fb)\.com\/([a-zA-Z0-9.]+)/i,
-    // username (просто текст)
-    /^([a-zA-Z0-9.]+)$/,
-  ];
-
-  for (const pattern of patterns) {
-    const match = cleaned.match(pattern);
-    if (match && match[1]) {
-      const username = match[1].toLowerCase();
+  // Если это уже полный URL (начинается с http:// или https://), возвращаем как есть
+  if (/^https?:\/\//i.test(cleaned)) {
+    // Проверяем, что это URL Facebook
+    if (/facebook\.com|fb\.com/i.test(cleaned)) {
+      // Извлекаем username или ID из URL
+      const usernameMatch = cleaned.match(/(?:facebook|fb)\.com\/([^/?]+)/i);
+      const idMatch = cleaned.match(/profile\.php\?id=(\d+)/i);
+      
+      if (usernameMatch && usernameMatch[1]) {
+        const username = usernameMatch[1];
+        return {
+          username,
+          url: cleaned,
+          display: username,
+        };
+      } else if (idMatch && idMatch[1]) {
+        return {
+          username: idMatch[1],
+          url: cleaned,
+          display: `ID: ${idMatch[1]}`,
+        };
+      } else {
+        // Если не удалось извлечь username/ID, все равно возвращаем URL как есть
+        return {
+          username: cleaned,
+          url: cleaned,
+          display: cleaned,
+        };
+      }
+    } else {
+      // Если это не Facebook URL, все равно возвращаем как есть
       return {
-        username,
-        url: `https://facebook.com/${username}`,
-        display: username,
+        username: cleaned,
+        url: cleaned,
+        display: cleaned,
       };
     }
   }
 
-  return null;
+  // Если это просто username (без http://), добавляем базовый URL
+  if (/^[a-zA-Z0-9._-]+$/.test(cleaned)) {
+    return {
+      username: cleaned.toLowerCase(),
+      url: `https://facebook.com/${cleaned}`,
+      display: cleaned,
+    };
+  }
+
+  // Для любых других случаев возвращаем как есть
+  return {
+    username: cleaned,
+    url: cleaned.startsWith('http') ? cleaned : `https://${cleaned}`,
+    display: cleaned,
+  };
 }
 
 /**
@@ -133,11 +169,13 @@ export function normalizeYouTube(input: string | null | undefined): SocialMediaD
     const match = cleaned.match(pattern);
     if (match && match[1]) {
       const channel = match[1];
-      // Если это не начинается с @, добавляем @ для нового формата YouTube
-      const displayChannel = channel.startsWith('@') ? channel : `@${channel}`;
+      // Убираем @ если есть, чтобы username был чистым
+      const cleanChannel = channel.replace(/^@/, '');
+      // Всегда используем формат @channel для отображения
+      const displayChannel = `@${cleanChannel}`;
       return {
-        username: channel,
-        url: `https://youtube.com/${displayChannel}`,
+        username: cleanChannel, // Сохраняем без @
+        url: `https://youtube.com/@${cleanChannel}`, // Всегда формат @username
         display: displayChannel,
       };
     }
@@ -209,11 +247,11 @@ export function formatFacebookForDisplay(input: string | null | undefined): Soci
  */
 export function formatYouTubeForDisplay(input: string | null | undefined): SocialMediaData | null {
   if (input && !input.startsWith('@') && !input.startsWith('http')) {
-    const channel = input;
-    const displayChannel = channel.startsWith('@') ? channel : `@${channel}`;
+    const channel = input.replace(/^@/, '');
+    const displayChannel = `@${channel}`;
     return {
       username: channel,
-      url: `https://youtube.com/${displayChannel}`,
+      url: `https://youtube.com/@${channel}`, // Всегда формат @username
       display: displayChannel,
     };
   }

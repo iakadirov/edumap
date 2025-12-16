@@ -33,6 +33,7 @@ import {
 import { getCityDistrict } from '@/lib/utils/translations';
 import { formatDate } from '@/lib/utils/date';
 import { useToast } from '@/contexts/ToastContext';
+import { ExternalLink } from 'lucide-react';
 
 // Вспомогательные функции для статусов
 const getStatusLabel = (status: string) => {
@@ -305,6 +306,13 @@ export function SchoolsTable({
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
+                      {school.slug && (
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/schools/${school.slug}`} target="_blank" rel="noopener noreferrer" title="Saytda ko'rish">
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      )}
                       <Button variant="ghost" size="sm" asChild>
                         <Link href={`/admin/schools/${school.id}`} prefetch={false}>Tahrirlash</Link>
                       </Button>

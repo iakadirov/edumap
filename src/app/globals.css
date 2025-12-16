@@ -62,7 +62,7 @@
   --popover-foreground: oklch(0.15 0.01 240);
   
   /* Primary: Образовательный синий */
-  --primary: oklch(0.488 0.243 264.376);
+  --primary: oklch(0.55 0.2 264);
   --primary-foreground: oklch(0.985 0 0);
   
   /* Secondary: Светло-голубоватый */
@@ -74,11 +74,11 @@
   --muted-foreground: oklch(0.5 0.01 240);
   
   --accent: oklch(0.95 0.015 240);
-  --accent-foreground: oklch(0.488 0.243 264.376);
+  --accent-foreground: oklch(0.55 0.2 264);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.9 0.01 240); /* Голубоватая граница */
   --input: oklch(0.95 0.01 240);
-  --ring: oklch(0.488 0.243 264.376);
+  --ring: oklch(0.55 0.2 264);
   
   /* Тени для bento карточек */
   --shadow-0: 0 0 0 0 rgba(0, 0, 0, 0);
@@ -127,7 +127,7 @@
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: oklch(0.55 0.2 264);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);

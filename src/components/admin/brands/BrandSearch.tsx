@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Building2, Search, X, Loader2 } from 'lucide-react';
-import Image from 'next/image';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import { cn } from '@/lib/utils';
 
 interface Brand {
@@ -107,13 +107,15 @@ export function BrandSearch({ value, onChange, label = "Brend qo'shish (ixtiyori
       {selectedBrand ? (
         <div className="flex items-center gap-3 p-3 border rounded-lg bg-muted/50">
           {selectedBrand.logo_url ? (
-            <Image
-              src={selectedBrand.logo_url}
-              alt={selectedBrand.name}
-              width={40}
-              height={40}
-              className="rounded object-cover"
-            />
+            <div className="relative w-10 h-10 rounded overflow-hidden">
+              <OptimizedImage
+                src={selectedBrand.logo_url}
+                alt={selectedBrand.name}
+                width={40}
+                height={40}
+                className="rounded object-cover"
+              />
+            </div>
           ) : (
             <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
               <Building2 className="h-5 w-5 text-muted-foreground" />
@@ -166,13 +168,15 @@ export function BrandSearch({ value, onChange, label = "Brend qo'shish (ixtiyori
                   )}
                 >
                   {brand.logo_url ? (
-                    <Image
-                      src={brand.logo_url}
-                      alt={brand.name}
-                      width={32}
-                      height={32}
-                      className="rounded object-cover"
-                    />
+                    <div className="relative w-8 h-8 rounded overflow-hidden flex-shrink-0">
+                      <OptimizedImage
+                        src={brand.logo_url}
+                        alt={brand.name}
+                        width={32}
+                        height={32}
+                        className="rounded object-cover"
+                      />
+                    </div>
                   ) : (
                     <div className="w-8 h-8 rounded bg-muted flex items-center justify-center flex-shrink-0">
                       <Building2 className="h-4 w-4 text-muted-foreground" />

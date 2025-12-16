@@ -19,8 +19,12 @@ import { saveTelegram } from '@/lib/utils/telegram';
 import { saveInstagram, saveFacebook, saveYouTube } from '@/lib/utils/social-media';
 import { YandexMap } from './YandexMap';
 import { BrandSearch } from '@/components/admin/brands/BrandSearch';
+import { SimilarSchoolsSearch } from './SimilarSchoolsSearch';
 import { Upload, X, Loader2, Image as ImageIcon, Phone, Mail, Globe, MessageCircle, Building2, GraduationCap, DollarSign, MapPin, School, BookOpen, Languages, FileText, BookMarked, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PhoneInput } from '@/components/ui/phone-input';
+import { normalizePhone } from '@/lib/utils/phone';
+import { normalizeWebsite } from '@/lib/utils/website';
 
 interface PhoneWithComment {
   phone: string;
@@ -195,13 +199,13 @@ export function SchoolCreationForm() {
         slug,
         description: data.description || null,
         status: 'published',
-        phone: data.phone,
-        phone_secondary: data.phone2?.phone || null,
+        phone: normalizePhone(data.phone) || null,
+        phone_secondary: normalizePhone(data.phone2?.phone) || null,
         phone_secondary_comment: data.phone2?.comment || null,
-        phone_admission: data.phone3?.phone || null,
+        phone_admission: normalizePhone(data.phone3?.phone) || null,
         phone_admission_comment: data.phone3?.comment || null,
         email: data.email || null,
-        website: data.website || null,
+        website: normalizeWebsite(data.website) || null,
         telegram: normalizedTelegram,
         instagram: normalizedInstagram,
         facebook: normalizedFacebook,
@@ -323,6 +327,7 @@ export function SchoolCreationForm() {
                 onChange={(e) => updateData('name_uz', e.target.value)}
                 placeholder="Cambridge School Tashkent"
               />
+              <SimilarSchoolsSearch query={data.name_uz} />
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="school_type" className="flex items-center gap-2">
@@ -409,12 +414,10 @@ export function SchoolCreationForm() {
                 <Phone className="w-4 h-4" />
                 Asosiy telefon (Koll markaz) *
               </Label>
-              <Input
+              <PhoneInput
                 id="phone"
-                type="tel"
                 value={data.phone}
-                onChange={(e) => updateData('phone', e.target.value)}
-                placeholder="+998901234567"
+                onChange={(value) => updateData('phone', value)}
               />
             </div>
 
@@ -425,12 +428,10 @@ export function SchoolCreationForm() {
                   <Phone className="w-4 h-4" />
                   Qo'shimcha telefon 1
                 </Label>
-                <Input
+                <PhoneInput
                   id="phone2"
-                  type="tel"
                   value={data.phone2?.phone || ''}
-                  onChange={(e) => updateData('phone2', { ...data.phone2, phone: e.target.value } as PhoneWithComment)}
-                  placeholder="+998901234567"
+                  onChange={(value) => updateData('phone2', { ...data.phone2, phone: value } as PhoneWithComment)}
                 />
               </div>
               <div className="space-y-2">
@@ -451,12 +452,10 @@ export function SchoolCreationForm() {
                   <Phone className="w-4 h-4" />
                   Qo'shimcha telefon 2
                 </Label>
-                <Input
+                <PhoneInput
                   id="phone3"
-                  type="tel"
                   value={data.phone3?.phone || ''}
-                  onChange={(e) => updateData('phone3', { ...data.phone3, phone: e.target.value } as PhoneWithComment)}
-                  placeholder="+998901234567"
+                  onChange={(value) => updateData('phone3', { ...data.phone3, phone: value } as PhoneWithComment)}
                 />
               </div>
               <div className="space-y-2">

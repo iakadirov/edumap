@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
+import { ExternalLink } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,9 +37,18 @@ export default async function EditBrandPage({
               {brand.name}
             </p>
           </div>
-          <Button variant="outline" asChild>
-            <Link href="/admin/brands">Orqaga</Link>
-          </Button>
+          <div className="flex gap-2">
+            {brand.slug && (
+              <Button variant="outline" asChild>
+                <Link href={`/schools/brands/${brand.slug}`} target="_blank" rel="noopener noreferrer">
+                  Saytda ko'rish <ExternalLink className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            )}
+            <Button variant="outline" asChild>
+              <Link href="/admin/brands">Orqaga</Link>
+            </Button>
+          </div>
         </div>
         <BrandForm brand={brand} />
       </div>

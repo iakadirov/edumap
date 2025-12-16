@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { SchoolCard } from './SchoolCard';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import { Building2, Globe, User, Calendar, Phone, Mail, ExternalLink } from 'lucide-react';
 import { formatInstagramForDisplay, formatFacebookForDisplay, formatYouTubeForDisplay } from '@/lib/utils/social-media';
 
@@ -39,8 +39,8 @@ export function BrandPage({ brand, schools }: BrandPageProps) {
         <div className="container mx-auto px-4 py-12">
           <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
             {brand.logo_url && (
-              <div className="flex-shrink-0">
-                <Image
+              <div className="flex-shrink-0 relative w-[120px] h-[120px]">
+                <OptimizedImage
                   src={brand.logo_url}
                   alt={brand.name}
                   width={120}

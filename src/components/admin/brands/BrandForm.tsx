@@ -11,6 +11,8 @@ import { useToast } from '@/contexts/ToastContext';
 import { saveInstagram, saveFacebook, saveYouTube } from '@/lib/utils/social-media';
 import { Upload, X, Loader2, Image as ImageIcon, Building2, Globe, User, Calendar, Phone, Mail, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PhoneInput } from '@/components/ui/phone-input';
+import { normalizePhone } from '@/lib/utils/phone';
 
 interface BrandFormProps {
   brand?: {
@@ -313,7 +315,7 @@ export function BrandForm({ brand }: BrandFormProps) {
         founder: founder || null,
         description: description || null,
         founded_year: foundedYear ? parseInt(foundedYear) : null,
-        phone: phone || null,
+        phone: normalizePhone(phone) || null,
         email: email || null,
         instagram: normalizedInstagram,
         facebook: normalizedFacebook,
@@ -487,12 +489,10 @@ export function BrandForm({ brand }: BrandFormProps) {
                 <Phone className="w-4 h-4" />
                 Telefon
               </Label>
-              <Input
+              <PhoneInput
                 id="phone"
-                type="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+998901234567"
+                onChange={(value) => setPhone(value)}
               />
             </div>
             <div className="space-y-2">

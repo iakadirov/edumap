@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import { OptimizedImage } from '@/components/ui/optimized-image';
+import { PhoneLink } from '@/components/shared/PhoneLink';
 
 // Кэширование на 300 секунд (5 минут) для страниц школ
 export const revalidate = 300;
@@ -862,34 +863,28 @@ export default async function SchoolProfilePage({ params }: SchoolProfilePagePro
                   {school.phone && (
                     <div>
                       <span className="font-medium">Telefon: </span>
-                      <a
-                        href={`tel:${school.phone}`}
+                      <PhoneLink
+                        phone={school.phone}
                         className="text-primary hover:underline"
-                      >
-                        {school.phone}
-                      </a>
+                      />
                     </div>
                   )}
                   {school.phone_secondary && (
                     <div>
                       <span className="font-medium">Qoʻshimcha: </span>
-                      <a
-                        href={`tel:${school.phone_secondary}`}
+                      <PhoneLink
+                        phone={school.phone_secondary}
                         className="text-primary hover:underline"
-                      >
-                        {school.phone_secondary}
-                      </a>
+                      />
                     </div>
                   )}
                   {school.phone_admission && (
                     <div>
                       <span className="font-medium">Qabul komissiyasi: </span>
-                      <a
-                        href={`tel:${school.phone_admission}`}
+                      <PhoneLink
+                        phone={school.phone_admission}
                         className="text-primary hover:underline"
-                      >
-                        {school.phone_admission}
-                      </a>
+                      />
                     </div>
                   )}
                 </div>

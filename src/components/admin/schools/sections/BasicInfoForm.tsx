@@ -24,8 +24,11 @@ import { saveTelegram } from '@/lib/utils/telegram';
 import { saveInstagram, saveFacebook, saveYouTube } from '@/lib/utils/social-media';
 import { YandexMap } from '../YandexMap';
 import { BrandSearch } from '@/components/admin/brands/BrandSearch';
-import { Upload, X, Loader2, Image as ImageIcon, Phone, Mail, Globe, MessageCircle, Building2, GraduationCap, DollarSign, MapPin, School, BookOpen, Languages, FileText, BookMarked, Coins } from 'lucide-react';
+import { Upload, X, Loader2, Image as ImageIcon, Phone, Mail, Globe, MessageCircle, Building2, GraduationCap, DollarSign, MapPin, School, BookOpen, Languages, FileText, BookMarked, Coins, Link as LinkIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PhoneInput } from '@/components/ui/phone-input';
+import { normalizePhone } from '@/lib/utils/phone';
+import { normalizeWebsite } from '@/lib/utils/website';
 
 interface BasicInfoFormProps {
   organization: any;
@@ -331,7 +334,26 @@ export function BasicInfoForm({
 
   // Основная информация
   const [nameUz, setNameUz] = useState(organization?.name_uz || '');
+  const [slug, setSlug] = useState(organization?.slug || '');
   const [description, setDescription] = useState(organization?.description || '');
+
+  // Генерация slug из названия
+  const generateSlug = (text: string): string => {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Удаляем спецсимволы
+      .replace(/\s+/g, '-') // Заменяем пробелы на дефисы
+      .replace(/-+/g, '-') // Убираем множественные дефисы
+      .replace(/^-|-$/g, ''); // Убираем дефисы в начале и конце
+  };
+
+  // Автогенерация slug при изменении названия
+  useEffect(() => {
+    if (nameUz && (!slug || slug === generateSlug(organization?.name_uz || ''))) {
+      setSlug(generateSlug(nameUz));
+    }
+  }, [nameUz, organization?.name_uz]);
   const [logoUrl, setLogoUrl] = useState(organization?.logo_url || null);
   const [bannerUrl, setBannerUrl] = useState(organization?.banner_url || organization?.cover_image_url || null);
   const [schoolType, setSchoolType] = useState(schoolDetails?.school_type || 'private');
@@ -405,8 +427,9 @@ export function BasicInfoForm({
 
   // Формируем данные для автосохранения
   const formData = {
-    name_uz: nameUz,
-    description: description,
+      name_uz: nameUz,
+      slug: slug || generateSlug(nameUz),
+      description: description,
     phone: phone,
     email: email,
     region_id: regionId,
@@ -438,17 +461,18 @@ export function BasicInfoForm({
 
     const organizationData = {
       name_uz: data.name_uz || null,
+      slug: data.slug || generateSlug(data.name_uz || ''),
       description: data.description || null,
       logo_url: logoUrl || null,
       banner_url: bannerUrl || null,
       cover_image_url: bannerUrl || null, // Для обратной совместимости (используем bannerUrl)
-      phone: data.phone || null,
-      phone_secondary: phone2.phone || null,
+      phone: normalizePhone(data.phone) || null,
+      phone_secondary: normalizePhone(phone2.phone) || null,
       phone_secondary_comment: phone2.comment || null,
-      phone_admission: phone3.phone || null,
+      phone_admission: normalizePhone(phone3.phone) || null,
       phone_admission_comment: phone3.comment || null,
       email: data.email || null,
-      website: website || null,
+      website: normalizeWebsite(website) || null,
       telegram: normalizedTelegram,
       instagram: normalizedInstagram,
       facebook: normalizedFacebook,
@@ -661,6 +685,21 @@ export function BasicInfoForm({
               )}
             </div>
             <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="slug" className="flex items-center gap-2">
+                <LinkIcon className="w-4 h-4" />
+                Slug (URL nikneyim)
+              </Label>
+              <Input
+                id="slug"
+                value={slug}
+                onChange={(e) => setSlug(generateSlug(e.target.value))}
+                placeholder="cambridge-school-tashkent"
+              />
+              <p className="text-sm text-muted-foreground">
+                URL: edumap.uz/schools/{slug || 'slug'}
+              </p>
+            </div>
+            <div className="space-y-2 md:col-span-2">
               <Label htmlFor="school_type" className="flex items-center gap-2">
                 <Building2 className="w-4 h-4" />
                 Maktab turi *
@@ -743,12 +782,10 @@ export function BasicInfoForm({
                 <Phone className="w-4 h-4" />
                 Asosiy telefon (Koll markaz) *
               </Label>
-              <Input
+              <PhoneInput
                 id="phone"
-                type="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+998901234567"
+                onChange={(value) => setPhone(value)}
                 className={validationErrors.phone ? 'border-destructive' : ''}
               />
               {validationErrors.phone && (
@@ -763,12 +800,10 @@ export function BasicInfoForm({
                   <Phone className="w-4 h-4" />
                   Qo'shimcha telefon 1
                 </Label>
-                <Input
+                <PhoneInput
                   id="phone2"
-                  type="tel"
                   value={phone2.phone}
-                  onChange={(e) => setPhone2({ ...phone2, phone: e.target.value })}
-                  placeholder="+998901234567"
+                  onChange={(value) => setPhone2({ ...phone2, phone: value })}
                 />
               </div>
               <div className="space-y-2">
@@ -789,12 +824,10 @@ export function BasicInfoForm({
                   <Phone className="w-4 h-4" />
                   Qo'shimcha telefon 2
                 </Label>
-                <Input
+                <PhoneInput
                   id="phone3"
-                  type="tel"
                   value={phone3.phone}
-                  onChange={(e) => setPhone3({ ...phone3, phone: e.target.value })}
-                  placeholder="+998901234567"
+                  onChange={(value) => setPhone3({ ...phone3, phone: value })}
                 />
               </div>
               <div className="space-y-2">

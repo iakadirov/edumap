@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Building2, MoreVertical, Search, Edit, Trash2, ExternalLink } from 'lucide-react';
-import Image from 'next/image';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/contexts/ToastContext';
 
@@ -114,8 +114,6 @@ export function BrandList({ brands, currentPage, totalPages, search: initialSear
           <TableHeader>
             <TableRow>
               <TableHead>Brend</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>Veb-sayt</TableHead>
               <TableHead>Maktablar</TableHead>
               <TableHead>Yaratilgan</TableHead>
               <TableHead className="text-right">Harakatlar</TableHead>
@@ -124,7 +122,7 @@ export function BrandList({ brands, currentPage, totalPages, search: initialSear
           <TableBody>
             {brands.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                   Brendlar topilmadi
                 </TableCell>
               </TableRow>
@@ -134,13 +132,15 @@ export function BrandList({ brands, currentPage, totalPages, search: initialSear
                   <TableCell>
                     <div className="flex items-center gap-3">
                       {brand.logo_url ? (
-                        <Image
-                          src={brand.logo_url}
-                          alt={brand.name}
-                          width={40}
-                          height={40}
-                          className="rounded object-cover"
-                        />
+                        <div className="relative w-10 h-10 rounded overflow-hidden">
+                          <OptimizedImage
+                            src={brand.logo_url}
+                            alt={brand.name}
+                            width={40}
+                            height={40}
+                            className="rounded object-cover"
+                          />
+                        </div>
                       ) : (
                         <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
                           <Building2 className="h-5 w-5 text-muted-foreground" />
@@ -150,26 +150,6 @@ export function BrandList({ brands, currentPage, totalPages, search: initialSear
                         <div className="font-medium">{brand.name}</div>
                       </div>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <code className="text-xs bg-muted px-2 py-1 rounded">
-                      {brand.slug}
-                    </code>
-                  </TableCell>
-                  <TableCell>
-                    {brand.website ? (
-                      <a
-                        href={brand.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline flex items-center gap-1"
-                      >
-                        {brand.website}
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">{brand.schools_count || 0}</span>
@@ -185,6 +165,14 @@ export function BrandList({ brands, currentPage, totalPages, search: initialSear
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        {brand.slug && (
+                          <DropdownMenuItem asChild>
+                            <Link href={`/schools/brands/${brand.slug}`} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              Saytda ko'rish
+                            </Link>
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem asChild>
                           <Link href={`/admin/brands/${brand.id}`}>
                             <Edit className="mr-2 h-4 w-4" />
