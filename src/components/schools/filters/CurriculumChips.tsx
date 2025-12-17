@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { CheckCircleBold } from '@solar-icons/react-perf';
 import {
   Tooltip,
   TooltipContent,
@@ -78,7 +78,9 @@ export function CurriculumChips({
   return (
     <TooltipProvider>
       <div className={cn('space-y-2', className)}>
-        <label className="text-sm font-medium">Dastur</label>
+        {!className?.includes('space-y-0') && (
+          <label className="text-sm font-medium">Dastur</label>
+        )}
         <div className="flex flex-wrap gap-2">
           {options.map((curr) => {
             const isSelected = selected.includes(curr.id);
@@ -97,7 +99,7 @@ export function CurriculumChips({
                         : 'bg-background hover:bg-accent'
                     )}
                   >
-                    {isSelected && <Check className="h-4 w-4" />}
+                    {isSelected && <CheckCircleBold className="h-4 w-4" />}
                     <span>{curr.label}</span>
                   </Button>
                 </TooltipTrigger>

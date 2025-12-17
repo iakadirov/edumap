@@ -3,7 +3,11 @@
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { Bus, UtensilsCrossed, Clock } from 'lucide-react';
+import {
+  BusBold,
+  PlateBold,
+  ClockCircleBold,
+} from '@solar-icons/react-perf';
 
 interface ServiceOption {
   id: string;
@@ -25,17 +29,17 @@ const serviceOptions: ServiceOption[] = [
   {
     id: 'transport',
     label: 'Transport',
-    icon: <Bus className="h-4 w-4" />,
+    icon: <BusBold className="h-4 w-4" />,
   },
   {
     id: 'meals',
     label: 'Ovqatlanish',
-    icon: <UtensilsCrossed className="h-4 w-4" />,
+    icon: <PlateBold className="h-4 w-4" />,
   },
   {
     id: 'extended_day',
     label: 'Kengaytirilgan kun',
-    icon: <Clock className="h-4 w-4" />,
+    icon: <ClockCircleBold className="h-4 w-4" />,
   },
 ];
 
@@ -57,17 +61,21 @@ export function ServicesToggles({
   onExtendedDayChange,
   className,
 }: ServicesTogglesProps) {
+  const isHorizontal = className?.includes('space-y-0');
+
   return (
     <div className={cn('space-y-4', className)}>
-      <Label className="text-sm font-medium">Xizmatlar</Label>
-      <div className="space-y-3">
+      {!isHorizontal && (
+        <Label className="text-sm font-medium">Xizmatlar</Label>
+      )}
+      <div className={cn(isHorizontal ? 'flex flex-row gap-4' : 'space-y-3')}>
         {/* Транспорт */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className={cn('flex items-center', isHorizontal ? 'gap-2' : 'justify-between')}>
+          <div className="flex items-center gap-2">
             <div className="text-muted-foreground">
-              <Bus className="h-4 w-4" />
+              <BusBold className="h-4 w-4" />
             </div>
-            <Label htmlFor="transport" className="cursor-pointer">
+            <Label htmlFor="transport" className="cursor-pointer text-sm">
               Transport
             </Label>
           </div>
@@ -79,12 +87,12 @@ export function ServicesToggles({
         </div>
 
         {/* Питание */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className={cn('flex items-center', isHorizontal ? 'gap-2' : 'justify-between')}>
+          <div className="flex items-center gap-2">
             <div className="text-muted-foreground">
-              <UtensilsCrossed className="h-4 w-4" />
+              <PlateBold className="h-4 w-4" />
             </div>
-            <Label htmlFor="meals" className="cursor-pointer">
+            <Label htmlFor="meals" className="cursor-pointer text-sm">
               Ovqatlanish
             </Label>
           </div>
@@ -96,12 +104,12 @@ export function ServicesToggles({
         </div>
 
         {/* Продлёнка */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className={cn('flex items-center', isHorizontal ? 'gap-2' : 'justify-between')}>
+          <div className="flex items-center gap-2">
             <div className="text-muted-foreground">
-              <Clock className="h-4 w-4" />
+              <ClockCircleBold className="h-4 w-4" />
             </div>
-            <Label htmlFor="extended-day" className="cursor-pointer">
+            <Label htmlFor="extended-day" className="cursor-pointer text-sm">
               Kengaytirilgan kun
             </Label>
           </div>

@@ -14,13 +14,14 @@ interface DistrictOption {
 interface DistrictsLoaderProps {
   selected: string[];
   onSelectionChange: (selected: string[]) => void;
+  compact?: boolean;
 }
 
 /**
  * Компонент для загрузки районов на клиенте с учетом выбранной области
  * Реактивно обновляется при изменении области
  */
-export function DistrictsLoader({ selected, onSelectionChange }: DistrictsLoaderProps) {
+export function DistrictsLoader({ selected, onSelectionChange, compact = false }: DistrictsLoaderProps) {
   const searchParams = useSearchParams();
   const [districts, setDistricts] = useState<DistrictOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,11 +78,37 @@ export function DistrictsLoader({ selected, onSelectionChange }: DistrictsLoader
   }, [regionId]);
 
   if (loading) {
-    return (
+    return compact ? (
+      <div className="flex items-center justify-between w-full">
+        <span className="text-base font-normal text-black">Tumanni tanlang</span>
+        <div className="w-4 h-4 bg-muted animate-pulse rounded" />
+      </div>
+    ) : (
       <div className="space-y-2">
         <label className="text-sm font-medium">Tuman</label>
         <div className="h-10 bg-muted animate-pulse rounded-md" />
       </div>
+    );
+  }
+
+  if (compact) {
+    const selectedCount = selected.length;
+    const selectedDistricts = districts.filter(d => selected.includes(d.id));
+    const displayText = selectedCount === 0 
+      ? 'Tumanni tanlang'
+      : selectedCount === 1
+      ? selectedDistricts[0]?.name_uz || selectedDistricts[0]?.name || 'Tumanni tanlang'
+      : `${selectedCount} tuman tanlandi`;
+    
+    return (
+      <DistrictMultiSelect
+        options={districts}
+        selected={selected}
+        onSelectionChange={onSelectionChange}
+        placeholder="Barcha tumanlar"
+        compact
+        displayText={displayText}
+      />
     );
   }
 

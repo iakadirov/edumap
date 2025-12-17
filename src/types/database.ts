@@ -428,6 +428,248 @@ export type Database = {
         }
         Relationships: []
       }
+      school_reviews: {
+        Row: {
+          id: string
+          organization_id: string
+          author_name: string
+          author_role: string
+          author_avatar_url: string | null
+          is_verified_parent: boolean
+          rating: number
+          ratings: Json | null
+          content: string
+          pros: string[] | null
+          cons: string[] | null
+          helpful_count: number
+          school_response: string | null
+          school_response_date: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          author_name: string
+          author_role: string
+          author_avatar_url?: string | null
+          is_verified_parent?: boolean
+          rating: number
+          ratings?: Json | null
+          content: string
+          pros?: string[] | null
+          cons?: string[] | null
+          helpful_count?: number
+          school_response?: string | null
+          school_response_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          author_name?: string
+          author_role?: string
+          author_avatar_url?: string | null
+          is_verified_parent?: boolean
+          rating?: number
+          ratings?: Json | null
+          content?: string
+          pros?: string[] | null
+          cons?: string[] | null
+          helpful_count?: number
+          school_response?: string | null
+          school_response_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_reviews_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_media: {
+        Row: {
+          id: string
+          organization_id: string
+          type: string
+          url: string
+          category: string | null
+          caption: string | null
+          is_cover: boolean
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          type: string
+          url: string
+          category?: string | null
+          caption?: string | null
+          is_cover?: boolean
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          type?: string
+          url?: string
+          category?: string | null
+          caption?: string | null
+          is_cover?: boolean
+          sort_order?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_media_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_staff: {
+        Row: {
+          id: string
+          organization_id: string
+          name: string
+          position: string
+          photo_url: string | null
+          experience_years: number | null
+          education: string | null
+          certifications: string[] | null
+          bio: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          name: string
+          position: string
+          photo_url?: string | null
+          experience_years?: number | null
+          education?: string | null
+          certifications?: string[] | null
+          bio?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          name?: string
+          position?: string
+          photo_url?: string | null
+          experience_years?: number | null
+          education?: string | null
+          certifications?: string[] | null
+          bio?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_staff_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_results: {
+        Row: {
+          id: string
+          organization_id: string
+          year: number
+          total_graduates: number | null
+          graduates_to_universities: number | null
+          graduates_on_grants: number | null
+          graduates_to_top_uz_universities: number | null
+          graduates_to_foreign_universities: number | null
+          top_universities_uz: string[] | null
+          foreign_universities: string[] | null
+          avg_dtm_score: number | null
+          avg_ielts_score: number | null
+          avg_sat_score: number | null
+          students_with_ielts_7plus: number | null
+          students_with_ielts_8plus: number | null
+          olympiad_medals_international: number
+          olympiad_medals_national: number
+          olympiad_medals_city: number
+          olympiad_subjects: string[] | null
+          school_awards: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          year: number
+          total_graduates?: number | null
+          graduates_to_universities?: number | null
+          graduates_on_grants?: number | null
+          graduates_to_top_uz_universities?: number | null
+          graduates_to_foreign_universities?: number | null
+          top_universities_uz?: string[] | null
+          foreign_universities?: string[] | null
+          avg_dtm_score?: number | null
+          avg_ielts_score?: number | null
+          avg_sat_score?: number | null
+          students_with_ielts_7plus?: number | null
+          students_with_ielts_8plus?: number | null
+          olympiad_medals_international?: number
+          olympiad_medals_national?: number
+          olympiad_medals_city?: number
+          olympiad_subjects?: string[] | null
+          school_awards?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          year?: number
+          total_graduates?: number | null
+          graduates_to_universities?: number | null
+          graduates_on_grants?: number | null
+          graduates_to_top_uz_universities?: number | null
+          graduates_to_foreign_universities?: number | null
+          top_universities_uz?: string[] | null
+          foreign_universities?: string[] | null
+          avg_dtm_score?: number | null
+          avg_ielts_score?: number | null
+          avg_sat_score?: number | null
+          students_with_ielts_7plus?: number | null
+          students_with_ielts_8plus?: number | null
+          olympiad_medals_international?: number
+          olympiad_medals_national?: number
+          olympiad_medals_city?: number
+          olympiad_subjects?: string[] | null
+          school_awards?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_results_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           auth_user_id: string | null

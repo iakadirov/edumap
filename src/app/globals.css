@@ -47,11 +47,11 @@
   --radius: 0.625rem;
   
   /* Контейнерная система */
-  --container-wrapper: 1440px;
-  --container-wrapper-padding: 24px;
-  --container-content: 1392px; /* 1440 - 24*2 */
+  --container-wrapper: 1200px;
+  --container-wrapper-padding: 30px;
+  --container-content: 1140px; /* 1200 - 30*2 */
   --container-content-padding: 24px;
-  --container-inner: 1344px; /* 1392 - 24*2 (12 колонок) */
+  --container-inner: 1092px; /* 1140 - 24*2 */
   
   /* Цветовая схема: синий-сероватые фоны, белые карточки */
   --background: oklch(0.98 0.005 240); /* Светло-голубоватый фон */
@@ -184,6 +184,12 @@
     background-color: #f7fcfe;
   }
   
+  /* Белый фон для container-content только на странице школы */
+  main .container-content:has(.school-hero),
+  main .container-content:has([data-school-page]) {
+    background-color: #fff;
+  }
+  
   .container-inner {
     width: 100%;
     max-width: var(--container-inner);
@@ -275,5 +281,15 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+  
+  /* Скрытие скроллбара для табов */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

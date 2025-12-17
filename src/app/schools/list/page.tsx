@@ -138,43 +138,40 @@ export default async function SchoolsListPage({ searchParams }: SchoolsListPageP
               Maktablar katalogi
             </h1>
 
-            {/* Адаптивная сетка: фильтры слева, список справа */}
-            <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] xl:grid-cols-[360px_1fr] gap-4 lg:gap-6">
-              {/* Панель фильтров */}
-              <aside className="lg:sticky lg:top-4 lg:h-fit order-2 lg:order-1">
-                <SchoolFilters 
-                  cities={cities}
-                  initialFilters={{
-                    district: params.district,
-                    city: params.city,
-                    school_type: params.school_type,
-                    price_min: params.price_min,
-                    price_max: params.price_max,
-                    language: params.language,
-                    curriculum: params.curriculum,
-                    grade: params.grade,
-                    rating_min: params.rating_min,
-                    has_transport: params.has_transport,
-                    has_meals: params.has_meals,
-                    has_extended_day: params.has_extended_day,
-                  }}
-                />
-              </aside>
+            {/* Фильтры сверху горизонтально */}
+            <div className="w-full">
+              <SchoolFilters 
+                cities={cities}
+                initialFilters={{
+                  district: params.district,
+                  city: params.city,
+                  school_type: params.school_type,
+                  price_min: params.price_min,
+                  price_max: params.price_max,
+                  language: params.language,
+                  curriculum: params.curriculum,
+                  grade: params.grade,
+                  rating_min: params.rating_min,
+                  has_transport: params.has_transport,
+                  has_meals: params.has_meals,
+                  has_extended_day: params.has_extended_day,
+                }}
+              />
+            </div>
 
-              {/* Список школ - загружается отдельно через Suspense для streaming */}
-              <div className="flex-1 flex flex-col gap-4 sm:gap-5 order-1 lg:order-2">
-                <Suspense 
-                  fallback={
-                    <div className="space-y-4 sm:space-y-5 w-full">
-                      {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="h-48 sm:h-[242px] bg-muted animate-pulse rounded-[20px]" />
-                      ))}
-                    </div>
-                  }
-                >
-                  <SchoolsList params={params} />
-                </Suspense>
-              </div>
+            {/* Список школ - загружается отдельно через Suspense для streaming */}
+            <div className="w-full flex flex-col gap-4 sm:gap-5">
+              <Suspense 
+                fallback={
+                  <div className="space-y-4 sm:space-y-5 w-full">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <div key={i} className="h-48 sm:h-[242px] bg-muted animate-pulse rounded-[20px]" />
+                    ))}
+                  </div>
+                }
+              >
+                <SchoolsList params={params} />
+              </Suspense>
             </div>
           </div>
         </div>

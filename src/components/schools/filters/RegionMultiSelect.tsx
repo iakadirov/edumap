@@ -10,7 +10,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, X } from 'lucide-react';
+import {
+  MagniferBold,
+  CloseCircleBold,
+} from '@solar-icons/react-perf';
 import { cn } from '@/lib/utils';
 
 interface RegionOption {
@@ -103,7 +106,7 @@ export function RegionMultiSelect({
           {/* Поиск */}
           <div className="p-2 border-b sticky top-0 bg-background z-10">
             <div className="relative">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <MagniferBold className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
                 placeholder="Qidirish..."
                 value={searchQuery}
@@ -177,7 +180,7 @@ export function RegionMultiSelect({
                 className="ml-1 rounded-full hover:bg-secondary-foreground/20 p-0.5 transition-colors"
                 aria-label={`Remove ${option.name_uz || option.name}`}
               >
-                <X className="h-3 w-3" />
+                <CloseCircleBold className="h-3 w-3" />
               </button>
             </Badge>
           ))}

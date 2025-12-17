@@ -2,7 +2,7 @@
 
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Star } from 'lucide-react';
+import { StarBold } from '@solar-icons/react-perf';
 import { cn } from '@/lib/utils';
 
 interface RatingOption {
@@ -53,7 +53,7 @@ export function RatingRadio({
 
   const renderStars = (count: number, total: number = 5) => {
     return Array.from({ length: total }).map((_, i) => (
-      <Star
+      <StarBold
         key={i}
         className={cn(
           'h-4 w-4',

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Globe } from 'lucide-react';
+import { GlobusBold } from '@solar-icons/react-perf';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
           variant="ghost"
           className="h-11 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl gap-1"
         >
-          <Globe className="h-5 w-5 text-slate-600" />
+          <GlobusBold className="h-5 w-5 text-slate-600" />
           <span className="text-base font-medium text-slate-600">
             {currentLangName}
           </span>

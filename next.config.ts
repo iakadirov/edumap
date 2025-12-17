@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
     ],
     optimizeCss: true,
   },
+  // Отключаем source maps в production для избежания ошибок с зависимостями
+  productionBrowserSourceMaps: false,
   // Компрессия
   compress: true,
   // Оптимизация изображений

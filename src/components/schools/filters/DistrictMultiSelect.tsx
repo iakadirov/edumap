@@ -10,7 +10,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, X } from 'lucide-react';
+import {
+  MagniferBold,
+  CloseCircleBold,
+  AltArrowDownLinear,
+} from '@solar-icons/react-perf';
 import { cn } from '@/lib/utils';
 
 interface DistrictOption {
@@ -26,6 +30,8 @@ interface DistrictMultiSelectProps {
   onSelectionChange: (selected: string[]) => void;
   placeholder?: string;
   className?: string;
+  compact?: boolean;
+  displayText?: string;
 }
 
 /**
@@ -43,6 +49,8 @@ export function DistrictMultiSelect({
   onSelectionChange,
   placeholder = 'Barcha tumanlar',
   className,
+  compact = false,
+  displayText,
 }: DistrictMultiSelectProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -84,6 +92,107 @@ export function DistrictMultiSelect({
 
   const selectedCount = selected.length;
 
+  // Компактный режим для использования в горизонтальных фильтрах
+  if (compact) {
+    return (
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="flex items-center justify-between w-full px-4 py-3.5 gap-2.5 h-12 rounded-xl text-left cursor-pointer"
+            style={{
+              background: '#F7FCFE',
+              border: '1px solid #DDEBF0',
+              height: '48px'
+            }}
+          >
+            <span className="text-base font-normal text-black flex-1">
+              {displayText || (selectedCount === 0
+                ? placeholder
+                : selectedCount === 1
+                ? selectedOptions[0]?.name_uz || selectedOptions[0]?.name
+                : `${selectedCount} tuman tanlandi`)}
+            </span>
+            <AltArrowDownLinear className="w-4 h-4 text-black flex-shrink-0" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-[300px] p-0" align="start">
+          {/* Поиск */}
+          <div className="p-2 border-b sticky top-0 bg-background z-10">
+            <div className="relative">
+              <MagniferBold className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <Input
+                placeholder="Qidirish..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Список опций с чекбоксами */}
+          <div className="max-h-[300px] overflow-y-auto">
+            {filteredOptions.length === 0 ? (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                Hech narsa topilmadi
+              </div>
+            ) : (
+              <div className="p-1">
+                {selected.length >= MAX_DISTRICTS && (
+                  <div className="p-2 text-xs text-muted-foreground bg-muted rounded-sm mb-1">
+                    Maksimal {MAX_DISTRICTS} tuman tanlash mumkin
+                  </div>
+                )}
+                {filteredOptions.map((option) => {
+                  const isSelected = selected.includes(option.id);
+                  const isDisabled = !isSelected && selected.length >= MAX_DISTRICTS;
+                  return (
+                    <div
+                      key={option.id}
+                      className={cn(
+                        "flex items-center gap-2 p-2 rounded-sm transition-colors",
+                        isDisabled 
+                          ? "opacity-50 cursor-not-allowed" 
+                          : "hover:bg-accent cursor-pointer"
+                      )}
+                      onClick={() => !isDisabled && toggleDistrict(option.id)}
+                      role="option"
+                      aria-selected={isSelected}
+                      aria-disabled={isDisabled}
+                    >
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => !isDisabled && toggleDistrict(option.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="pointer-events-none"
+                        disabled={isDisabled}
+                      />
+                      <span className="flex-1 text-sm">
+                        {option.name_uz || option.name}
+                      </span>
+                      {option.count !== undefined && (
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          ({option.count})
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
   return (
     <div className={cn('space-y-2', className)}>
       <label className="text-sm font-medium">Tuman</label>
@@ -106,7 +215,7 @@ export function DistrictMultiSelect({
           {/* Поиск */}
           <div className="p-2 border-b sticky top-0 bg-background z-10">
             <div className="relative">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <MagniferBold className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
                 placeholder="Qidirish..."
                 value={searchQuery}
@@ -193,7 +302,7 @@ export function DistrictMultiSelect({
                 className="ml-1 rounded-full hover:bg-secondary-foreground/20 p-0.5 transition-colors"
                 aria-label={`Remove ${option.name_uz || option.name}`}
               >
-                <X className="h-3 w-3" />
+                <CloseCircleBold className="h-3 w-3" />
               </button>
             </Badge>
           ))}

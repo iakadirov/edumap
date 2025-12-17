@@ -3,7 +3,15 @@
 import Link from 'next/link';
 import { SchoolCard } from './SchoolCard';
 import { OptimizedImage } from '@/components/ui/optimized-image';
-import { Building2, Globe, User, Calendar, Phone, Mail, ExternalLink } from 'lucide-react';
+import {
+  BuildingsBold,
+  GlobusBold,
+  UserBold,
+  CalendarBold,
+  PhoneCallingBold,
+  LetterBold,
+  LinkRoundLinear,
+} from '@solar-icons/react-perf';
 import { formatInstagramForDisplay, formatFacebookForDisplay, formatYouTubeForDisplay } from '@/lib/utils/social-media';
 
 interface Brand {
@@ -57,13 +65,13 @@ export function BrandPage({ brand, schools }: BrandPageProps) {
               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                 {brand.founder && (
                   <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
+                    <UserBold className="h-4 w-4" />
                     <span>Asoschisi: {brand.founder}</span>
                   </div>
                 )}
                 {brand.founded_year && (
                   <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
+                    <CalendarBold className="h-4 w-4" />
                     <span>{brand.founded_year} yildan</span>
                   </div>
                 )}
@@ -84,7 +92,7 @@ export function BrandPage({ brand, schools }: BrandPageProps) {
               </h2>
               {schools.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <BuildingsBold className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>Hozircha maktablar qo'shilmagan</p>
                 </div>
               ) : (
@@ -105,7 +113,7 @@ export function BrandPage({ brand, schools }: BrandPageProps) {
               {brand.website && (
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Globe className="h-4 w-4" />
+                    <GlobusBold className="h-4 w-4" />
                     Veb-sayt
                   </div>
                   <a
@@ -115,7 +123,7 @@ export function BrandPage({ brand, schools }: BrandPageProps) {
                     className="text-primary hover:underline flex items-center gap-1"
                   >
                     {brand.website}
-                    <ExternalLink className="h-3 w-3" />
+                    <LinkRoundLinear className="h-3 w-3" />
                   </a>
                 </div>
               )}
@@ -123,7 +131,7 @@ export function BrandPage({ brand, schools }: BrandPageProps) {
               {brand.phone && (
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Phone className="h-4 w-4" />
+                    <PhoneCallingBold className="h-4 w-4" />
                     Telefon
                   </div>
                   <a href={`tel:${brand.phone}`} className="text-foreground hover:underline">
@@ -135,7 +143,7 @@ export function BrandPage({ brand, schools }: BrandPageProps) {
               {brand.email && (
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Mail className="h-4 w-4" />
+                    <LetterBold className="h-4 w-4" />
                     Email
                   </div>
                   <a href={`mailto:${brand.email}`} className="text-foreground hover:underline">

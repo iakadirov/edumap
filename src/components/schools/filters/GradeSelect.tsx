@@ -82,7 +82,9 @@ export function GradeSelect({
 
   return (
     <div className={cn('space-y-2', className)}>
-      <Label className="text-sm font-medium">Qabul qilish sinfi</Label>
+      {!className?.includes('no-label') && (
+        <Label className="text-sm font-medium">Qabul qilish sinfi</Label>
+      )}
       <Select
         value={value || 'any'}
         onValueChange={handleValueChange}

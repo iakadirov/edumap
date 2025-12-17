@@ -4,7 +4,13 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { translateCity, translateDistrict } from '@/lib/utils/translations';
-import { Check, Star, Shield, Heart, MoreHorizontal } from 'lucide-react';
+import {
+  CheckCircleBold,
+  StarBold,
+  ShieldCheckBold,
+  HeartLinear,
+  MenuDotsCircleLinear,
+} from '@solar-icons/react-perf';
 import { refreshImageUrl, isPresignedUrl } from '@/lib/utils/image-url';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import type { Database } from '@/types/database';
@@ -176,7 +182,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
                 {school.is_verified && (
                   <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center flex-shrink-0">
                     <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-600 rounded-full flex items-center justify-center">
-                      <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
+                      <CheckCircleBold className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
                     </div>
                   </div>
                 )}
@@ -194,7 +200,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
 
               {/* Звездный рейтинг и отзывы */}
               <div className="flex items-center gap-1.5 mb-3 sm:mb-2">
-                <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                <StarBold className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400 flex-shrink-0" />
                 <span className="text-base sm:text-lg font-medium text-black">
                   {averageRating || '0.00'}
                 </span>
@@ -236,7 +242,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
                 <span className="text-base sm:text-lg font-medium text-black">
                   {school.overall_rating.toFixed(1)}
                 </span>
-                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500 stroke-emerald-500 flex-shrink-0" strokeWidth={1.5} />
+                <ShieldCheckBold className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500 flex-shrink-0" />
               </div>
             )}
           </div>
@@ -262,10 +268,10 @@ export function SchoolCard({ school }: SchoolCardProps) {
             {/* Кнопки действий */}
             <div className="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
               <button className="p-2 bg-white rounded-full hover:bg-gray-50 transition-colors" aria-label="Дополнительные действия">
-                <MoreHorizontal className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
+                <MenuDotsCircleLinear className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
               </button>
               <button className="p-2 bg-white rounded-full hover:bg-gray-50 transition-colors" aria-label="Добавить в избранное">
-                <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
+                <HeartLinear className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
               </button>
               <Button
                 asChild

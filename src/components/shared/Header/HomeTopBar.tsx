@@ -3,7 +3,12 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { RegionSelector } from '@/components/shared/RegionSelector';
-import { MapPin, BookOpen, Plus, ChevronDown } from 'lucide-react';
+import {
+  MapPointBold,
+  BookBold,
+  AddCircleBold,
+  AltArrowDownLinear,
+} from '@solar-icons/react-perf';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +35,8 @@ export function HomeTopBar() {
   const activeOrgType = getActiveOrgType();
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 py-3 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 lg:gap-0">
+    <div className="container-wrapper">
+      <div className="w-full py-3 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 lg:gap-0">
       {/* Левая часть: выбор города и навигация по типам */}
       <div className="flex flex-wrap items-center gap-4 lg:gap-8">
         {/* Выбор города */}
@@ -47,11 +53,11 @@ export function HomeTopBar() {
             button?.click();
           }}
         >
-          <MapPin className="h-5 w-5 text-slate-600" />
+          <MapPointBold className="h-5 w-5 text-slate-600" />
           <span className="text-base font-medium text-slate-600">
             Toshkent
           </span>
-          <ChevronDown className="h-3 w-3 text-slate-600" />
+          <AltArrowDownLinear className="h-3 w-3 text-slate-600" />
         </Button>
 
         {/* Навигация по типам организаций */}
@@ -75,7 +81,7 @@ export function HomeTopBar() {
                 : 'rounded-xl hover:bg-white/50'
             )}
           >
-            <BookOpen className={cn(
+            <BookBold className={cn(
               'h-5 w-5',
               activeOrgType === 'schools' ? 'text-blue-600' : 'text-slate-600'
             )} />
@@ -119,12 +125,13 @@ export function HomeTopBar() {
           className="h-11 px-3 sm:px-4 py-3 bg-white border-[1.5px] border-slate-200 rounded-xl gap-1 hover:bg-gray-50"
         >
           <Link href="/admin/schools/new">
-            <Plus className="h-5 w-5 text-slate-600" />
+            <AddCircleBold className="h-5 w-5 text-slate-600" />
             <span className="hidden sm:inline text-base font-medium text-slate-600">
               Tashkilot qo'shish
             </span>
           </Link>
         </Button>
+      </div>
       </div>
     </div>
   );

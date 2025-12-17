@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { CheckCircleBold } from '@solar-icons/react-perf';
 import { cn } from '@/lib/utils';
 
 interface LanguageOption {
@@ -47,7 +47,9 @@ export function LanguageChips({
 
   return (
     <div className={cn('space-y-2', className)}>
-      <label className="text-sm font-medium">Ta'lim tili</label>
+      {!className?.includes('space-y-0') && (
+        <label className="text-sm font-medium">Ta'lim tili</label>
+      )}
       <div className="flex flex-wrap gap-2">
         {options.map((lang) => {
           const isSelected = selected.includes(lang.id);
@@ -65,7 +67,7 @@ export function LanguageChips({
                   : 'bg-background hover:bg-accent'
               )}
             >
-              {isSelected && <Check className="h-4 w-4" />}
+              {isSelected && <CheckCircleBold className="h-4 w-4" />}
               <span>{lang.label_short || lang.label}</span>
             </Button>
           );

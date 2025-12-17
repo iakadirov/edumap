@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Search, Plus } from 'lucide-react';
+import {
+  MagniferBold,
+  AddCircleBold,
+} from '@solar-icons/react-perf';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -80,7 +83,7 @@ export function SchoolsMainNav() {
           className="h-5 w-5 text-gray-400 hover:text-gray-600"
           aria-label="Qidirish"
         >
-          <Search className="h-5 w-5" />
+          <MagniferBold className="h-5 w-5" />
         </Button>
 
         <Button
@@ -88,7 +91,7 @@ export function SchoolsMainNav() {
           className="h-12 px-4 sm:px-5 py-3 bg-blue-600 hover:bg-blue-700 border-[1.5px] border-blue-600 rounded-2xl gap-1"
         >
           <Link href="/auth/login">
-            <Plus className="h-6 w-6 text-white" />
+            <AddCircleBold className="h-6 w-6 text-white" />
             <span className="text-base font-semibold text-white">
               Kirish
             </span>

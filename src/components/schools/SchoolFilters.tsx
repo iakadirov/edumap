@@ -22,6 +22,19 @@ import { RatingRadio } from './filters/RatingRadio';
 import { ServicesToggles } from './filters/ServicesToggles';
 import { useDebouncedCallback } from '@/hooks/use-debounce';
 import { translateDistrict } from '@/lib/utils/translations';
+import { AltArrowDownLinear } from '@solar-icons/react-perf';
+import { Slider } from '@/components/ui/slider';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+const defaultLanguages = [
+  { id: 'uzbek', label: 'O\'zbek' },
+  { id: 'russian', label: 'Русский' },
+  { id: 'english', label: 'English' },
+];
 
 interface DistrictOption {
   id: string;
@@ -78,6 +91,8 @@ export interface FilterValues {
 export function SchoolFilters({ cities, initialFilters, onFiltersChange }: SchoolFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [priceDropdownOpen, setPriceDropdownOpen] = useState(false);
+  const [additionalFiltersOpen, setAdditionalFiltersOpen] = useState(false);
 
   // Инициализируем фильтры из пропсов
   const [filters, setFilters] = useState<FilterValues>(() => {
@@ -91,7 +106,7 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
 
       // Определяем min/max цены из данных
       const DEFAULT_MIN = 0;
-      const DEFAULT_MAX = 50000000;
+      const DEFAULT_MAX = 20000000; // 20 млн сумов
 
       return {
         districts: districtIds.length > 0 ? districtIds : undefined,
@@ -102,7 +117,7 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
               init.price_min ? Number(init.price_min) : DEFAULT_MIN,
               init.price_max ? Number(init.price_max) : DEFAULT_MAX,
             ]
-          : [DEFAULT_MIN, DEFAULT_MAX],
+          : undefined, // Если цена не выбрана - не применяем фильтр
         language: init.language ? init.language.split(',').filter(Boolean) : [],
         curriculum: init.curriculum ? init.curriculum.split(',').filter(Boolean) : [],
         grade: init.grade || undefined,
@@ -114,7 +129,7 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
     } catch (error) {
       console.error('Ошибка инициализации фильтров:', error);
       return {
-        price_range: [0, 50000000],
+        price_range: undefined,
         language: [],
         curriculum: [],
       };
@@ -155,7 +170,7 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
     // Price range
     if (updatedFilters.price_range) {
       const [min, max] = updatedFilters.price_range;
-      const DEFAULT_MAX = 50000000;
+      const DEFAULT_MAX = 20000000; // 20 млн сумов
       if (min > 0) {
         params.set('price_min', min.toString());
       }
@@ -226,7 +241,7 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
   // Сброс всех фильтров
   const resetFilters = () => {
     const reset: FilterValues = {
-      price_range: [0, 50000000],
+      price_range: undefined,
       language: [],
       curriculum: [],
     };
@@ -247,7 +262,7 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
     filters.has_transport ||
     filters.has_meals ||
     filters.has_extended_day ||
-    (filters.price_range && (filters.price_range[0] > 0 || filters.price_range[1] < 50000000));
+    (filters.price_range && filters.price_range[1] > 0 && filters.price_range[1] < 20000000);
 
   // Типы школ
   const schoolTypes = [
@@ -259,102 +274,221 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
   // Districts теперь загружаются реактивно через DistrictsLoader
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Qidiruv filtrlari</CardTitle>
-          {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={resetFilters}>
-              Tozalash
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* ГРУППА 1: ОСНОВНЫЕ ФИЛЬТРЫ (всегда видны) */}
-        
-        {/* Район - Multi-select (загружается реактивно по области) */}
-        <DistrictsLoader
-          selected={filters.districts || []}
-          onSelectionChange={(selected) => updateFilters({ districts: selected.length > 0 ? selected : undefined })}
-        />
-
-        {/* Цена - Range Slider */}
-        {filters.price_range && (
-          <PriceRangeSlider
-            value={filters.price_range}
-            min={0}
-            max={50000000}
-            onValueChange={(value) => updateFilters({ price_range: value })}
-          />
+    <div className="w-full flex flex-col gap-4" style={{ width: '1092px' }}>
+      {/* Заголовок и кнопка сброса */}
+      <div className="flex items-center justify-between w-full h-5">
+        <h3 className="text-base font-semibold text-black" style={{ width: '108px', height: '20px' }}>
+          Qidiruv filtrlari
+        </h3>
+        {hasActiveFilters && (
+          <Button 
+            variant="ghost" 
+            onClick={resetFilters} 
+            className="flex items-center gap-1 h-5 p-0 text-base font-medium text-black hover:bg-transparent cursor-pointer"
+            style={{ width: '131px', height: '20px' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.5 5.5L5.5 2.5M5.5 2.5L8.5 5.5M5.5 2.5V11.5" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M13.5 10.5L10.5 13.5M10.5 13.5L7.5 10.5M10.5 13.5V4.5" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span>Filtrni tozalash</span>
+          </Button>
         )}
+      </div>
 
-        {/* Класс поступления */}
-        <GradeSelect
-          value={filters.grade}
-          onValueChange={(value) => updateFilters({ grade: value })}
-        />
-
-        {/* Язык обучения - Chips */}
-        <LanguageChips
-          selected={filters.language || []}
-          onSelectionChange={(selected) => updateFilters({ language: selected.length > 0 ? selected : [] })}
-        />
-
-        <Separator />
-
-        {/* ГРУППА 2: ПРОГРАММА И КАЧЕСТВО */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-semibold">Dastur va sifat</Label>
-          </div>
-
-          {/* Программа - Chips */}
-          <CurriculumChips
-            selected={filters.curriculum || []}
-            onSelectionChange={(selected) => updateFilters({ curriculum: selected.length > 0 ? selected : [] })}
+      {/* Белая карточка с фильтрами */}
+      <div 
+        className="bg-white rounded-[20px] p-5 flex flex-row items-end gap-5"
+        style={{ 
+          boxShadow: '0px 0px 2px rgba(0, 0, 0, 0.15)',
+          width: '1092px',
+          height: '116px'
+        }}
+      >
+        {/* Район - Multi-select */}
+        <div className="flex flex-col gap-2 flex-1" style={{ width: '297.33px', height: '76px' }}>
+          <label className="text-base font-normal text-black" style={{ height: '20px' }}>
+            Tumanni tanlang
+          </label>
+          <DistrictsLoader
+            selected={filters.districts || []}
+            onSelectionChange={(selected) => updateFilters({ districts: selected.length > 0 ? selected : undefined })}
+            compact
           />
+        </div>
 
-          {/* Рейтинг - Radio */}
-          <RatingRadio
-            value={filters.rating_min}
-            onValueChange={(value) => updateFilters({ rating_min: value })}
-          />
-
-          {/* Тип школы */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Maktab turi</Label>
-            <Select
-              value={filters.school_type || 'all'}
-              onValueChange={(value) => updateFilters({ school_type: value === 'all' ? undefined : value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Barcha turlar" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Barcha turlar</SelectItem>
-                {schoolTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {/* Язык обучения */}
+        <div className="flex flex-col gap-2 flex-1" style={{ width: '297.33px', height: '76px' }}>
+          <label className="text-base font-normal text-black" style={{ height: '20px' }}>
+            Ta'lim tilini tanlang
+          </label>
+          <div className="flex flex-row items-center gap-3" style={{ height: '48px' }}>
+            {defaultLanguages.map((lang) => {
+              const isSelected = filters.language?.includes(lang.id) || false;
+              return (
+                <button
+                  key={lang.id}
+                  type="button"
+                  onClick={() => {
+                    const current = filters.language || [];
+                    const updated = isSelected
+                      ? current.filter((id) => id !== lang.id)
+                      : [...current, lang.id];
+                    updateFilters({ language: updated.length > 0 ? updated : [] });
+                  }}
+                  className="flex items-center justify-center px-4 py-3.5 flex-1 h-12 rounded-xl transition-colors cursor-pointer"
+                  style={{
+                    background: isSelected ? '#0077ff' : '#F7FCFE',
+                    border: isSelected ? '1px solid #0077ff' : '1px solid #DDEBF0',
+                    height: '48px',
+                    color: isSelected ? '#ffffff' : '#000000'
+                  }}
+                >
+                  <span className="text-base font-normal">
+                    {lang.id === 'uzbek' ? 'O\'zbek' : lang.id === 'russian' ? 'Русский' : 'English'}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        <Separator />
+        {/* Цена */}
+        <div className="flex flex-col gap-2 flex-1 relative" style={{ width: '297.33px', height: '76px' }}>
+          <label className="text-base font-normal text-black" style={{ height: '20px' }}>
+            Maktab narxini belgilang
+          </label>
+          <div className="flex items-center gap-2 relative" style={{ height: '48px' }}>
+            <DropdownMenu open={priceDropdownOpen} onOpenChange={setPriceDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <div 
+                  className="flex items-center px-4 py-3.5 gap-2.5 flex-1 h-12 rounded-xl cursor-pointer"
+                  style={{
+                    background: '#F7FCFE',
+                    border: '1px solid #DDEBF0',
+                    height: '48px'
+                  }}
+                >
+                  <span className="text-base font-normal text-black">
+                    {filters.price_range?.[1] && filters.price_range[1] > 0
+                      ? `${Math.round(filters.price_range[1] / 1000000)} 000 000 so'mgacha`
+                      : 'Narxni tanlang'}
+                  </span>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                className="w-[297.33px] p-4 bg-white border border-gray-200 rounded-b-xl shadow-lg"
+                align="start"
+                side="bottom"
+                sideOffset={0}
+                style={{
+                  borderTop: 'none',
+                  borderTopLeftRadius: '0',
+                  borderTopRightRadius: '0',
+                  marginTop: '-1px',
+                }}
+              >
+                <div className="space-y-4">
+                  <div className="text-sm font-medium text-gray-700">
+                    Maksimal narx: {filters.price_range?.[1] ? `${(filters.price_range[1] / 1000000).toFixed(1)} млн so'm` : '0 so\'m'}
+                  </div>
+                  <div className="px-2">
+                    <Slider
+                      value={[filters.price_range?.[1] || 0]}
+                      onValueChange={(value) => {
+                        const newRange: [number, number] = [0, value[0]];
+                        updateFilters({ price_range: newRange });
+                      }}
+                      min={0}
+                      max={20000000}
+                      step={500000}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 px-2">
+                    <span>0 so'm</span>
+                    <span>20 млн so'm</span>
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
+            {/* Разделитель */}
+            <div className="w-px h-8 bg-gray-300" />
+            
+            {/* Кнопка Yana с дополнительными фильтрами */}
+            <DropdownMenu open={additionalFiltersOpen} onOpenChange={setAdditionalFiltersOpen}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center px-4 py-3.5 gap-1 h-12 rounded-xl cursor-pointer"
+                  style={{
+                    background: '#F7FCFE',
+                    border: '1px solid #DDEBF0',
+                    width: '100px',
+                    height: '48px'
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4.33 9.33L6.67 6.67M6.67 6.67L9.33 4.33M6.67 6.67V13.33" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M11.67 6.67L9.33 9.33M9.33 9.33L6.67 11.67M9.33 9.33V2.67" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2.67 11.33L5.33 8.67M5.33 8.67L8 6M5.33 8.67V15.33" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M13.33 4.67L10.67 7.33M10.67 7.33L8 10M10.67 7.33V0.67" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span className="text-base font-normal text-black">Yana</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                className="w-[400px] p-6 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[600px] overflow-y-auto"
+                align="end"
+                side="bottom"
+                sideOffset={8}
+              >
+                <div className="space-y-6">
+                  {/* Программа обучения */}
+                  <div>
+                    <label className="text-sm font-medium text-gray-900 mb-3 block">Dastur</label>
+                    <CurriculumChips
+                      selected={filters.curriculum || []}
+                      onSelectionChange={(selected) => updateFilters({ curriculum: selected.length > 0 ? selected : [] })}
+                      className="space-y-0"
+                    />
+                  </div>
 
-        {/* ГРУППА 3: УСЛУГИ */}
-        <ServicesToggles
-          transport={filters.has_transport || false}
-          meals={filters.has_meals || false}
-          extendedDay={filters.has_extended_day || false}
-          onTransportChange={(value) => updateFilters({ has_transport: value || undefined })}
-          onMealsChange={(value) => updateFilters({ has_meals: value || undefined })}
-          onExtendedDayChange={(value) => updateFilters({ has_extended_day: value || undefined })}
-        />
-      </CardContent>
-    </Card>
+                  {/* Рейтинг */}
+                  <div>
+                    <RatingRadio
+                      value={filters.rating_min}
+                      onValueChange={(value) => updateFilters({ rating_min: value })}
+                    />
+                  </div>
+
+                  {/* Услуги */}
+                  <div>
+                    <ServicesToggles
+                      transport={filters.has_transport || false}
+                      meals={filters.has_meals || false}
+                      extendedDay={filters.has_extended_day || false}
+                      onTransportChange={(value) => updateFilters({ has_transport: value || undefined })}
+                      onMealsChange={(value) => updateFilters({ has_meals: value || undefined })}
+                      onExtendedDayChange={(value) => updateFilters({ has_extended_day: value || undefined })}
+                      className="space-y-0"
+                    />
+                  </div>
+
+                  {/* Класс поступления */}
+                  <div>
+                    <GradeSelect
+                      value={filters.grade}
+                      onValueChange={(value) => updateFilters({ grade: value })}
+                    />
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -377,12 +377,29 @@ export async function getSchoolsWithFilters(filters: {
   }
 
   // Language - множественный выбор
+  // Если языки не выбраны - показываем все школы (не применяем фильтр)
   if (filters.language && filters.language.length > 0) {
+    const selectedLanguages = filters.language; // Сохраняем для использования внутри filter
     filteredData = filteredData.filter((school: any) => {
       const details = Array.isArray(school.school_details)
         ? school.school_details[0]
         : school.school_details;
-      return details && filters.language?.includes(details.primary_language);
+      if (!details) return false;
+      
+      // Проверяем primary_language
+      const primaryMatch = details.primary_language && selectedLanguages.includes(details.primary_language);
+      
+      // Проверяем additional_languages (массив языков)
+      const additionalLanguages = details.additional_languages;
+      let additionalMatch = false;
+      if (additionalLanguages && Array.isArray(additionalLanguages)) {
+        additionalMatch = additionalLanguages.some((lang: string) => 
+          selectedLanguages.includes(lang)
+        );
+      }
+      
+      // Школа проходит фильтр, если хотя бы один из выбранных языков совпадает
+      return primaryMatch || additionalMatch;
     });
   }
 
@@ -622,4 +639,168 @@ export async function getDistrictsWithCounts(regionId?: number | null) {
       if (a.count !== b.count) return b.count - a.count; // Сортировка по количеству школ
       return a.name_uz.localeCompare(b.name_uz); // Сортировка по имени
     });
+}
+
+/**
+ * Получить медиа школы (фотографии и видео)
+ */
+export async function getSchoolMedia(schoolId: string) {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('school_media')
+    .select('*')
+    .eq('organization_id', schoolId)
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data || [];
+}
+
+/**
+ * Получить отзывы школы с фильтрацией и сортировкой
+ */
+export async function getSchoolReviews(
+  schoolId: string,
+  options?: {
+    filter?: number | null;
+    sort?: 'newest' | 'oldest' | 'highest' | 'lowest' | 'helpful';
+    page?: number;
+    limit?: number;
+  }
+) {
+  const supabase = await createClient();
+  
+  const {
+    filter = null,
+    sort = 'newest',
+    page = 1,
+    limit = 10,
+  } = options || {};
+  
+  let query = supabase
+    .from('school_reviews')
+    .select('*', { count: 'exact' })
+    .eq('organization_id', schoolId);
+  
+  if (filter !== null && filter >= 1 && filter <= 5) {
+    query = query.eq('rating', filter);
+  }
+  
+  switch (sort) {
+    case 'oldest':
+      query = query.order('created_at', { ascending: true });
+      break;
+    case 'highest':
+      query = query.order('rating', { ascending: false });
+      break;
+    case 'lowest':
+      query = query.order('rating', { ascending: true });
+      break;
+    case 'helpful':
+      query = query.order('helpful_count', { ascending: false });
+      break;
+    case 'newest':
+    default:
+      query = query.order('created_at', { ascending: false });
+      break;
+  }
+  
+  const offset = (page - 1) * limit;
+  query = query.range(offset, offset + limit - 1);
+  
+  const { data, error, count } = await query;
+  
+  if (error) {
+    throw error;
+  }
+  
+  return {
+    reviews: data || [],
+    total: count || 0,
+    page,
+    limit,
+    totalPages: Math.ceil((count || 0) / limit),
+  };
+}
+
+/**
+ * Получить педагогический состав школы
+ */
+export async function getSchoolStaff(schoolId: string) {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from('school_staff')
+    .select('*')
+    .eq('organization_id', schoolId)
+    .order('position', { ascending: true })
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data || [];
+}
+
+/**
+ * Получить похожие школы
+ */
+export async function getSimilarSchools(schoolId: string, limit: number = 3) {
+  const supabase = await createClient();
+  
+  // Получаем текущую школу для определения критериев похожести
+  const { data: currentSchool } = await supabase
+    .from('organizations')
+    .select('district, school_details(school_type, curriculum, fee_monthly_min)')
+    .eq('id', schoolId)
+    .single();
+  
+  if (!currentSchool) {
+    return [];
+  }
+  
+  let query = supabase
+    .from('organizations')
+    .select(`
+      id,
+      name,
+      slug,
+      cover_image_url,
+      overall_rating,
+      reviews_count,
+      district,
+      school_details(
+        fee_monthly_min,
+        school_type,
+        curriculum
+      )
+    `)
+    .eq('org_type', 'school')
+    .in('status', ['active', 'published'])
+    .neq('id', schoolId);
+  
+  // Фильтруем по району, если есть
+  if (currentSchool.district) {
+    query = query.eq('district', currentSchool.district);
+  }
+  
+  // Сортируем по рейтингу
+  query = query.order('overall_rating', { ascending: false, nullsFirst: false });
+  
+  // Ограничиваем количество
+  query = query.limit(limit);
+  
+  const { data, error } = await query;
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data || [];
 }

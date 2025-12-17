@@ -9,7 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { MapPin, ChevronDown } from 'lucide-react';
+import {
+  MapPointBold,
+  AltArrowDownLinear,
+} from '@solar-icons/react-perf';
 import { useRegion, type Region } from '@/contexts/RegionContext';
 import { cn } from '@/lib/utils';
 
@@ -109,7 +112,7 @@ export function RegionSelector() {
   if (isLoading) {
     return (
       <Button variant="outline" disabled className="gap-2">
-        <MapPin className="h-4 w-4" />
+        <MapPointBold className="h-4 w-4" />
         <span>Yuklanmoqda...</span>
       </Button>
     );
@@ -131,11 +134,11 @@ export function RegionSelector() {
           !selectedRegion && 'text-muted-foreground'
         )}
       >
-        <MapPin className="h-5 w-5 text-slate-600" />
+        <MapPointBold className="h-5 w-5 text-slate-600" />
         <span className="text-base font-medium text-slate-600">
           {displayName}
         </span>
-        <ChevronDown className="h-3 w-3 text-slate-600" />
+        <AltArrowDownLinear className="h-3 w-3 text-slate-600" />
       </Button>
 
       {/* Модальное окно выбора области */}
@@ -159,7 +162,7 @@ export function RegionSelector() {
               onClick={() => handleSelectRegion(null)}
             >
               <div className="flex items-center">
-                <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                <MapPointBold className="h-4 w-4 text-primary flex-shrink-0" />
                 <span className="font-semibold text-left ml-2">O'zbekiston</span>
               </div>
               {!isLoadingCounts && totalCount !== null && (
@@ -181,7 +184,7 @@ export function RegionSelector() {
                 onClick={() => handleSelectRegion(region)}
               >
                 <div className="flex items-center">
-                  <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                  <MapPointBold className="h-4 w-4 text-primary flex-shrink-0" />
                   <span className="font-semibold text-left ml-2">{region.name_uz}</span>
                 </div>
                 {!isLoadingCounts && region.count !== undefined && (
