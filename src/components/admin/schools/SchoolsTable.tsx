@@ -30,10 +30,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import { getCityDistrict } from '@/lib/utils/translations';
 import { formatDate } from '@/lib/utils/date';
 import { useToast } from '@/contexts/ToastContext';
 import { ExternalLink } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 // Вспомогательные функции для статусов
 const getStatusLabel = (status: string) => {
@@ -63,8 +63,6 @@ interface School {
   name_ru: string | null;
   status: string | null;
   created_at: string;
-  city: string | null;
-  district: string | null;
 }
 
 interface SchoolsTableProps {
@@ -73,6 +71,7 @@ interface SchoolsTableProps {
   totalPages: number;
   search: string;
   status: string;
+  progressMap?: Map<string, number>;
 }
 
 // Компонент для выбора статуса школы
@@ -97,7 +96,11 @@ function StatusSelect({
   const handleStatusChange = async (newStatus: string) => {
     if (newStatus === status) return;
 
+    // Оптимистичное обновление - сразу меняем статус в UI
+    const previousStatus = status;
+    setStatus(newStatus);
     setLoading(true);
+
     try {
       const response = await fetch(`/api/admin/schools/${schoolId}/status`, {
         method: 'PATCH',
@@ -108,6 +111,8 @@ function StatusSelect({
       });
 
       if (!response.ok) {
+        // Откатываем изменения при ошибке
+        setStatus(previousStatus);
         const error = await response.json();
         let errorMessage = error.details || error.error || 'Ошибка изменения статуса';
         
@@ -120,7 +125,7 @@ function StatusSelect({
         throw new Error(errorMessage);
       }
 
-      setStatus(newStatus);
+      // Успешно обновлено - вызываем callback для обновления родительского компонента
       showToast({
         type: 'success',
         title: 'Статус изменен',
@@ -168,6 +173,7 @@ export function SchoolsTable({
   totalPages,
   search: initialSearch,
   status: initialStatus,
+  progressMap = new Map(),
 }: SchoolsTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -216,8 +222,8 @@ export function SchoolsTable({
       if (response.ok) {
         setDeleteDialogOpen(false);
         setSchoolToDelete(null);
-        // Полная перезагрузка страницы для обновления данных
-        window.location.reload();
+        // Обновляем данные страницы без полной перезагрузки
+        router.refresh();
       } else {
         alert('Xatolik yuz berdi');
       }
@@ -264,7 +270,7 @@ export function SchoolsTable({
           <TableHeader>
             <TableRow>
               <TableHead>Nomi</TableHead>
-              <TableHead>Shahar</TableHead>
+              <TableHead>To'ldirilgan</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Yaratilgan</TableHead>
               <TableHead className="text-right">Amallar</TableHead>
@@ -278,15 +284,22 @@ export function SchoolsTable({
                 </TableCell>
               </TableRow>
             ) : (
-              schools.map((school) => (
-                <TableRow key={school.id}>
-                  <TableCell className="font-medium">
-                    {school.name_uz || school.name_ru || school.name || 'Nomsiz'}
-                  </TableCell>
-                  <TableCell>
-                    {getCityDistrict(school.city, school.district)}
-                  </TableCell>
-                  <TableCell>
+              schools.map((school) => {
+                const progress = progressMap.get(school.id) || 0;
+                return (
+                  <TableRow key={school.id}>
+                    <TableCell className="font-medium">
+                      {school.name_uz || school.name_ru || school.name || 'Nomsiz'}
+                    </TableCell>
+                    <TableCell className="w-[200px]">
+                      <div className="flex items-center gap-2">
+                        <Progress value={progress} className="flex-1 h-2" />
+                        <span className="text-sm font-medium text-muted-foreground min-w-[40px] text-right">
+                          {progress}%
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                     <div className="flex items-center gap-2">
                       <Badge variant={getStatusVariant(school.status || 'draft') as any} className="text-xs">
                         {getStatusLabel(school.status || 'draft')}
@@ -326,8 +339,9 @@ export function SchoolsTable({
                       </Button>
                     </div>
                   </TableCell>
-                </TableRow>
-              ))
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>

@@ -96,70 +96,37 @@ export default async function EditSchoolPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  // Получаем школу с деталями
-  const { data: organization, error: orgError } = await supabase
-    .from('organizations')
-    .select('*')
-    .eq('id', id)
-    .single();
+  // Параллельно получаем школу и прогресс разделов
+  const [orgResult, progressResult] = await Promise.all([
+    supabase
+      .from('organizations')
+      .select('*')
+      .eq('id', id)
+      .single(),
+    (async () => {
+      try {
+        const result = await (supabase as any)
+          .from('school_sections_progress')
+          .select('section, completeness')
+          .eq('organization_id', id);
+        return result;
+      } catch (error) {
+        // Игнорируем ошибки прогресса
+        return { data: null, error: null };
+      }
+    })(),
+  ]);
+
+  const { data: organization, error: orgError } = orgResult;
+  const { data: progressData } = progressResult;
 
   if (orgError || !organization) {
     notFound();
   }
 
-  // Получаем прогресс разделов
-  console.log('[EditSchoolPage] Fetching progress for organization:', id);
-  
-  let progressData: any[] | null = null;
-  let progressError: any = null;
-  
-  try {
-    const progressQuery = (supabase as any)
-      .from('school_sections_progress')
-      .select('section, completeness')
-      .eq('organization_id', id);
-    
-    const result = await progressQuery;
-    progressData = result.data;
-    progressError = result.error;
-
-    console.log('[EditSchoolPage] Progress query result:', {
-      hasData: !!progressData,
-      dataLength: progressData?.length || 0,
-      hasError: !!progressError,
-      errorType: typeof progressError,
-      errorKeys: progressError ? Object.keys(progressError) : [],
-      status: result.status,
-      statusText: result.statusText,
-    });
-
-    if (progressError) {
-      console.error('[EditSchoolPage] Error fetching progress:', {
-        error: progressError,
-        errorString: JSON.stringify(progressError),
-        errorMessage: progressError?.message,
-        errorCode: progressError?.code,
-        errorDetails: progressError?.details,
-        errorHint: progressError?.hint,
-        errorStack: progressError?.stack,
-        organizationId: id,
-      });
-      // Если ошибка RLS, продолжаем с пустым прогрессом
-      progressData = null;
-    }
-  } catch (err) {
-    console.error('[EditSchoolPage] Exception fetching progress:', err);
-    progressError = err;
-    progressData = null;
-  }
-
-  console.log('[EditSchoolPage] Progress data (final):', progressData);
-
   const progressMap = new Map<string, number>(
     progressData?.map((p: any) => [p.section, p.completeness]) || []
   );
-
-  console.log('[EditSchoolPage] Progress map:', Array.from(progressMap.entries()));
 
   // Вычисляем общий прогресс
   const overallProgress =
@@ -169,8 +136,6 @@ export default async function EditSchoolPage({
             progressData.length
         )
       : 0;
-
-  console.log('[EditSchoolPage] Overall progress:', overallProgress);
 
   // Формируем секции с прогрессом
   const sectionsWithProgress = SECTIONS.map((section) => ({

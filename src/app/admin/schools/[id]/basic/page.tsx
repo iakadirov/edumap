@@ -17,59 +17,58 @@ export default async function BasicInfoPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  // Получаем данные школы
-  const { data: organization } = await supabase
-    .from('organizations')
-    .select('*')
-    .eq('id', id)
-    .single();
+  // Параллельно получаем все необходимые данные
+  const [
+    orgResult,
+    schoolDetailsResult,
+    progressResult,
+    regionsResult,
+  ] = await Promise.all([
+    supabase
+      .from('organizations')
+      .select('*')
+      .eq('id', id)
+      .single(),
+    supabase
+      .from('school_details')
+      .select('*')
+      .eq('organization_id', id)
+      .maybeSingle(),
+    (async () => {
+      try {
+        const result = await (supabase as any)
+          .from('school_sections_progress')
+          .select('completeness')
+          .eq('organization_id', id)
+          .eq('section', 'basic')
+          .maybeSingle();
+        return result;
+      } catch (error) {
+        // Игнорируем ошибки прогресса
+        return { data: null, error: null };
+      }
+    })(),
+    (supabase as any)
+      .from('regions')
+      .select('*')
+      .order('name_uz'),
+  ]);
+
+  const { data: organization } = orgResult;
+  const { data: schoolDetails } = schoolDetailsResult;
+  const { data: progress } = progressResult;
+  const { data: regions } = regionsResult;
 
   if (!organization) {
     notFound();
   }
 
-  // Получаем данные школы (может не быть)
-  const { data: schoolDetails, error: schoolDetailsError } = await supabase
-    .from('school_details')
-    .select('*')
-    .eq('organization_id', id)
-    .maybeSingle();
-
-  if (schoolDetailsError) {
-    console.error('Error fetching school details:', schoolDetailsError);
-  }
-
-  // Получаем прогресс раздела (может не быть)
-  const { data: progress, error: progressError } = await (supabase as any)
-    .from('school_sections_progress')
-    .select('completeness')
-    .eq('organization_id', id)
-    .eq('section', 'basic')
-    .maybeSingle();
-  
-  if (progressError) {
-    console.error('Error fetching progress:', progressError);
-  }
-
-  // Получаем регионы и районы
-  const { data: regions, error: regionsError } = await (supabase as any)
-    .from('regions')
-    .select('*')
-    .order('name_uz');
-
-  if (regionsError) {
-    console.error('Error fetching regions:', regionsError);
-  }
-
-  const { data: districts, error: districtsError } = await (supabase as any)
+  // Получаем районы для выбранного региона
+  const { data: districts } = await (supabase as any)
     .from('districts')
     .select('*')
     .eq('region_id', (organization as any).region_id || 0)
     .order('name_uz');
-
-  if (districtsError) {
-    console.error('Error fetching districts:', districtsError);
-  }
 
   return (
     <div className="flex-1 overflow-auto">

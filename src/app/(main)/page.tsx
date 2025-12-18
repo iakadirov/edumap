@@ -1,6 +1,37 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import type { Metadata } from 'next';
+
+/**
+ * SEO Metadata для главной страницы
+ */
+export const metadata: Metadata = {
+  title: 'EduMap.uz — Oʻzbekistonning yagona taʼlim platformasi',
+  description: 'Maktablar, oliygohlar, bogʻchalar va kurslar bir joyda. Shaffof maʼlumotlar, halol sharhlar va AI tavsiyalari orqali eng yaxshi taʼlimni tanlang.',
+  keywords: [
+    'taʼlim platformasi',
+    'maktablar',
+    'oliygohlar',
+    'bogʻchalar',
+    'kurslar',
+    'taʼlim muassasalari',
+    'Oʻzbekiston',
+    'education',
+    'schools',
+    'universities',
+    'kindergartens',
+  ],
+  openGraph: {
+    title: 'EduMap.uz — Oʻzbekistonning yagona taʼlim platformasi',
+    description: 'Maktablar, oliygohlar, bogʻchalar va kurslar bir joyda. Shaffof maʼlumotlar, halol sharhlar va AI tavsiyalari.',
+    type: 'website',
+    locale: 'uz_UZ',
+  },
+  alternates: {
+    canonical: '/',
+  },
+};
 
 /**
  * Главная страница платформы EduMap.uz
@@ -11,6 +42,12 @@ import { Card } from '@/components/ui/card';
  * - Общая информация о платформе
  * - Все типы учебных заведений
  * - Преимущества платформы
+ * 
+ * SEO:
+ * - Уникальный контент с H1, H2 заголовками
+ * - Структурированные секции
+ * - Внутренние ссылки на ключевые разделы
+ * - Нет редиректа (важно для SEO!)
  */
 export default function Home() {
   return (

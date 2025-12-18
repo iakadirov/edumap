@@ -16,8 +16,11 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressIndicator } from '../ProgressIndicator';
+import { SaveStatusIndicator } from '../SaveStatusIndicator';
+import { ErrorDisplay } from '../ErrorDisplay';
 import { useToast } from '@/contexts/ToastContext';
-import { useAutosave, formatAutosaveStatus } from '@/lib/schools/autosave';
+import { useAutosave } from '@/lib/schools/autosave';
+import { useUnsavedChanges } from '@/hooks/use-unsaved-changes';
 import { validateBasicSection } from '@/lib/schools/section-validators';
 import { calculateSectionProgress } from '@/lib/schools/progress-calculator';
 import { saveTelegram } from '@/lib/utils/telegram';
@@ -451,6 +454,17 @@ export function BasicInfoForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nameUz, description, phone, email, regionId, districtId, address, lat, lng, schoolType, acceptedGrades, primaryLanguages, curriculum, pricingTiers]);
 
+  // Валидация в реальном времени
+  useEffect(() => {
+    const validation = validateBasicSection(formData);
+    const errors: Record<string, string> = {};
+    validation.errors.forEach((err) => {
+      errors[err.field] = err.message;
+    });
+    setValidationErrors(errors);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nameUz, phone, email, address, lat, lng, schoolType, acceptedGrades, primaryLanguages, curriculum, pricingTiers]);
+
   // Функция сохранения
   const saveData = async (data: any) => {
     // Нормализуем социальные сети
@@ -575,6 +589,9 @@ export function BasicInfoForm({
     enabled: true,
   });
 
+  // Предупреждение о несохраненных изменениях
+  useUnsavedChanges(autosave.hasUnsavedChanges, 'Sizda saqlanmagan o\'zgarishlar bor. Sahifani tark etishni xohlaysizmi?');
+
   const handleManualSave = async () => {
     setLoading(true);
     setError(null);
@@ -642,9 +659,12 @@ export function BasicInfoForm({
               </CardDescription>
             </div>
             <div className="text-right">
-              <div className="text-sm text-muted-foreground mb-2">
-                {formatAutosaveStatus(autosave.status)}
-              </div>
+              <SaveStatusIndicator
+                status={autosave.status}
+                lastSaved={autosave.lastSaved}
+                error={autosave.error}
+                className="mb-2"
+              />
               <ProgressIndicator value={currentProgress} showLabel={false} />
             </div>
           </div>
@@ -656,6 +676,18 @@ export function BasicInfoForm({
         <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
           {error}
         </div>
+      )}
+
+      {/* Ошибки валидации */}
+      {Object.keys(validationErrors).length > 0 && (
+        <ErrorDisplay
+          errors={Object.entries(validationErrors).map(([field, message]) => ({
+            field,
+            message,
+          }))}
+          onDismiss={() => setValidationErrors({})}
+          scrollToFirst={false}
+        />
       )}
 
       {/* Section 1: Basic Information */}

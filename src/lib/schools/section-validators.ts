@@ -86,24 +86,12 @@ export function validateBasicSection(data: any): ValidationResult {
     });
   }
 
-  // Классы
-  if (data.grade_from === undefined || data.grade_from === null) {
-    errors.push({
-      field: 'grade_from',
-      message: 'Boshlang\'ich sinf tanlanishi kerak',
-    });
-  }
-
-  if (data.grade_to === undefined || data.grade_to === null) {
-    errors.push({
-      field: 'grade_to',
-      message: 'Yakuniy sinf tanlanishi kerak',
-    });
-  }
-
+  // Классы (опционально, но если указаны - проверяем логику)
   if (
     data.grade_from !== undefined &&
+    data.grade_from !== null &&
     data.grade_to !== undefined &&
+    data.grade_to !== null &&
     data.grade_from > data.grade_to
   ) {
     errors.push({
@@ -112,24 +100,12 @@ export function validateBasicSection(data: any): ValidationResult {
     });
   }
 
-  // Цены
-  if (data.fee_monthly_min === undefined || data.fee_monthly_min === null) {
-    errors.push({
-      field: 'fee_monthly_min',
-      message: 'Minimal oylik to\'lov kiritilishi kerak',
-    });
-  }
-
-  if (data.fee_monthly_max === undefined || data.fee_monthly_max === null) {
-    errors.push({
-      field: 'fee_monthly_max',
-      message: 'Maksimal oylik to\'lov kiritilishi kerak',
-    });
-  }
-
+  // Цены (опционально, но если указаны - проверяем логику)
   if (
     data.fee_monthly_min !== undefined &&
+    data.fee_monthly_min !== null &&
     data.fee_monthly_max !== undefined &&
+    data.fee_monthly_max !== null &&
     data.fee_monthly_min > data.fee_monthly_max
   ) {
     errors.push({
