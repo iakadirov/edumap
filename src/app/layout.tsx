@@ -1,18 +1,6 @@
 import type { Metadata } from "next";
-import { Onest } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-
-const onest = Onest({
-  variable: "--font-onest",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-  preload: true,
-  fallback: ['system-ui', 'arial'],
-  // Оптимизация: загружаем только критичные веса сразу
-  adjustFontFallback: true,
-});
 
 export const metadata: Metadata = {
   title: "EduMap.uz — Oʻzbekistonning yagona taʼlim platformasi",
@@ -30,9 +18,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uz" suppressHydrationWarning>
-      <body
-        className={`${onest.variable} font-sans antialiased`}
-      >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="font-sans antialiased">
         {children}
         <Analytics />
       </body>

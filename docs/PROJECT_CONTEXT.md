@@ -109,7 +109,7 @@
 - **Language**: TypeScript (strict mode)
 - **Styling**: Tailwind CSS v4
 - **UI Components**: shadcn/ui
-- **Font**: Onest (Google Fonts)
+- **Font**: Google Sans Flex (Google Fonts, Variable Font, weights 1-1000)
 - **Forms**: React Hook Form + Zod (планируется)
 
 ### Backend & Database
