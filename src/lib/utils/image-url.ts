@@ -2,6 +2,8 @@
  * Утилиты для работы с URL изображений из Yandex Cloud Storage
  */
 
+import { getThumbnailKey, isThumbnailKey } from './image-thumbnail';
+
 /**
  * Извлекает ключ файла из presigned URL Yandex Cloud Storage
  * 
@@ -123,5 +125,61 @@ export async function refreshImageUrl(urlOrKey: string): Promise<string> {
     console.error('Failed to refresh image URL:', error);
     // В случае ошибки возвращаем исходный URL
     return urlOrKey;
+  }
+}
+
+/**
+ * Получает thumbnail URL из оригинального URL или ключа
+ * 
+ * @param originalUrlOrKey - Оригинальный URL или ключ файла
+ * @param useThumbnail - Использовать ли thumbnail версию (по умолчанию true)
+ * @returns URL thumbnail версии или оригинальный URL, если thumbnail недоступен
+ */
+export async function getThumbnailUrl(
+  originalUrlOrKey: string,
+  useThumbnail: boolean = true
+): Promise<string> {
+  if (!useThumbnail) {
+    return originalUrlOrKey;
+  }
+
+  try {
+    // Извлекаем ключ из URL, если это presigned URL
+    let key: string | null = null;
+    
+    if (isPresignedUrl(originalUrlOrKey)) {
+      key = extractKeyFromPresignedUrl(originalUrlOrKey);
+    } else {
+      // Если это уже ключ, используем его напрямую
+      key = originalUrlOrKey;
+    }
+    
+    if (!key) {
+      // Если не удалось извлечь ключ, возвращаем исходный URL
+      return originalUrlOrKey;
+    }
+
+    // Если это уже thumbnail, возвращаем как есть
+    if (isThumbnailKey(key)) {
+      return originalUrlOrKey;
+    }
+
+    // Генерируем ключ thumbnail версии
+    const thumbnailKey = getThumbnailKey(key);
+    
+    // Запрашиваем presigned URL для thumbnail через API
+    const response = await fetch(`/api/storage/url?key=${encodeURIComponent(thumbnailKey)}&expires=3600`);
+    
+    if (!response.ok) {
+      // Если thumbnail не найден, возвращаем оригинальный URL
+      return originalUrlOrKey;
+    }
+    
+    const data = await response.json();
+    return data.url || originalUrlOrKey;
+  } catch (error) {
+    console.error('Failed to get thumbnail URL:', error);
+    // В случае ошибки возвращаем исходный URL
+    return originalUrlOrKey;
   }
 }

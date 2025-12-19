@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadFile, getFileUrl, getTempPath } from '@/lib/storage';
+import { createThumbnailFromFile } from '@/lib/storage/image-processor';
 import { getCurrentUser } from '@/lib/auth/middleware';
 
 /**
@@ -152,12 +153,30 @@ export async function POST(request: NextRequest) {
     // Получение URL для доступа к файлу
     const url = await getFileUrl(key, 3600); // URL действителен 1 час
 
+    // Создаем thumbnail версию для логотипов и баннеров
+    let thumbnailKey: string | null = null;
+    let thumbnailUrl: string | null = null;
+    
+    if ((type === 'logo' || type === 'cover') && isImage) {
+      try {
+        thumbnailKey = await createThumbnailFromFile(file, key, type);
+        thumbnailUrl = await getFileUrl(thumbnailKey, 3600);
+      } catch (error) {
+        console.error('Failed to create thumbnail:', error);
+        // Не прерываем процесс, если thumbnail не удалось создать
+      }
+    }
+
     return NextResponse.json({
       key,
       url,
       size: file.size,
       contentType: file.type,
       originalName: file.name,
+      ...(thumbnailKey && thumbnailUrl ? {
+        thumbnailKey,
+        thumbnailUrl,
+      } : {}),
     });
   } catch (error: any) {
     console.error('Upload error:', error);

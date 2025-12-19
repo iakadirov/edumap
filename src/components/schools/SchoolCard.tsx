@@ -11,7 +11,7 @@ import {
   HeartLinear,
   MenuDotsCircleLinear,
 } from '@solar-icons/react-perf';
-import { refreshImageUrl, isPresignedUrl } from '@/lib/utils/image-url';
+import { refreshImageUrl, isPresignedUrl, getThumbnailUrl } from '@/lib/utils/image-url';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import type { Database } from '@/types/database';
 
@@ -36,22 +36,39 @@ interface SchoolCardProps {
  * - Футер с ценой и кнопками действий
  */
 export function SchoolCard({ school }: SchoolCardProps) {
-  // Состояние для обновленного URL логотипа
+  // Состояние для обновленного URL логотипа (thumbnail версия для карточки)
   const [logoUrl, setLogoUrl] = useState<string | null>(school.logo_url || null);
+  // Состояние для thumbnail версии баннера
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(school.cover_image_url || null);
   
-  // Предварительно обновляем presigned URL при монтировании компонента
+  // Предварительно получаем thumbnail версии для карточки
   useEffect(() => {
-    if (school.logo_url && isPresignedUrl(school.logo_url)) {
-      refreshImageUrl(school.logo_url)
-        .then((newUrl) => {
-          setLogoUrl(newUrl);
+    // Получаем thumbnail версию логотипа
+    if (school.logo_url) {
+      getThumbnailUrl(school.logo_url, true)
+        .then((thumbnailUrl) => {
+          setLogoUrl(thumbnailUrl);
         })
         .catch((error) => {
-          console.error('Failed to refresh logo URL on mount:', error);
-          // Оставляем исходный URL, если не удалось обновить
+          console.error('Failed to get logo thumbnail URL:', error);
+          // Используем оригинальный URL, если thumbnail недоступен
+          setLogoUrl(school.logo_url);
         });
     }
-  }, [school.logo_url]);
+
+    // Получаем thumbnail версию баннера
+    if (school.cover_image_url) {
+      getThumbnailUrl(school.cover_image_url, true)
+        .then((thumbnailUrl) => {
+          setCoverImageUrl(thumbnailUrl);
+        })
+        .catch((error) => {
+          console.error('Failed to get cover thumbnail URL:', error);
+          // Используем оригинальный URL, если thumbnail недоступен
+          setCoverImageUrl(school.cover_image_url);
+        });
+    }
+  }, [school.logo_url, school.cover_image_url]);
   
   // Обрабатываем school_details (может быть массивом или объектом)
   const details = Array.isArray(school.school_details)
@@ -141,13 +158,14 @@ export function SchoolCard({ school }: SchoolCardProps) {
       <div className="flex flex-col sm:flex-row sm:items-stretch">
         {/* Изображение школы - только левые углы скруглены на десктопе, растягивается на всю высоту */}
         <div className="relative w-full sm:w-64 md:w-80 h-48 sm:h-auto sm:self-stretch flex-shrink-0 overflow-hidden rounded-t-[20px] sm:rounded-tl-[20px] sm:rounded-bl-[20px] sm:rounded-tr-none sm:rounded-br-none">
-          {school.cover_image_url ? (
+          {coverImageUrl ? (
             <OptimizedImage
-              src={school.cover_image_url}
+              src={coverImageUrl}
               alt={school.name}
               fill
               className="object-cover"
               sizes="(max-width: 640px) 100vw, (max-width: 768px) 256px, 320px"
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-full bg-gray-200" />

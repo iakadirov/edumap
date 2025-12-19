@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
 
     // Проверяем, что ключ валидный (начинается с разрешенных префиксов)
     // Это позволяет публичный доступ для изображений на публичных страницах
+    // Также поддерживаем thumbnail версии (с _thumb в имени файла)
     const allowedPrefixes = ['logos/', 'covers/', 'galleries/', 'temp/', 'banners/'];
     const isValidKey = allowedPrefixes.some(prefix => key.startsWith(prefix));
     
