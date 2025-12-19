@@ -7,9 +7,11 @@
 export {
   uploadFile,
   getFileUrl,
+  downloadFile,
   deleteFile,
   fileExists,
   getFileInfo,
+  listFiles,
   getLogoPath,
   getGalleryImagePath,
   getLicensePath,

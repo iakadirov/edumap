@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, HeadObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 // Функция для создания клиента Yandex Cloud Storage
@@ -99,6 +99,32 @@ export async function getFileUrl(
 }
 
 /**
+ * Скачивание файла из хранилища
+ */
+export async function downloadFile(key: string): Promise<Buffer> {
+  const command = new GetObjectCommand({
+    Bucket: getBucketName(),
+    Key: key,
+  });
+
+  const response = await getS3Client().send(command);
+  
+  if (!response.Body) {
+    throw new Error(`File ${key} not found or empty`);
+  }
+
+  // Конвертируем stream в Buffer
+  const chunks: Uint8Array[] = [];
+  const stream = response.Body as any;
+  
+  for await (const chunk of stream) {
+    chunks.push(chunk);
+  }
+  
+  return Buffer.concat(chunks);
+}
+
+/**
  * Удаление файла из хранилища
  */
 export async function deleteFile(key: string): Promise<void> {
@@ -159,6 +185,38 @@ export async function getFileInfo(key: string): Promise<FileInfo | null> {
 }
 
 /**
+ * Получение списка файлов в префиксе
+ */
+export async function listFiles(prefix: string, maxKeys: number = 1000): Promise<string[]> {
+  const client = getS3Client();
+  const keys: string[] = [];
+  let continuationToken: string | undefined;
+
+  do {
+    const command = new ListObjectsV2Command({
+      Bucket: getBucketName(),
+      Prefix: prefix,
+      MaxKeys: maxKeys,
+      ContinuationToken: continuationToken,
+    });
+
+    const response = await client.send(command);
+    
+    if (response.Contents) {
+      for (const object of response.Contents) {
+        if (object.Key) {
+          keys.push(object.Key);
+        }
+      }
+    }
+
+    continuationToken = response.NextContinuationToken;
+  } while (continuationToken);
+
+  return keys;
+}
+
+/**
  * Генерация пути для файла логотипа организации
  */
 export function getLogoPath(organizationId: number | string, extension: string = 'jpg'): string {
@@ -204,4 +262,3 @@ export function getTempPath(uploadId: string, fileName: string): string {
 }
 
 export { getS3Client, getBucketName };
-
