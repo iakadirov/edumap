@@ -74,7 +74,16 @@ async function getImagesFromDatabase(): Promise<ImageInfo[]> {
     return images;
   }
 
-  for (const org of organizations || []) {
+  // Явно указываем тип для результата запроса
+  type OrganizationRow = {
+    id: string;
+    logo_url: string | null;
+    cover_image_url: string | null;
+  };
+
+  const orgs: OrganizationRow[] = (organizations || []) as OrganizationRow[];
+
+  for (const org of orgs) {
     // Обрабатываем логотип
     if (org.logo_url) {
       const key = extractKeyFromUrl(org.logo_url);
