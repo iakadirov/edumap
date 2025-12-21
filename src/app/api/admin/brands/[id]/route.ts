@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
+import type { BrandRow } from '@/types/brand';
 
 export async function GET(
   request: Request,
@@ -32,6 +33,9 @@ export async function GET(
       );
     }
 
+    // Явно указываем тип для результата запроса
+    const typedBrand = brand as BrandRow;
+
     // Получаем количество школ
     const { count, error: countError } = await supabase
       .from('organizations')
@@ -40,7 +44,7 @@ export async function GET(
 
     return NextResponse.json({
       brand: {
-        ...brand,
+        ...typedBrand,
         schools_count: count || 0,
       },
     });
