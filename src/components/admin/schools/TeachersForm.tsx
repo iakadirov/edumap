@@ -18,10 +18,32 @@ import { useAutosave, formatAutosaveStatus } from '@/lib/schools/autosave';
 import { validateTeachersSection } from '@/lib/schools/section-validators';
 import { calculateSectionProgress } from '@/lib/schools/progress-calculator';
 
+interface StaffMember {
+  id?: string;
+  name: string;
+  position: string;
+  photo_url?: string;
+  experience_years?: number;
+  education?: string;
+  certifications?: string[];
+}
+
+interface OrganizationBasic {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface SchoolDetailsBasic {
+  total_teachers?: number;
+  avg_experience_years?: number;
+  students_per_teacher?: number;
+}
+
 interface TeachersFormProps {
-  organization: any;
-  schoolDetails?: any;
-  initialStaff?: any[];
+  organization: OrganizationBasic;
+  schoolDetails?: SchoolDetailsBasic;
+  initialStaff?: StaffMember[];
 }
 
 export function TeachersForm({

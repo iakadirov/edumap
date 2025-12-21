@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
 import { canEditSchool } from '@/lib/auth/permissions';
+import { updateOrganizationSchema, validateOrganization } from '@/lib/validation/schemas/organization';
+import { updateSchoolDetailsSchema, validateSchoolDetails } from '@/lib/validation/schemas/school-details';
+import { z } from 'zod';
+
+// Схема для обновления школы
+const updateSchoolSchema = z.object({
+  organization: updateOrganizationSchema,
+  school_details: updateSchoolDetailsSchema,
+});
 
 export async function PUT(
   request: Request,
@@ -15,14 +24,25 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { organization, school_details } = body;
 
-    if (!organization || !school_details) {
+    // Валидация входных данных
+    const validation = updateSchoolSchema.safeParse(body);
+    if (!validation.success) {
+      const errors = validation.error.issues.map((err) => {
+        const path = err.path.join('.');
+        return `${path}: ${err.message}`;
+      });
+      console.error('Validation failed:', {
+        errors,
+        body: JSON.stringify(body, null, 2),
+      });
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Validation failed', details: errors },
         { status: 400 }
       );
     }
+
+    const { organization, school_details } = validation.data;
 
     const supabase = await createClient();
 
@@ -89,12 +109,16 @@ export async function PUT(
         );
       }
     } else {
-      // Создаем новые детали
+      // Создаем новые детали с обязательными полями
       const { error: detailsError } = await supabase
         .from('school_details')
         .insert({
-          ...school_details,
           organization_id: id,
+          school_type: school_details.school_type || 'private',
+          grade_from: school_details.grade_from ?? 1,
+          grade_to: school_details.grade_to ?? 11,
+          primary_language: school_details.primary_language || 'uzbek',
+          ...school_details,
         });
 
       if (detailsError) {

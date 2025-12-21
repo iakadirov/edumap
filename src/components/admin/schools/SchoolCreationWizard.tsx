@@ -567,6 +567,7 @@ export function SchoolCreationWizard({
                     <YandexMap
                       lat={data.lat}
                       lng={data.lng}
+                      address={data.address}
                       onCoordinatesChange={(lat, lng) => {
                         updateData('lat', lat);
                         updateData('lng', lng);

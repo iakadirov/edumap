@@ -81,8 +81,8 @@ export function MediaManager({
       } else {
         setError(data.error || 'Failed to load media');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to load media');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load media');
     } finally {
       setLoading(false);
     }
@@ -133,8 +133,8 @@ export function MediaManager({
       }
 
       await loadMedia();
-    } catch (err: any) {
-      setError(err.message || 'Upload failed');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
     } finally {
       setUploading(false);
       // Сбрасываем input
@@ -158,8 +158,8 @@ export function MediaManager({
       if (response.ok) {
         await loadMedia();
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to set cover');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to set cover');
     }
   };
 
@@ -181,8 +181,8 @@ export function MediaManager({
       } else {
         setError('Failed to delete media');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete media');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete media');
     }
   };
 
@@ -218,8 +218,8 @@ export function MediaManager({
       } else {
         setError('Failed to update media');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to update media');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update media');
     }
   };
 

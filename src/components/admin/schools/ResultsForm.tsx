@@ -18,9 +18,36 @@ import { useAutosave, formatAutosaveStatus } from '@/lib/schools/autosave';
 import { validateResultsSection } from '@/lib/schools/section-validators';
 import { calculateSectionProgress } from '@/lib/schools/progress-calculator';
 
+interface YearlyResult {
+  year: number;
+  total_graduates?: number;
+  graduates_to_universities?: number;
+  graduates_on_grants?: number;
+  graduates_to_top_uz_universities?: number;
+  graduates_to_foreign_universities?: number;
+  top_universities_uz?: string[];
+  foreign_universities?: string[];
+  avg_dtm_score?: number | null;
+  avg_ielts_score?: number | null;
+  avg_sat_score?: number | null;
+  students_with_ielts_7plus?: number;
+  students_with_ielts_8plus?: number;
+  olympiad_medals_international?: number;
+  olympiad_medals_national?: number;
+  olympiad_medals_city?: number;
+  olympiad_subjects?: string[];
+  school_awards?: Array<{ year: number; title: string; organization: string }>;
+}
+
+interface OrganizationBasic {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 interface ResultsFormProps {
-  organization: any;
-  initialResults?: any[];
+  organization: OrganizationBasic;
+  initialResults?: YearlyResult[];
 }
 
 export function ResultsForm({ organization, initialResults = [] }: ResultsFormProps) {

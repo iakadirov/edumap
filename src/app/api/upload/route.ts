@@ -2,17 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { uploadFile, getFileUrl, getTempPath } from '@/lib/storage';
 import { createThumbnailFromFile } from '@/lib/storage/image-processor';
 import { getCurrentUser } from '@/lib/auth/middleware';
+import { checkRateLimit, RATE_LIMITS, createRateLimitKey } from '@/lib/utils/rate-limit';
 
 /**
  * API endpoint для загрузки файлов в Yandex Cloud Storage
- * 
+ *
  * POST /api/upload
- * 
+ *
  * Body (multipart/form-data):
  * - file: File
  * - type: 'logo' | 'gallery' | 'license' | 'document'
  * - organizationId?: number (для привязки к организации)
- * 
+ *
  * Response:
  * {
  *   key: string,      // Путь к файлу в storage
@@ -51,6 +52,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    // Rate limiting
+    const rateLimitKey = createRateLimitKey(request, 'upload', user.id);
+    const rateLimit = checkRateLimit(rateLimitKey, RATE_LIMITS.upload);
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many requests',
+          retryAfterMs: rateLimit.retryAfterMs,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': Math.ceil((rateLimit.retryAfterMs || 0) / 1000).toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimit.resetAt.toString(),
+          },
+        }
       );
     }
 

@@ -117,17 +117,22 @@ export function normalizeFacebook(input: string | null | undefined): SocialMedia
 
   // Если это просто username (без http://), добавляем базовый URL
   if (/^[a-zA-Z0-9._-]+$/.test(cleaned)) {
+    const url = `https://facebook.com/${cleaned}`;
     return {
       username: cleaned.toLowerCase(),
-      url: `https://facebook.com/${cleaned}`,
+      url: url,
       display: cleaned,
     };
   }
 
-  // Для любых других случаев возвращаем как есть
+  // Для любых других случаев возвращаем как есть, но гарантируем валидный URL
+  let finalUrl = cleaned;
+  if (!cleaned.startsWith('http://') && !cleaned.startsWith('https://')) {
+    finalUrl = `https://${cleaned}`;
+  }
   return {
     username: cleaned,
-    url: cleaned.startsWith('http') ? cleaned : `https://${cleaned}`,
+    url: finalUrl,
     display: cleaned,
   };
 }
@@ -193,19 +198,19 @@ export function saveInstagram(input: string | null | undefined): string | null {
 }
 
 /**
- * Сохраняет Facebook в нормализованном виде
+ * Сохраняет Facebook в нормализованном виде (возвращает URL)
  */
 export function saveFacebook(input: string | null | undefined): string | null {
   const normalized = normalizeFacebook(input);
-  return normalized ? normalized.username : null;
+  return normalized ? normalized.url : null;
 }
 
 /**
- * Сохраняет YouTube в нормализованном виде
+ * Сохраняет YouTube в нормализованном виде (возвращает URL)
  */
 export function saveYouTube(input: string | null | undefined): string | null {
   const normalized = normalizeYouTube(input);
-  return normalized ? normalized.username : null;
+  return normalized ? normalized.url : null;
 }
 
 /**

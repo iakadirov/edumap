@@ -6,9 +6,9 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 
 export type AutosaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
-export interface UseAutosaveOptions {
-  data: any;
-  onSave: (data: any) => Promise<void>;
+export interface UseAutosaveOptions<T = unknown> {
+  data: T;
+  onSave: (data: T) => Promise<void>;
   interval?: number; // Интервал автосохранения в миллисекундах (по умолчанию 30000)
   debounceMs?: number; // Debounce для сохранения после изменений (по умолчанию 2000)
   enabled?: boolean; // Включено ли автосохранение (по умолчанию true)
@@ -25,13 +25,13 @@ export interface UseAutosaveResult {
 /**
  * Хук для автоматического сохранения данных
  */
-export function useAutosave({
+export function useAutosave<T = unknown>({
   data,
   onSave,
   interval = 30000, // 30 секунд
   debounceMs = 2000, // 2 секунды
   enabled = true,
-}: UseAutosaveOptions): UseAutosaveResult {
+}: UseAutosaveOptions<T>): UseAutosaveResult {
   const [status, setStatus] = useState<AutosaveStatus>('idle');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [error, setError] = useState<Error | null>(null);

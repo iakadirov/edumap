@@ -87,9 +87,9 @@ export function useRegionDistrict(
         const data = await response.json();
         const regionsList = Array.isArray(data) ? data : [];
         setRegions(regionsList);
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error loading regions:', err);
-        setError(err.message || 'Xatolik yuz berdi');
+        setError(err instanceof Error ? err.message : 'Xatolik yuz berdi');
       } finally {
         setLoadingRegions(false);
       }

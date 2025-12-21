@@ -56,8 +56,8 @@ export function SchoolCreationForm() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [regions, setRegions] = useState<any[]>([]);
-  const [districts, setDistricts] = useState<any[]>([]);
+  const [regions, setRegions] = useState<Array<{ id: number; name: string; name_uz?: string }>>([]);
+  const [districts, setDistricts] = useState<Array<{ id: number; name: string; name_uz?: string; region_id: number }>>([]);
   const [loadingRegions, setLoadingRegions] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [loadingDuplicate, setLoadingDuplicate] = useState(false);
@@ -73,12 +73,13 @@ export function SchoolCreationForm() {
           if (data.brand) {
             const brand = data.brand;
             // Заполняем только пустые поля, чтобы не перезаписывать уже введенные данные
+            const brandBannerUrl = brand.banner_url || brand.cover_image_url;
             setData((prev) => ({
               ...prev,
               name_uz: prev.name_uz || brand.name || '',
               description: prev.description || brand.description || '',
               logo_url: prev.logo_url || brand.logo_url || undefined,
-              banner_url: prev.banner_url || brand.banner_url || brand.cover_image_url || undefined,
+              banner_url: prev.banner_url || brandBannerUrl || undefined,
               phone: prev.phone || brand.phone || '',
               website: prev.website || brand.website || '',
               instagram: prev.instagram || brand.instagram || '',
@@ -143,7 +144,7 @@ export function SchoolCreationForm() {
           const districtsList = Array.isArray(responseData) ? responseData : [];
           setDistricts(districtsList);
           // Сбрасываем район, если он не принадлежит новому региону
-          if (data.district_id && !districtsList.some((d: any) => d.id === data.district_id)) {
+          if (data.district_id && !districtsList.some((d) => d.id === data.district_id)) {
             updateData('district_id', null);
           }
         })
@@ -345,6 +346,7 @@ export function SchoolCreationForm() {
         lng: data.lng || null,
         logo_url: data.logo_url || null,
         banner_url: data.banner_url || null,
+        cover_image_url: data.banner_url || null, // Для обратной совместимости (используем banner_url)
         brand_id: brandId || null,
       };
 
@@ -497,7 +499,7 @@ export function SchoolCreationForm() {
               .then((districtsData) => {
                 const districtsList = Array.isArray(districtsData) ? districtsData : [];
                 setDistricts(districtsList);
-                if (data.district_id && !districtsList.some((d: any) => d.id === data.district_id)) {
+                if (data.district_id && !districtsList.some((d) => d.id === data.district_id)) {
                   updateData('district_id', null);
                 }
               })

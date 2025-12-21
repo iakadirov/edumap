@@ -1,6 +1,11 @@
 import { unstable_cache } from 'next/cache';
 import { createClient } from './server';
 import type { Database } from '@/types/database';
+import {
+  getSchoolDetails,
+  matchesFilters,
+  type SchoolWithDetails as SchoolWithDetailsType
+} from '@/lib/utils/school-helpers';
 
 type Organization = Database['public']['Tables']['organizations']['Row'];
 type SchoolDetails = Database['public']['Tables']['school_details']['Row'];
@@ -40,6 +45,7 @@ export async function getActiveSchools() {
       website,
       logo_url,
       cover_image_url,
+      banner_url,
       is_verified,
       org_type,
       school_details (
@@ -238,6 +244,7 @@ export async function getSchoolsWithFilters(filters: {
       website,
       logo_url,
       cover_image_url,
+      banner_url,
       is_verified,
       org_type,
       school_details (
@@ -319,147 +326,34 @@ export async function getSchoolsWithFilters(filters: {
   }
 
   // Фильтрация на клиенте для сложных фильтров
-  let filteredData = [...data];
-
-  // School type
-  if (filters.school_type) {
-    filteredData = filteredData.filter((school: any) => {
-      const details = Array.isArray(school.school_details)
-        ? school.school_details[0]
-        : school.school_details;
-      return details && details.school_type === filters.school_type;
-    });
-  }
-
-  // Price range
-  if (filters.price_min !== undefined || filters.price_max !== undefined) {
-    filteredData = filteredData.filter((school: any) => {
-      const details = Array.isArray(school.school_details)
-        ? school.school_details[0]
-        : school.school_details;
-      if (!details) return false;
-      
-      const minPrice = details.fee_monthly_min || 0;
-      const maxPrice = details.fee_monthly_max || 0;
-      
-      if (filters.price_min !== undefined && maxPrice < filters.price_min) {
-        return false;
-      }
-      if (filters.price_max !== undefined && minPrice > filters.price_max) {
-        return false;
-      }
-      return true;
-    });
-  }
-
-  // Grade - фильтр по классу
-  if (filters.grade) {
-    filteredData = filteredData.filter((school: any) => {
-      const details = Array.isArray(school.school_details)
-        ? school.school_details[0]
-        : school.school_details;
-      
-      if (!details) return false;
-      
-      // Если grade = "0", проверяем accepts_preparatory
-      if (filters.grade === '0') {
-        return details.accepts_preparatory === true;
-      }
-      
-      const gradeNum = parseInt(filters.grade!, 10);
-      if (isNaN(gradeNum)) return true;
-      
-      const gradeFrom = details.grade_from || 1;
-      const gradeTo = details.grade_to || 11;
-      
-      return gradeNum >= gradeFrom && gradeNum <= gradeTo;
-    });
-  }
-
-  // Language - множественный выбор
-  // Если языки не выбраны - показываем все школы (не применяем фильтр)
-  if (filters.language && filters.language.length > 0) {
-    const selectedLanguages = filters.language; // Сохраняем для использования внутри filter
-    filteredData = filteredData.filter((school: any) => {
-      const details = Array.isArray(school.school_details)
-        ? school.school_details[0]
-        : school.school_details;
-      if (!details) return false;
-      
-      // Проверяем primary_language
-      const primaryMatch = details.primary_language && selectedLanguages.includes(details.primary_language);
-      
-      // Проверяем additional_languages (массив языков)
-      const additionalLanguages = details.additional_languages;
-      let additionalMatch = false;
-      if (additionalLanguages && Array.isArray(additionalLanguages)) {
-        additionalMatch = additionalLanguages.some((lang: string) => 
-          selectedLanguages.includes(lang)
-        );
-      }
-      
-      // Школа проходит фильтр, если хотя бы один из выбранных языков совпадает
-      return primaryMatch || additionalMatch;
-    });
-  }
-
-  // Curriculum - множественный выбор
-  if (filters.curriculum && filters.curriculum.length > 0) {
-    filteredData = filteredData.filter((school: any) => {
-      const details = Array.isArray(school.school_details)
-        ? school.school_details[0]
-        : school.school_details;
-      if (!details || !details.curriculum) return false;
-      const schoolCurricula = Array.isArray(details.curriculum) ? details.curriculum : [details.curriculum];
-      return filters.curriculum?.some((curr) => schoolCurricula.includes(curr));
-    });
-  }
-
-  // Services
-  if (filters.has_transport) {
-    filteredData = filteredData.filter((school: any) => {
-      const details = Array.isArray(school.school_details)
-        ? school.school_details[0]
-        : school.school_details;
-      return details && details.has_transport === true;
-    });
-  }
-
-  if (filters.has_meals) {
-    filteredData = filteredData.filter((school: any) => {
-      const details = Array.isArray(school.school_details)
-        ? school.school_details[0]
-        : school.school_details;
-      return details && details.has_meals === true;
-    });
-  }
-
-  if (filters.has_extended_day) {
-    filteredData = filteredData.filter((school: any) => {
-      const details = Array.isArray(school.school_details)
-        ? school.school_details[0]
-        : school.school_details;
-      return details && details.has_extended_day === true;
-    });
-  }
+  // Используем централизованную функцию matchesFilters
+  let filteredData = data.filter((school) =>
+    matchesFilters(school as SchoolWithDetailsType, {
+      school_type: filters.school_type,
+      price_min: filters.price_min,
+      price_max: filters.price_max,
+      language: filters.language,
+      curriculum: filters.curriculum,
+      grade: filters.grade,
+      has_transport: filters.has_transport,
+      has_meals: filters.has_meals,
+      has_extended_day: filters.has_extended_day,
+    })
+  );
 
   // Применяем сортировку на клиенте для price и popularity
   if (filters.sort === 'price_asc' || filters.sort === 'price_desc') {
-    filteredData.sort((a: any, b: any) => {
-      const aDetails = Array.isArray(a.school_details) ? a.school_details[0] : a.school_details;
-      const bDetails = Array.isArray(b.school_details) ? b.school_details[0] : b.school_details;
-      
+    filteredData.sort((a, b) => {
+      const aDetails = getSchoolDetails(a as SchoolWithDetailsType);
+      const bDetails = getSchoolDetails(b as SchoolWithDetailsType);
+
       const aPrice = aDetails?.fee_monthly_min || aDetails?.fee_monthly_max || 0;
       const bPrice = bDetails?.fee_monthly_min || bDetails?.fee_monthly_max || 0;
-      
-      if (filters.sort === 'price_asc') {
-        return aPrice - bPrice;
-      } else {
-        return bPrice - aPrice;
-      }
+
+      return filters.sort === 'price_asc' ? aPrice - bPrice : bPrice - aPrice;
     });
   } else if (filters.sort === 'popularity') {
-    filteredData.sort((a: any, b: any) => {
+    filteredData.sort((a, b) => {
       const aScore = (a.overall_rating || 0) * 0.7 + (a.reviews_count || 0) * 0.3;
       const bScore = (b.overall_rating || 0) * 0.7 + (b.reviews_count || 0) * 0.3;
       return bScore - aScore;

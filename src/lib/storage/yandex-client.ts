@@ -115,7 +115,7 @@ export async function downloadFile(key: string): Promise<Buffer> {
 
   // Конвертируем stream в Buffer
   const chunks: Uint8Array[] = [];
-  const stream = response.Body as any;
+  const stream = response.Body as AsyncIterable<Uint8Array>;
   
   for await (const chunk of stream) {
     chunks.push(chunk);
@@ -148,8 +148,9 @@ export async function fileExists(key: string): Promise<boolean> {
 
     await getS3Client().send(command);
     return true;
-  } catch (error: any) {
-    if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+  } catch (error) {
+    const err = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+    if (err.name === 'NotFound' || err.$metadata?.httpStatusCode === 404) {
       return false;
     }
     throw error;
@@ -176,8 +177,9 @@ export async function getFileInfo(key: string): Promise<FileInfo | null> {
       lastModified: response.LastModified || new Date(),
       etag: response.ETag,
     };
-  } catch (error: any) {
-    if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+  } catch (error) {
+    const err = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+    if (err.name === 'NotFound' || err.$metadata?.httpStatusCode === 404) {
       return null;
     }
     throw error;

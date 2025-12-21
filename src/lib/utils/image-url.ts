@@ -204,7 +204,7 @@ export async function getThumbnailUrl(
     }
     
     return data.url;
-  } catch (error: any) {
+  } catch (error) {
     console.error('Failed to get thumbnail URL:', error);
     // В случае ошибки возвращаем исходный URL
     return originalUrlOrKey;

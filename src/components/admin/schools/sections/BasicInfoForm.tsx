@@ -339,6 +339,7 @@ export function BasicInfoForm({
   const [nameUz, setNameUz] = useState(organization?.name_uz || '');
   const [slug, setSlug] = useState(organization?.slug || '');
   const [description, setDescription] = useState(organization?.description || '');
+  const [detailedDescription, setDetailedDescription] = useState(organization?.detailed_description || '');
 
   // Генерация slug из названия
   const generateSlug = (text: string): string => {
@@ -474,11 +475,18 @@ export function BasicInfoForm({
     }
   }, [regionId, districtId]);
 
-  // Формируем данные для автосохранения
+  // Вычисляем производные поля для расчета прогресса
+  const sortedGrades = [...acceptedGrades].sort((a, b) => a - b);
+  const gradeFrom = sortedGrades.length > 0 ? (sortedGrades[0] === 0 ? 1 : sortedGrades[0]) : undefined;
+  const gradeTo = sortedGrades.length > 0 ? sortedGrades[sortedGrades.length - 1] : undefined;
+  const primaryLanguage = primaryLanguages.length > 0 ? primaryLanguages[0] : undefined;
+
+  // Формируем данные для автосохранения и расчета прогресса
   const formData = {
-      name_uz: nameUz,
-      slug: slug || generateSlug(nameUz),
-      description: description,
+    name_uz: nameUz,
+    slug: slug || generateSlug(nameUz),
+    description: description,
+    detailed_description: detailedDescription,
     phone: phone,
     email: email,
     region_id: regionId,
@@ -487,6 +495,11 @@ export function BasicInfoForm({
     lat: lat,
     lng: lng,
     school_type: schoolType,
+    // Для расчета прогресса нужны вычисленные поля
+    grade_from: gradeFrom,
+    grade_to: gradeTo,
+    primary_language: primaryLanguage,
+    // Оригинальные поля для сохранения
     accepted_grades: acceptedGrades,
     primary_languages: primaryLanguages,
     curriculum: curriculum,
@@ -498,7 +511,7 @@ export function BasicInfoForm({
     const calculatedProgress = calculateSectionProgress('basic', formData);
     setCurrentProgress(calculatedProgress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nameUz, description, phone, email, regionId, districtId, address, lat, lng, schoolType, acceptedGrades, primaryLanguages, curriculum, pricingTiers]);
+  }, [nameUz, description, detailedDescription, phone, email, regionId, districtId, address, lat, lng, schoolType, acceptedGrades, primaryLanguages, curriculum, pricingTiers]);
 
   // Валидация в реальном времени
   useEffect(() => {
@@ -523,6 +536,7 @@ export function BasicInfoForm({
       name_uz: data.name_uz || null,
       slug: data.slug || generateSlug(data.name_uz || ''),
       description: data.description || null,
+      detailed_description: data.detailed_description || null,
       logo_url: logoUrl || null,
       banner_url: bannerUrl || null,
       cover_image_url: bannerUrl || null, // Для обратной совместимости (используем bannerUrl)
@@ -544,6 +558,8 @@ export function BasicInfoForm({
       lat: data.lat,
       lng: data.lng,
       brand_id: brandId || null,
+      // Сохраняем текущий статус, чтобы он не сбрасывался на draft
+      status: organization.status || undefined,
     };
 
     // Вычисляем grade_from и grade_to из accepted_grades для обратной совместимости
@@ -592,7 +608,10 @@ export function BasicInfoForm({
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to save');
+      const errorMessage = errorData.details 
+        ? `${errorData.error || 'Validation failed'}: ${Array.isArray(errorData.details) ? errorData.details.join(', ') : errorData.details}`
+        : errorData.error || 'Failed to save';
+      throw new Error(errorMessage);
     }
 
     // Обновляем прогресс
@@ -819,6 +838,24 @@ export function BasicInfoForm({
               />
               <p className="text-sm text-muted-foreground">
                 {description.length}/200 belgi
+              </p>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="detailedDescription" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Maktab haqida batafsil
+              </Label>
+              <Textarea
+                id="detailedDescription"
+                value={detailedDescription}
+                onChange={(e) => setDetailedDescription(e.target.value)}
+                placeholder="Maktab haqida batafsil ma'lumot kiriting..."
+                rows={10}
+                maxLength={5000}
+                className="resize-y"
+              />
+              <p className="text-sm text-muted-foreground">
+                {detailedDescription.length}/5000 belgi
               </p>
             </div>
             
@@ -1088,6 +1125,7 @@ export function BasicInfoForm({
               <YandexMap
                 lat={lat}
                 lng={lng}
+                address={address}
                 onCoordinatesChange={(newLat, newLng) => {
                   setLat(newLat);
                   setLng(newLng);

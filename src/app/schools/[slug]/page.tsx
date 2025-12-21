@@ -62,8 +62,8 @@ export async function generateMetadata({
  */
 export default async function SchoolProfilePage({ params }: SchoolProfilePageProps) {
   const { slug } = await params;
-  let school: any;
-  let branchesData: any = null;
+  let school: Awaited<ReturnType<typeof getSchoolWithBranches>>['current'] | null;
+  let branchesData: Awaited<ReturnType<typeof getSchoolWithBranches>> | null = null;
   let error: Error | null = null;
 
   try {

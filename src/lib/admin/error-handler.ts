@@ -6,13 +6,13 @@ export interface AdminError {
   code: string;
   message: string;
   field?: string;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 /**
  * Преобразование технических ошибок в понятные сообщения
  */
-export function parseError(error: any): AdminError {
+export function parseError(error: unknown): AdminError {
   // Если это уже AdminError
   if (error && typeof error === 'object' && 'code' in error && 'message' in error) {
     return error as AdminError;
@@ -28,30 +28,32 @@ export function parseError(error: any): AdminError {
 
   // Если это объект ошибки
   if (error && typeof error === 'object') {
+    const err = error as Record<string, unknown>;
+
     // Supabase ошибки
-    if (error.code && error.message) {
+    if (typeof err.code === 'string' && typeof err.message === 'string') {
       return {
-        code: error.code,
-        message: translateSupabaseError(error.code, error.message),
-        details: error,
+        code: err.code,
+        message: translateSupabaseError(err.code, err.message),
+        details: err,
       };
     }
 
     // API ошибки
-    if (error.error) {
+    if (typeof err.error === 'string') {
       return {
         code: 'API_ERROR',
-        message: translateApiError(error.error),
-        details: error,
+        message: translateApiError(err.error),
+        details: err,
       };
     }
 
     // Обычные ошибки
-    if (error.message) {
+    if (typeof err.message === 'string') {
       return {
         code: 'ERROR',
-        message: translateErrorMessage(error.message),
-        details: error,
+        message: translateErrorMessage(err.message),
+        details: err,
       };
     }
   }
@@ -161,7 +163,7 @@ export function logError(error: AdminError, context?: string) {
 /**
  * Обработка ошибки с логированием и возвратом понятного сообщения
  */
-export function handleError(error: any, context?: string): string {
+export function handleError(error: unknown, context?: string): string {
   const adminError = parseError(error);
   logError(adminError, context);
   return adminError.message;

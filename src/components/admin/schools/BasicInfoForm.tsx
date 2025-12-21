@@ -473,6 +473,7 @@ export function BasicInfoForm({ organization, schoolDetails }: BasicInfoFormProp
             <YandexMap
               lat={lat}
               lng={lng}
+              address={address}
               onCoordinatesChange={(newLat, newLng) => {
                 setLat(newLat);
                 setLng(newLng);

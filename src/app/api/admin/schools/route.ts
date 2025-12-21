@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
+import { validateCreateSchool } from '@/lib/validation/schemas/school-details';
 
 export async function POST(request: Request) {
   try {
     const user = await getCurrentUser();
-    
+
     // Разрешаем создание школы для admin, super_admin и school_admin
     if (!user || !['super_admin', 'admin', 'school_admin'].includes(user.role)) {
       return NextResponse.json(
@@ -15,14 +16,17 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { organization, school_details } = body;
 
-    if (!organization || !school_details) {
+    // Валидация входных данных
+    const validation = validateCreateSchool(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Validation failed', details: validation.errors },
         { status: 400 }
       );
     }
+
+    const { organization, school_details } = validation.data;
 
     const supabase = await createClient();
 
@@ -76,12 +80,22 @@ export async function POST(request: Request) {
       );
     }
 
-    // Создаем school_details
+    // Создаем school_details с обязательными полями
     const { error: detailsError } = await supabase
       .from('school_details')
       .insert({
-        ...school_details,
         organization_id: newOrganization.id,
+        school_type: school_details.school_type,
+        grade_from: school_details.grade_from ?? 1,
+        grade_to: school_details.grade_to ?? 11,
+        primary_language: school_details.primary_language || 'uzbek',
+        accepts_preparatory: school_details.accepts_preparatory ?? false,
+        accepted_grades: school_details.accepted_grades,
+        additional_languages: school_details.additional_languages,
+        curriculum: school_details.curriculum,
+        fee_monthly_min: school_details.fee_monthly_min,
+        fee_monthly_max: school_details.fee_monthly_max,
+        pricing_tiers: school_details.pricing_tiers,
       });
 
     if (detailsError) {

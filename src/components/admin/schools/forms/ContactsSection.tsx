@@ -258,6 +258,7 @@ export function ContactsSection({
             <YandexMap
               lat={data.lat}
               lng={data.lng}
+              address={data.address}
               onCoordinatesChange={(lat, lng) => {
                 onDataChange('lat', lat);
                 onDataChange('lng', lng);

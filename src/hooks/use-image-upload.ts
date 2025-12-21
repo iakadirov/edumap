@@ -101,8 +101,8 @@ export function useImageUpload(
       const data = await response.json();
       setPreview(data.url);
       onSuccess?.(data.url);
-    } catch (err: any) {
-      const errorMsg = err.message || 'Fayl yuklanmadi';
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Fayl yuklanmadi';
       setError(errorMsg);
       setPreview(initialValue || null);
       onError?.(errorMsg);

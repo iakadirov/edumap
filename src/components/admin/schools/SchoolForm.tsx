@@ -15,9 +15,43 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 
+interface OrganizationData {
+  id?: string;
+  name_uz?: string;
+  name_ru?: string;
+  description?: string;
+  short_description?: string;
+  status?: string;
+  is_verified?: boolean;
+  phone?: string;
+  phone_admission?: string;
+  email?: string;
+  email_admission?: string;
+  website?: string;
+  address?: string;
+  landmark?: string;
+  slug?: string;
+}
+
+interface SchoolDetailsData {
+  school_type?: string;
+  grade_from?: number;
+  grade_to?: number;
+  accepts_preparatory?: boolean;
+  primary_language?: string;
+  total_students?: number;
+  avg_class_size?: number;
+  fee_monthly_min?: number;
+  fee_monthly_max?: number;
+  has_transport?: boolean;
+  has_meals?: boolean;
+  has_extended_day?: boolean;
+  curriculum?: string[];
+}
+
 interface SchoolFormProps {
-  organization?: any;
-  schoolDetails?: any;
+  organization?: OrganizationData;
+  schoolDetails?: SchoolDetailsData;
 }
 
 export function SchoolForm({ organization, schoolDetails }: SchoolFormProps) {

@@ -25,10 +25,26 @@ export interface ValidationResult {
   errors: ValidationError[];
 }
 
+interface BasicSectionData {
+  name_uz?: string;
+  name_ru?: string;
+  school_type?: string;
+  description?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  lat?: number | null;
+  lng?: number | null;
+  grade_from?: number;
+  grade_to?: number;
+  fee_monthly_min?: number | null;
+  fee_monthly_max?: number | null;
+}
+
 /**
  * Валидация базовой информации
  */
-export function validateBasicSection(data: any): ValidationResult {
+export function validateBasicSection(data: BasicSectionData): ValidationResult {
   const errors: ValidationError[] = [];
 
   // Название (обязательно name_uz)
@@ -120,10 +136,15 @@ export function validateBasicSection(data: any): ValidationResult {
   };
 }
 
+interface EducationSectionData {
+  curriculum?: string[];
+  primary_language?: string;
+}
+
 /**
  * Валидация образовательной программы
  */
-export function validateEducationSection(data: any): ValidationResult {
+export function validateEducationSection(data: EducationSectionData): ValidationResult {
   const errors: ValidationError[] = [];
 
   // Учебная программа
@@ -148,10 +169,23 @@ export function validateEducationSection(data: any): ValidationResult {
   };
 }
 
+interface TeachersSectionData {
+  total_teachers?: number;
+  avg_experience_years?: number;
+  percent_with_higher_education?: number;
+  percent_with_pedagogical_education?: number;
+  percent_with_masters?: number;
+  percent_with_phd?: number;
+  students_per_teacher?: number;
+  has_pd_program?: boolean;
+  staff?: unknown[];
+  [key: string]: number | boolean | unknown[] | undefined;
+}
+
 /**
  * Валидация педагогического состава
  */
-export function validateTeachersSection(data: any): ValidationResult {
+export function validateTeachersSection(data: TeachersSectionData): ValidationResult {
   const errors: ValidationError[] = [];
 
   // Количество учителей
@@ -179,9 +213,10 @@ export function validateTeachersSection(data: any): ValidationResult {
   ];
 
   percentFields.forEach((field) => {
+    const value = data[field];
     if (
-      data[field] !== undefined &&
-      (data[field] < 0 || data[field] > 100)
+      typeof value === 'number' &&
+      (value < 0 || value > 100)
     ) {
       errors.push({
         field,
@@ -196,15 +231,27 @@ export function validateTeachersSection(data: any): ValidationResult {
   };
 }
 
+interface ResultItem {
+  year?: number;
+  avg_ielts_score?: number | null;
+  avg_sat_score?: number | null;
+  total_graduates?: number;
+  graduates_to_universities?: number;
+}
+
+interface ResultsSectionData {
+  results?: ResultItem[];
+}
+
 /**
  * Валидация результатов
  */
-export function validateResultsSection(data: any): ValidationResult {
+export function validateResultsSection(data: ResultsSectionData): ValidationResult {
   const errors: ValidationError[] = [];
 
   // Если есть результаты за год, проверяем валидность
   if (data.results && Array.isArray(data.results)) {
-    data.results.forEach((result: any, index: number) => {
+    data.results.forEach((result: ResultItem, index: number) => {
       // Год
       if (!result.year || result.year < 2000 || result.year > 2100) {
         errors.push({
@@ -216,6 +263,7 @@ export function validateResultsSection(data: any): ValidationResult {
       // IELTS балл (0-9.0)
       if (
         result.avg_ielts_score !== undefined &&
+        result.avg_ielts_score !== null &&
         (result.avg_ielts_score < 0 || result.avg_ielts_score > 9.0)
       ) {
         errors.push({
@@ -227,6 +275,7 @@ export function validateResultsSection(data: any): ValidationResult {
       // SAT балл (400-1600)
       if (
         result.avg_sat_score !== undefined &&
+        result.avg_sat_score !== null &&
         (result.avg_sat_score < 400 || result.avg_sat_score > 1600)
       ) {
         errors.push({
@@ -243,22 +292,24 @@ export function validateResultsSection(data: any): ValidationResult {
   };
 }
 
+type SectionData = BasicSectionData | EducationSectionData | TeachersSectionData | ResultsSectionData;
+
 /**
  * Основная функция валидации раздела
  */
 export function validateSection(
   section: Section,
-  data: any
+  data: SectionData
 ): ValidationResult {
   switch (section) {
     case 'basic':
-      return validateBasicSection(data);
+      return validateBasicSection(data as BasicSectionData);
     case 'education':
-      return validateEducationSection(data);
+      return validateEducationSection(data as EducationSectionData);
     case 'teachers':
-      return validateTeachersSection(data);
+      return validateTeachersSection(data as TeachersSectionData);
     case 'results':
-      return validateResultsSection(data);
+      return validateResultsSection(data as ResultsSectionData);
     default:
       // Для остальных разделов нет строгой валидации
       return { valid: true, errors: [] };

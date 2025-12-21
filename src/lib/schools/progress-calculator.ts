@@ -15,8 +15,19 @@ export type Section =
   | 'photos'
   | 'videos';
 
+type SectionFieldValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | string[]
+  | number[]
+  | Record<string, unknown>
+  | Record<string, unknown>[];
+
 export interface SectionFields {
-  [key: string]: any;
+  [key: string]: SectionFieldValue;
 }
 
 /**
@@ -36,8 +47,8 @@ const REQUIRED_FIELDS: Record<Section, string[]> = {
     'grade_from',
     'grade_to',
     'primary_language',
-    'fee_monthly_min',
-    'fee_monthly_max',
+    // fee_monthly_min и fee_monthly_max не обязательны, так как могут быть вычислены из pricing_tiers
+    // или школа может быть бесплатной
   ],
   education: [
     'curriculum',
@@ -70,6 +81,7 @@ const IMPORTANT_FIELDS: Record<Section, string[]> = {
     'landmark',
     'lat',
     'lng',
+    'pricing_tiers', // Важное поле - тарифы для классов
   ],
   education: [
     'accreditations',
@@ -134,8 +146,10 @@ export function calculateSectionProgress(
     let filledRequired = requiredFields.filter((field) => {
       // Для name_uz проверяем, что хотя бы одно название есть
       if (field === 'name_uz') {
-        const hasName = (data.name_uz && data.name_uz.trim() !== '') || 
-               (data.name_ru && data.name_ru.trim() !== '');
+        const nameUz = data.name_uz;
+        const nameRu = data.name_ru;
+        const hasName = (typeof nameUz === 'string' && nameUz.trim() !== '') ||
+               (typeof nameRu === 'string' && nameRu.trim() !== '');
         return hasName;
       }
       const value = data[field];
@@ -143,9 +157,14 @@ export function calculateSectionProgress(
       // Для чисел проверяем, что не null/undefined (0 - валидное значение для некоторых полей)
       if (typeof value === 'number') {
         // Для fee_monthly_min и fee_monthly_max 0 может быть валидным (бесплатная школа)
-        // Но обычно это означает незаполненное поле, поэтому проверяем > 0
+        // Но обычно это означает незаполненное поле, поэтому проверяем >= 0
         if (field === 'fee_monthly_min' || field === 'fee_monthly_max') {
-          isFilled = value !== null && value !== undefined && value >= 0;
+          // Если значение 0, это может быть бесплатная школа, но обычно это незаполненное поле
+          // Проверяем, что значение явно указано (не null/undefined)
+          isFilled = value !== null && value !== undefined;
+        } else if (field === 'grade_from' || field === 'grade_to') {
+          // Для классов проверяем, что значение валидное (1-11)
+          isFilled = value !== null && value !== undefined && value >= 1 && value <= 11;
         } else {
           isFilled = value !== null && value !== undefined;
         }
@@ -154,7 +173,7 @@ export function calculateSectionProgress(
         isFilled = value !== null && value !== undefined && value.trim() !== '';
       } else {
         // Для остальных типов (boolean, object, etc.)
-        isFilled = value !== null && value !== undefined && value !== '';
+        isFilled = value !== null && value !== undefined;
       }
       return isFilled;
     }).length;
@@ -167,10 +186,26 @@ export function calculateSectionProgress(
     // Считаем заполненные важные поля (вес 30%)
     const filledImportant = importantFields.filter((field) => {
       const value = data[field];
-      if (typeof value === 'string') {
-        return value !== null && value !== undefined && value.trim() !== '';
+      
+      // Специальная обработка для pricing_tiers
+      if (field === 'pricing_tiers') {
+        // Проверяем, что есть хотя бы один тариф с ценой
+        if (Array.isArray(value) && value.length > 0) {
+          return value.some((tier: any) => 
+            tier && 
+            typeof tier.price === 'number' && 
+            tier.price > 0 &&
+            Array.isArray(tier.grades) && 
+            tier.grades.length > 0
+          );
+        }
+        return false;
       }
-      return value !== null && value !== undefined && value !== '';
+      
+      if (typeof value === 'string') {
+        return value.trim() !== '';
+      }
+      return value !== null && value !== undefined;
     }).length;
 
     const importantProgress =
@@ -185,7 +220,10 @@ export function calculateSectionProgress(
   // Для остальных разделов стандартная логика
   const filledRequired = requiredFields.filter((field) => {
     const value = data[field];
-    return value !== null && value !== undefined && value !== '';
+    if (typeof value === 'string') {
+      return value.trim() !== '';
+    }
+    return value !== null && value !== undefined;
   }).length;
 
   const requiredProgress =
@@ -196,7 +234,10 @@ export function calculateSectionProgress(
   // Считаем заполненные важные поля (вес 30%)
   const filledImportant = importantFields.filter((field) => {
     const value = data[field];
-    return value !== null && value !== undefined && value !== '';
+    if (typeof value === 'string') {
+      return value.trim() !== '';
+    }
+    return value !== null && value !== undefined;
   }).length;
 
   const importantProgress =

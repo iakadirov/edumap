@@ -24,6 +24,7 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           description: string | null
+          detailed_description: string | null
           district: string | null
           email: string | null
           email_admission: string | null
@@ -50,6 +51,8 @@ export type Database = {
           phone_secondary: string | null
           phone_secondary_comment: string | null
           region: string | null
+          region_id: number | null
+          district_id: number | null
           reviews_count: number
           short_description: string | null
           slug: string
@@ -70,6 +73,8 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          detailed_          description?: string | null
+          detailed_description?: string | null
           district?: string | null
           email?: string | null
           email_admission?: string | null
@@ -96,6 +101,8 @@ export type Database = {
           phone_secondary?: string | null
           phone_secondary_comment?: string | null
           region?: string | null
+          region_id?: number | null
+          district_id?: number | null
           reviews_count?: number
           short_description?: string | null
           slug: string
@@ -116,6 +123,8 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          detailed_          description?: string | null
+          detailed_description?: string | null
           district?: string | null
           email?: string | null
           email_admission?: string | null
@@ -142,6 +151,8 @@ export type Database = {
           phone_secondary?: string | null
           phone_secondary_comment?: string | null
           region?: string | null
+          region_id?: number | null
+          district_id?: number | null
           reviews_count?: number
           short_description?: string | null
           slug?: string
@@ -400,6 +411,7 @@ export type Database = {
           website?: string | null
           founder?: string | null
           description?: string | null
+          detailed_description?: string | null
           founded_year?: number | null
           phone?: string | null
           email?: string | null
@@ -417,6 +429,7 @@ export type Database = {
           website?: string | null
           founder?: string | null
           description?: string | null
+          detailed_description?: string | null
           founded_year?: number | null
           phone?: string | null
           email?: string | null
@@ -724,6 +737,142 @@ export type Database = {
             foreignKeyName: "users_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      regions: {
+        Row: {
+          id: number
+          name_uz: string
+          name_ru: string | null
+          name_oz: string | null
+          soato_code: string | null
+          region_type: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          name_uz: string
+          name_ru?: string | null
+          name_oz?: string | null
+          soato_code?: string | null
+          region_type?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          name_uz?: string
+          name_ru?: string | null
+          name_oz?: string | null
+          soato_code?: string | null
+          region_type?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      districts: {
+        Row: {
+          id: number
+          region_id: number
+          name_uz: string
+          name_ru: string | null
+          name_oz: string | null
+          soato_code: string | null
+          district_type: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          region_id: number
+          name_uz: string
+          name_ru?: string | null
+          name_oz?: string | null
+          soato_code?: string | null
+          district_type?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          region_id?: number
+          name_uz?: string
+          name_ru?: string | null
+          name_oz?: string | null
+          soato_code?: string | null
+          district_type?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "districts_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_sections_progress: {
+        Row: {
+          id: string
+          organization_id: string
+          basic: number
+          education: number
+          teachers: number
+          infrastructure: number
+          services: number
+          results: number
+          admission: number
+          finance: number
+          documents: number
+          photos: number
+          videos: number
+          overall: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          basic?: number
+          education?: number
+          teachers?: number
+          infrastructure?: number
+          services?: number
+          results?: number
+          admission?: number
+          finance?: number
+          documents?: number
+          photos?: number
+          videos?: number
+          overall?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          basic?: number
+          education?: number
+          teachers?: number
+          infrastructure?: number
+          services?: number
+          results?: number
+          admission?: number
+          finance?: number
+          documents?: number
+          photos?: number
+          videos?: number
+          overall?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_sections_progress_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: true
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },

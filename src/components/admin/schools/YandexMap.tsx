@@ -12,6 +12,7 @@ declare global {
 interface YandexMapProps {
   lat?: number | null;
   lng?: number | null;
+  address?: string | null;
   onCoordinatesChange: (lat: number, lng: number) => void;
   onAddressChange?: (address: string) => void;
   height?: string;
@@ -21,6 +22,7 @@ interface YandexMapProps {
 export function YandexMap({
   lat,
   lng,
+  address: initialAddress,
   onCoordinatesChange,
   onAddressChange,
   height = '400px',
@@ -33,6 +35,8 @@ export function YandexMap({
   const [error, setError] = useState<string | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodingError, setGeocodingError] = useState<string | null>(null);
+  const lastSearchedAddressRef = useRef<string | null>(null);
+  const isUpdatingFromAddressRef = useRef(false);
 
   // Загружаем Яндекс.Карты
   useEffect(() => {
@@ -131,7 +135,7 @@ export function YandexMap({
         setMarker(newLat, newLng);
         onCoordinatesChange(newLat, newLng);
         
-        // Пробуем получить адрес по координатам (не блокируем работу если не получится)
+        // Получаем адрес по координатам и обновляем поле адреса
         geocodeCoordinates(newLat, newLng);
       });
 
@@ -176,59 +180,58 @@ export function YandexMap({
       const newLng = coords[1];
       
       onCoordinatesChange(newLat, newLng);
-      // Пробуем получить адрес, но не блокируем работу карты если не получится
+      // Получаем адрес по координатам и обновляем поле адреса
       geocodeCoordinates(newLat, newLng);
     });
   };
 
-  // Геокодирование координат для получения адреса
+  // Геокодирование координат для получения адреса (обратное геокодирование)
   const geocodeCoordinates = async (geocodeLat: number, geocodeLng: number) => {
     if (!onAddressChange) return;
 
     setIsGeocoding(true);
     setGeocodingError(null);
     
+    // Помечаем, что мы обновляем адрес из геокодирования, чтобы не искать его заново на карте
+    isUpdatingFromAddressRef.current = true;
+    
     try {
       // Используем встроенный геокодер из JavaScript API
-      // Встроенный геокодер работает только если подключен JavaScript API
       if (window.ymaps && typeof window.ymaps.geocode === 'function') {
-        console.log('Using built-in Yandex geocoder for coordinates:', { lat: geocodeLat, lng: geocodeLng });
-        
         try {
           // Используем встроенный геокодер JavaScript API
           // Формат: ymaps.geocode([широта, долгота], {options})
-          // lang: 'uz-UZ' - узбекский язык
           const res = await window.ymaps.geocode([geocodeLat, geocodeLng], {
             results: 1,
             lang: 'uz-UZ'
           });
           
-          console.log('Geocoder response:', res);
-          
           if (res && res.geoObjects && res.geoObjects.getLength() > 0) {
             const firstGeoObject = res.geoObjects.get(0);
             if (firstGeoObject) {
               const address = firstGeoObject.getAddressLine();
-              console.log('Got address from geocoder:', address);
               
               if (address) {
+                // Обновляем адрес в поле
                 onAddressChange(address);
+                lastSearchedAddressRef.current = address;
                 setIsGeocoding(false);
+                // Сбрасываем флаг через небольшую задержку
+                setTimeout(() => {
+                  isUpdatingFromAddressRef.current = false;
+                }, 500);
                 return;
               }
             }
           }
           
           // Если встроенный геокодер не вернул адрес, пробуем через API
-          console.warn('Built-in geocoder returned no address, trying API...');
           await geocodeViaAPI(geocodeLat, geocodeLng);
         } catch (err: any) {
           console.warn('Built-in geocoder error, trying API fallback:', err);
-          // Пробуем через наш API как fallback
           await geocodeViaAPI(geocodeLat, geocodeLng);
         }
       } else {
-        console.log('Built-in geocoder not available, using API');
         // Fallback на наш API если JavaScript API геокодер недоступен
         await geocodeViaAPI(geocodeLat, geocodeLng);
       }
@@ -236,6 +239,7 @@ export function YandexMap({
       console.error('Geocoding error:', err);
       setGeocodingError('Не удалось получить адрес автоматически. Введите адрес вручную.');
       setIsGeocoding(false);
+      isUpdatingFromAddressRef.current = false;
     }
   };
 
@@ -274,6 +278,7 @@ export function YandexMap({
       const data = await response.json();
       if (data.address && onAddressChange) {
         onAddressChange(data.address);
+        lastSearchedAddressRef.current = data.address;
       } else {
         console.warn('Geocoding returned no address:', data);
       }
@@ -282,6 +287,9 @@ export function YandexMap({
       setGeocodingError('Ошибка при получении адреса. Введите адрес вручную.');
     } finally {
       setIsGeocoding(false);
+      setTimeout(() => {
+        isUpdatingFromAddressRef.current = false;
+      }, 500);
     }
   };
 
@@ -291,6 +299,108 @@ export function YandexMap({
       setMarker(lat, lng);
     }
   }, [lat, lng, isLoading]);
+
+  // Поиск адреса на карте при изменении поля адреса (с debounce)
+  useEffect(() => {
+    // Пропускаем если:
+    // 1. Карта еще не загружена
+    // 2. Адрес пустой
+    // 3. Это тот же адрес, который мы уже искали
+    // 4. Мы сейчас обновляем адрес из геокодирования (чтобы избежать циклов)
+    if (
+      !window.ymaps || 
+      !mapInstanceRef.current || 
+      isLoading ||
+      !initialAddress || 
+      !initialAddress.trim() ||
+      initialAddress === lastSearchedAddressRef.current ||
+      isUpdatingFromAddressRef.current
+    ) {
+      return;
+    }
+
+    // Debounce: ждем 800ms после последнего изменения адреса перед поиском
+    // Ищем адрес даже если координаты уже есть (пользователь мог изменить адрес вручную)
+    const timeoutId = setTimeout(() => {
+      searchAddressOnMap(initialAddress);
+    }, 800);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [initialAddress, isLoading]);
+
+  // Поиск адреса на карте (прямое геокодирование)
+  const searchAddressOnMap = async (addressQuery: string) => {
+    if (!addressQuery.trim() || !window.ymaps || !mapInstanceRef.current) {
+      return;
+    }
+
+    // Помечаем, что мы ищем этот адрес
+    lastSearchedAddressRef.current = addressQuery;
+
+    try {
+      // Используем встроенный геокодер Yandex Maps для поиска адреса
+      const geocoder = window.ymaps.geocode(addressQuery, {
+        results: 1,
+        lang: 'uz-UZ',
+      });
+
+      const results = await geocoder;
+      
+      if (results && results.geoObjects && results.geoObjects.getLength() > 0) {
+        const firstGeoObject = results.geoObjects.get(0);
+        const coords = firstGeoObject.geometry.getCoordinates();
+        const foundLat = coords[0];
+        const foundLng = coords[1];
+
+        // Устанавливаем маркер на найденное место
+        setMarker(foundLat, foundLng);
+        
+        // Обновляем координаты (но не обновляем адрес, чтобы избежать циклов)
+        isUpdatingFromAddressRef.current = true;
+        onCoordinatesChange(foundLat, foundLng);
+        setTimeout(() => {
+          isUpdatingFromAddressRef.current = false;
+        }, 100);
+      }
+    } catch (err: any) {
+      console.error('Address search error:', err);
+      
+      // Fallback: пробуем через API
+      try {
+        await searchAddressViaAPI(addressQuery);
+      } catch (apiErr) {
+        console.error('API search error:', apiErr);
+      }
+    }
+  };
+
+  // Поиск адреса через наш API (fallback)
+  const searchAddressViaAPI = async (query: string) => {
+    try {
+      const response = await fetch(
+        `/api/geocode/search?query=${encodeURIComponent(query)}`
+      );
+
+      if (!response.ok) {
+        throw new Error('API search failed');
+      }
+
+      const data = await response.json();
+      
+      if (data.lat && data.lng) {
+        setMarker(data.lat, data.lng);
+        isUpdatingFromAddressRef.current = true;
+        onCoordinatesChange(data.lat, data.lng);
+        setTimeout(() => {
+          isUpdatingFromAddressRef.current = false;
+        }, 100);
+      }
+    } catch (err: any) {
+      console.error('API search error:', err);
+    }
+  };
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -323,7 +433,7 @@ export function YandexMap({
         />
       </div>
       <p className="text-xs text-muted-foreground">
-        Кликните на карте или перетащите маркер для выбора местоположения. Координаты сохраняются автоматически.
+        Введите адрес в поле "Manzil" для поиска на карте или кликните на карте для автоматического заполнения адреса.
       </p>
       {geocodingError && (
         <p className="text-xs text-yellow-600 mt-1">
