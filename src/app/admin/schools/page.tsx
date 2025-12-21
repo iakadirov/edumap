@@ -8,6 +8,21 @@ import { unstable_noStore as noStore } from 'next/cache';
 // Админ-панель всегда динамическая (не кэшируется)
 export const dynamic = 'force-dynamic';
 
+// Типы для результатов запросов
+type SchoolListItem = {
+  id: string;
+  slug: string | null;
+  name: string;
+  name_uz: string | null;
+  name_ru: string | null;
+  status: string;
+  created_at: string;
+};
+
+type OrganizationStatus = {
+  status: string;
+};
+
 export default async function AdminSchoolsPage({
   searchParams,
 }: {
@@ -47,10 +62,13 @@ export default async function AdminSchoolsPage({
     console.error('Error fetching schools:', error);
   }
 
+  // Явно указываем тип для результата запроса
+  const typedSchools = (schools || []) as SchoolListItem[];
+
   const totalPages = count ? Math.ceil(count / pageSize) : 0;
 
   // Получаем прогресс заполненности для всех школ параллельно
-  const schoolIds = schools?.map(s => s.id) || [];
+  const schoolIds = typedSchools.map(s => s.id);
   let progressMap = new Map<string, number>();
   
   if (schoolIds.length > 0) {
@@ -90,11 +108,14 @@ export default async function AdminSchoolsPage({
     .select('status')
     .eq('org_type', 'school');
 
+  // Явно указываем тип для результата запроса
+  const typedStatuses = (allStatuses || []) as OrganizationStatus[];
+
   const stats = {
-    total: allStatuses?.length || 0,
-    published: allStatuses?.filter((s) => s.status === 'published').length || 0,
-    pending: allStatuses?.filter((s) => s.status === 'pending').length || 0,
-    draft: allStatuses?.filter((s) => s.status === 'draft').length || 0,
+    total: typedStatuses.length,
+    published: typedStatuses.filter((s) => s.status === 'published').length,
+    pending: typedStatuses.filter((s) => s.status === 'pending').length,
+    draft: typedStatuses.filter((s) => s.status === 'draft').length,
   };
 
   return (
@@ -159,7 +180,7 @@ export default async function AdminSchoolsPage({
           </CardHeader>
           <CardContent>
             <SchoolsTable
-              schools={schools || []}
+              schools={typedSchools}
               currentPage={page}
               totalPages={totalPages}
               search={search}
