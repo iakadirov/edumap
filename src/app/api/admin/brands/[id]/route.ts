@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
 import type { BrandRow } from '@/types/brand';
+import type { Database } from '@/types/database';
 
 export async function GET(
   request: Request,
@@ -111,7 +112,7 @@ export async function PUT(
     }
 
     // Обновляем бренд
-    const updateData: any = {};
+    const updateData: Database['public']['Tables']['school_brands']['Update'] = {};
     if (name !== undefined) updateData.name = name;
     if (slug !== undefined) updateData.slug = slug;
     if (logo_url !== undefined) updateData.logo_url = logo_url || null;
