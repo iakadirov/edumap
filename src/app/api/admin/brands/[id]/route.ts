@@ -141,9 +141,12 @@ export async function PUT(
       );
     }
 
+    // Явно указываем тип для результата запроса
+    const typedUpdatedBrand = updatedBrand as BrandRow;
+
     return NextResponse.json({
       success: true,
-      brand: updatedBrand,
+      brand: typedUpdatedBrand,
     });
   } catch (error) {
     console.error('Error in PUT /api/admin/brands/[id]:', error);
