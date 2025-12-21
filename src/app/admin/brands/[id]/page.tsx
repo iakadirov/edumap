@@ -5,8 +5,11 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
 import { ExternalLink } from 'lucide-react';
+import type { Database } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
+
+type BrandRow = Database['public']['Tables']['school_brands']['Row'];
 
 export default async function EditBrandPage({
   params,
@@ -27,6 +30,9 @@ export default async function EditBrandPage({
     notFound();
   }
 
+  // Явно указываем тип для результата запроса
+  const typedBrand = brand as BrandRow;
+
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-6">
@@ -34,13 +40,13 @@ export default async function EditBrandPage({
           <div>
             <h1 className="text-3xl font-bold">Brendni tahrirlash</h1>
             <p className="text-muted-foreground mt-1">
-              {brand.name}
+              {typedBrand.name}
             </p>
           </div>
           <div className="flex gap-2">
-            {brand.slug && (
+            {typedBrand.slug && (
               <Button variant="outline" asChild>
-                <Link href={`/schools/brands/${brand.slug}`} target="_blank" rel="noopener noreferrer">
+                <Link href={`/schools/brands/${typedBrand.slug}`} target="_blank" rel="noopener noreferrer">
                   Saytda ko'rish <ExternalLink className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -50,7 +56,7 @@ export default async function EditBrandPage({
             </Button>
           </div>
         </div>
-        <BrandForm brand={brand} />
+        <BrandForm brand={typedBrand} />
       </div>
     </div>
   );
