@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth/middleware';
 import { canEditSchool } from '@/lib/auth/permissions';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
+import type { OrganizationRow } from '@/types/organization';
 
 /**
  * PATCH /api/admin/schools/[id]/status
@@ -59,6 +60,9 @@ export async function PATCH(
       );
     }
 
+    // Явно указываем тип для результата запроса
+    const typedExisting = existing as Pick<OrganizationRow, 'id' | 'status'>;
+
     // Используем service role клиент для обновления статуса (обходит RLS)
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!serviceRoleKey) {
@@ -83,6 +87,7 @@ export async function PATCH(
     // Обновляем статус через service role клиент
     const { data: updated, error: updateError } = await adminClient
       .from('organizations')
+      // @ts-expect-error - Supabase type inference issue
       .update({ status })
       .eq('id', id)
       .select()
@@ -96,7 +101,7 @@ export async function PATCH(
         code: updateError.code,
         id,
         status,
-        currentStatus: existing.status,
+        currentStatus: typedExisting.status,
       };
       
       console.error('Error updating status:', errorDetails);
@@ -160,6 +165,7 @@ export async function POST(
     // Обновляем статус на pending
     const { error: updateError } = await supabase
       .from('organizations')
+      // @ts-expect-error - Supabase type inference issue
       .update({ status: 'pending' })
       .eq('id', id);
 
@@ -234,6 +240,7 @@ export async function PUT(
     // Обновляем статус
     const { error: updateError } = await supabase
       .from('organizations')
+      // @ts-expect-error - Supabase type inference issue
       .update({ status: newStatus })
       .eq('id', id);
 

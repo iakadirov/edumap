@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import type { OrganizationRow } from '@/types/organization';
+import type { Database } from '@/types/database';
 
 export async function GET(
   request: NextRequest,
@@ -23,12 +25,15 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    // Явно указываем тип для результата запроса
+    const typedSchool = school as Pick<OrganizationRow, 'id'>;
     
     // Получаем медиа
     const { data: media, error } = await supabase
       .from('school_media')
       .select('*')
-      .eq('organization_id', school.id)
+      .eq('organization_id', typedSchool.id)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false });
     
@@ -39,10 +44,13 @@ export async function GET(
         { status: 500 }
       );
     }
+
+    // Явно указываем тип для результата запроса
+    const typedMedia = (media || []) as Database['public']['Tables']['school_media']['Row'][];
     
     // Разделяем на фото и видео
-    const photos = media
-      ?.filter((m) => m.type === 'photo')
+    const photos = typedMedia
+      .filter((m) => m.type === 'photo')
       .map((m) => ({
         id: m.id,
         type: 'photo' as const,
@@ -51,10 +59,10 @@ export async function GET(
         caption: m.caption || undefined,
         isCover: m.is_cover || false,
         sortOrder: m.sort_order || 0,
-      })) || [];
+      }));
     
-    const videos = media
-      ?.filter((m) => m.type === 'video')
+    const videos = typedMedia
+      .filter((m) => m.type === 'video')
       .map((m) => ({
         id: m.id,
         type: 'video' as const,

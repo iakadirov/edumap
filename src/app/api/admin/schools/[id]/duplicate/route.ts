@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
+import type { OrganizationRow } from '@/types/organization';
 
 /**
  * API endpoint для получения данных школы для дублирования
@@ -40,6 +41,9 @@ export async function GET(
       );
     }
 
+    // Явно указываем тип для результата запроса
+    const typedOrganization = organization as OrganizationRow;
+
     // Получаем данные school_details
     const { data: schoolDetails, error: detailsError } = await supabase
       .from('school_details')
@@ -57,7 +61,7 @@ export async function GET(
       reviews_count: _reviews_count,
       overall_rating: _overall_rating,
       ...organizationData
-    } = organization;
+    } = typedOrganization;
 
     // Устанавливаем статус по умолчанию для новой школы
     organizationData.status = 'draft';
@@ -66,13 +70,14 @@ export async function GET(
     // Исключаем системные поля
     let schoolDetailsData = null;
     if (schoolDetails) {
+      const typedSchoolDetails = schoolDetails as Record<string, any>;
       const {
         id: _detailsId,
         organization_id: _orgId,
         created_at: _detailsCreatedAt,
         updated_at: _detailsUpdatedAt,
         ...detailsData
-      } = schoolDetails;
+      } = typedSchoolDetails;
       schoolDetailsData = detailsData;
     }
 

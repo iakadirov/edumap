@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
+import type { OrganizationRow } from '@/types/organization';
 
 /**
  * Поиск похожих школ по названию
@@ -50,6 +51,9 @@ export async function GET(request: Request) {
       return NextResponse.json([]);
     }
 
+    // Явно указываем тип для результата запроса
+    const typedSchools = schools as OrganizationRow[];
+
     // Функция для вычисления схожести строк (простой алгоритм Левенштейна)
     const similarity = (str1: string, str2: string): number => {
       const s1 = str1.toLowerCase().trim();
@@ -92,7 +96,7 @@ export async function GET(request: Request) {
 
     // Фильтруем школы по схожести (80% = 0.8)
     const queryLower = query.toLowerCase().trim();
-    const similarSchools = schools
+    const similarSchools = typedSchools
       .map((school) => {
         const name = school.name_uz || school.name_ru || school.name || '';
         const sim = similarity(queryLower, name.toLowerCase());

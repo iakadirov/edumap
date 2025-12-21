@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
+import type { OrganizationRow } from '@/types/organization';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,14 +32,17 @@ export async function GET() {
       );
     }
 
+    // Явно указываем тип для результата запроса
+    const typedData = (data || []) as Pick<OrganizationRow, 'status'>[];
+
     // Подсчитываем статистику на сервере
     const stats = {
-      total: data?.length || 0,
-      published: data?.filter((s) => s.status === 'published').length || 0,
-      pending: data?.filter((s) => s.status === 'pending').length || 0,
-      draft: data?.filter((s) => s.status === 'draft').length || 0,
-      rejected: data?.filter((s) => s.status === 'rejected').length || 0,
-      suspended: data?.filter((s) => s.status === 'suspended').length || 0,
+      total: typedData.length,
+      published: typedData.filter((s) => s.status === 'published').length,
+      pending: typedData.filter((s) => s.status === 'pending').length,
+      draft: typedData.filter((s) => s.status === 'draft').length,
+      rejected: typedData.filter((s) => s.status === 'rejected').length,
+      suspended: typedData.filter((s) => s.status === 'suspended').length,
     };
 
     return NextResponse.json(stats, {

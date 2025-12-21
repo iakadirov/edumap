@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
+import type { UserRow } from '@/types/user';
 
 export async function POST(request: Request) {
   try {
@@ -90,6 +91,7 @@ export async function POST(request: Request) {
 
     const { data: newUser, error: userError } = await clientToUse
       .from('users')
+      // @ts-expect-error - Supabase type inference issue
       .insert({
         auth_user_id: authUserId,
         email,
@@ -110,9 +112,12 @@ export async function POST(request: Request) {
       );
     }
 
+    // Явно указываем тип для результата запроса
+    const typedNewUser = newUser as UserRow;
+
     return NextResponse.json({
       success: true,
-      id: newUser.id,
+      id: typedNewUser.id,
       message: authUserId
         ? 'Foydalanuvchi muvaffaqiyatli yaratildi va email orqali kirishi mumkin.'
         : 'Foydalanuvchi yaratildi. Endi u email orqali ro\'yxatdan o\'tishi kerak.',

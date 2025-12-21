@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
 import { validateCreateSchool } from '@/lib/validation/schemas/school-details';
+import type { OrganizationRow } from '@/types/organization';
 
 export async function POST(request: Request) {
   try {
@@ -68,6 +69,7 @@ export async function POST(request: Request) {
     // Создаем организацию
     const { data: newOrganization, error: orgError } = await supabase
       .from('organizations')
+      // @ts-expect-error - Supabase type inference issue
       .insert(organization)
       .select()
       .single();
@@ -80,11 +82,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Явно указываем тип для результата запроса
+    const typedNewOrganization = newOrganization as OrganizationRow;
+
     // Создаем school_details с обязательными полями
     const { error: detailsError } = await supabase
       .from('school_details')
+      // @ts-expect-error - Supabase type inference issue
       .insert({
-        organization_id: newOrganization.id,
+        organization_id: typedNewOrganization.id,
         school_type: school_details.school_type,
         grade_from: school_details.grade_from ?? 1,
         grade_to: school_details.grade_to ?? 11,
@@ -104,7 +110,7 @@ export async function POST(request: Request) {
       await supabase
         .from('organizations')
         .delete()
-        .eq('id', newOrganization.id);
+        .eq('id', typedNewOrganization.id);
       
       return NextResponse.json(
         { error: 'Failed to create school details: ' + detailsError.message },
@@ -114,8 +120,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      id: newOrganization.id,
-      slug: newOrganization.slug,
+      id: typedNewOrganization.id,
+      slug: typedNewOrganization.slug,
     });
   } catch (error) {
     console.error('Error in POST /api/admin/schools:', error);

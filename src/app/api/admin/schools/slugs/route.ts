@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
+import type { OrganizationRow } from '@/types/organization';
 
 /**
  * API endpoint для получения списка всех slugs школ
@@ -35,7 +36,9 @@ export async function GET() {
       );
     }
 
-    const slugs = organizations?.map(org => org.slug).filter(Boolean) || [];
+    // Явно указываем тип для результата запроса
+    const typedOrganizations = (organizations || []) as Pick<OrganizationRow, 'slug'>[];
+    const slugs = typedOrganizations.map(org => org.slug).filter((s): s is string => s !== null);
 
     return NextResponse.json({ slugs });
   } catch (error) {

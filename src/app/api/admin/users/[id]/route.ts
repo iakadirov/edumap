@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth/middleware';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
+import type { UserRow } from '@/types/user';
 
 export async function PUT(
   request: Request,
@@ -37,8 +38,11 @@ export async function PUT(
       );
     }
 
+    // Явно указываем тип для результата запроса
+    const typedExisting = existing as UserRow;
+
     // Проверяем права на изменение роли
-    if (existing.role === 'super_admin' && user.role !== 'super_admin') {
+    if (typedExisting.role === 'super_admin' && user.role !== 'super_admin') {
       return NextResponse.json(
         { error: 'Cannot modify super admin' },
         { status: 403 }
@@ -53,7 +57,7 @@ export async function PUT(
     }
 
     // Обновляем пароль через Admin API, если указан
-    if (password && existing.auth_user_id) {
+    if (password && typedExisting.auth_user_id) {
       const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
       if (serviceRoleKey) {
         try {
@@ -68,7 +72,7 @@ export async function PUT(
             }
           );
 
-          await adminClient.auth.admin.updateUserById(existing.auth_user_id, {
+          await adminClient.auth.admin.updateUserById(typedExisting.auth_user_id, {
             password,
           });
         } catch (adminError) {
@@ -81,14 +85,15 @@ export async function PUT(
     // Обновляем запись в users
     const updateData: any = {
       full_name: full_name || null,
-      role: role || existing.role,
-      subscription_tier: subscription_tier || existing.subscription_tier,
-      is_active: is_active ?? existing.is_active,
-      email_verified: email_verified ?? existing.email_verified,
+      role: role || typedExisting.role,
+      subscription_tier: subscription_tier || typedExisting.subscription_tier,
+      is_active: is_active ?? typedExisting.is_active,
+      email_verified: email_verified ?? typedExisting.email_verified,
     };
 
     const { error: updateError } = await supabase
       .from('users')
+      // @ts-expect-error - Supabase type inference issue
       .update(updateData)
       .eq('id', id);
 
@@ -145,8 +150,11 @@ export async function DELETE(
       .eq('id', id)
       .single();
 
+    // Явно указываем тип для результата запроса
+    const typedUserToDelete = userToDelete as Pick<UserRow, 'role' | 'auth_user_id'> | null;
+
     // Super admin не может удалять других super admin
-    if (userToDelete?.role === 'super_admin' && user.role !== 'super_admin') {
+    if (typedUserToDelete?.role === 'super_admin' && user.role !== 'super_admin') {
       return NextResponse.json(
         { error: 'Cannot delete super admin' },
         { status: 403 }
@@ -154,7 +162,7 @@ export async function DELETE(
     }
 
     // Удаляем пользователя из auth.users через Admin API, если есть auth_user_id
-    if (userToDelete?.auth_user_id) {
+    if (typedUserToDelete?.auth_user_id) {
       const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
       if (serviceRoleKey) {
         try {
@@ -169,7 +177,7 @@ export async function DELETE(
             }
           );
 
-          await adminClient.auth.admin.deleteUser(userToDelete.auth_user_id);
+          await adminClient.auth.admin.deleteUser(typedUserToDelete.auth_user_id);
         } catch (adminError) {
           console.error('Error deleting auth user:', adminError);
           // Продолжаем удаление из users
