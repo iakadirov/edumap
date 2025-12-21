@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import type { OrganizationRow } from '@/types/organization';
 
 export async function GET(
   request: NextRequest,
@@ -23,13 +24,24 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    // Явно указываем тип для результата запроса
+    const typedCurrentSchool = currentSchool as {
+      id: string;
+      district: string | null;
+      school_details: Array<{
+        school_type: string;
+        curriculum: string[] | null;
+        fee_monthly_min: number | null;
+      }> | null;
+    };
     
     const limit = parseInt(request.nextUrl.searchParams.get('limit') || '3');
     
     // Получаем похожие школы по району и типу
-    const details = Array.isArray(currentSchool.school_details)
-      ? currentSchool.school_details[0]
-      : currentSchool.school_details;
+    const details = Array.isArray(typedCurrentSchool.school_details)
+      ? typedCurrentSchool.school_details[0]
+      : typedCurrentSchool.school_details;
     
     let query = supabase
       .from('organizations')
@@ -49,11 +61,11 @@ export async function GET(
       `)
       .eq('org_type', 'school')
       .in('status', ['active', 'published'])
-      .neq('id', currentSchool.id);
+      .neq('id', typedCurrentSchool.id);
     
     // Фильтруем по району, если есть
-    if (currentSchool.district) {
-      query = query.eq('district', currentSchool.district);
+    if (typedCurrentSchool.district) {
+      query = query.eq('district', typedCurrentSchool.district);
     }
     
     // Сортируем по рейтингу
@@ -71,9 +83,28 @@ export async function GET(
         { status: 500 }
       );
     }
+
+    // Тип для результата запроса
+    type SimilarSchool = {
+      id: string;
+      name: string;
+      slug: string;
+      cover_image_url: string | null;
+      overall_rating: number | null;
+      reviews_count: number;
+      district: string | null;
+      school_details: Array<{
+        fee_monthly_min: number | null;
+        school_type: string;
+        curriculum: string[] | null;
+      }> | null;
+    };
+
+    // Явно указываем тип для результата запроса
+    const typedSchools = (schools || []) as SimilarSchool[];
     
     // Форматируем данные
-    const formattedSchools = schools?.map((school) => {
+    const formattedSchools = typedSchools.map((school) => {
       const schoolDetails = Array.isArray(school.school_details)
         ? school.school_details[0]
         : school.school_details;

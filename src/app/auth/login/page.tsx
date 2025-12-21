@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase/client';
+import type { UserRow } from '@/types/user';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,6 +46,7 @@ export default function LoginPage() {
             // Пользователь не найден - создаем с ролью user по умолчанию
             const { error: insertError } = await supabase
               .from('users')
+              // @ts-expect-error - Supabase type inference issue
               .insert({
                 auth_user_id: data.user.id,
                 email: data.user.email || '',
@@ -78,7 +80,10 @@ export default function LoginPage() {
           return;
         }
 
-        if (!userData.is_active) {
+        // Явно указываем тип для результата запроса
+        const typedUserData = userData as Pick<UserRow, 'id' | 'role' | 'is_active' | 'email' | 'auth_user_id'>;
+
+        if (!typedUserData.is_active) {
           setError('Foydalanuvchi faol emas. Admin bilan bogʻlaning.');
           await supabase.auth.signOut();
           return;
@@ -87,12 +92,13 @@ export default function LoginPage() {
         // Обновляем last_login_at
         await supabase
           .from('users')
+          // @ts-expect-error - Supabase type inference issue
           .update({ last_login_at: new Date().toISOString() })
           .eq('auth_user_id', data.user.id);
 
         // Редирект в зависимости от роли
         const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
-        if (['super_admin', 'admin', 'moderator'].includes(userData.role)) {
+        if (['super_admin', 'admin', 'moderator'].includes(typedUserData.role)) {
           router.push(redirectUrl || '/admin/dashboard');
         } else {
           router.push(redirectUrl || '/');

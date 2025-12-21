@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import type { OrganizationRow } from '@/types/organization';
 
 export async function GET(
   request: NextRequest,
@@ -23,12 +24,15 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    // Явно указываем тип для результата запроса
+    const typedSchool = school as Pick<OrganizationRow, 'id'>;
     
     // Получаем педагогический состав
     const { data: staff, error } = await supabase
       .from('school_staff')
       .select('*')
-      .eq('organization_id', school.id)
+      .eq('organization_id', typedSchool.id)
       .order('position', { ascending: true })
       .order('created_at', { ascending: false });
     
@@ -40,8 +44,23 @@ export async function GET(
       );
     }
     
+    // Тип для school_staff
+    type SchoolStaffRow = {
+      id: string;
+      name: string;
+      position: string;
+      photo_url: string | null;
+      experience_years: number | null;
+      education: string | null;
+      certifications: string[] | null;
+      bio: string | null;
+    };
+
+    // Явно указываем тип для результата запроса
+    const typedStaff = (staff || []) as SchoolStaffRow[];
+
     // Форматируем данные
-    const formattedStaff = staff?.map((s) => ({
+    const formattedStaff = typedStaff.map((s) => ({
       id: s.id,
       name: s.name,
       position: s.position,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import type { OrganizationRow } from '@/types/organization';
 
 export async function GET(
   request: NextRequest,
@@ -23,6 +24,9 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    // Явно указываем тип для результата запроса
+    const typedSchool = school as Pick<OrganizationRow, 'id'>;
     
     // Параметры запроса
     const searchParams = request.nextUrl.searchParams;
@@ -36,7 +40,7 @@ export async function GET(
     let query = supabase
       .from('school_reviews')
       .select('*')
-      .eq('organization_id', school.id);
+      .eq('organization_id', typedSchool.id);
     
     // Фильтр по рейтингу
     if (filter && filter !== 'all') {
@@ -78,12 +82,34 @@ export async function GET(
         { status: 500 }
       );
     }
+
+    // Тип для school_reviews
+    type SchoolReviewRow = {
+      id: string;
+      organization_id: string;
+      author_name: string;
+      author_role: string;
+      author_avatar_url: string | null;
+      is_verified_parent: boolean;
+      rating: number;
+      ratings: unknown;
+      content: string;
+      pros: string[] | null;
+      cons: string[] | null;
+      helpful_count: number;
+      school_response: string | null;
+      school_response_date: string | null;
+      created_at: string;
+    };
+
+    // Явно указываем тип для результата запроса
+    const typedReviews = (reviews || []) as SchoolReviewRow[];
     
     // Получаем общее количество для пагинации
     let countQuery = supabase
       .from('school_reviews')
       .select('*', { count: 'exact', head: true })
-      .eq('organization_id', school.id);
+      .eq('organization_id', typedSchool.id);
     
     if (filter && filter !== 'all') {
       const rating = parseInt(filter);
@@ -95,7 +121,7 @@ export async function GET(
     const { count } = await countQuery;
     
     // Форматируем данные
-    const formattedReviews = reviews?.map((review) => ({
+    const formattedReviews = typedReviews.map((review) => ({
       id: review.id,
       author: {
         name: review.author_name,

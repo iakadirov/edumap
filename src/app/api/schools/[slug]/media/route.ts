@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { OrganizationRow } from '@/types/organization';
-import type { Database } from '@/types/database';
+
+// Тип для school_media
+type SchoolMediaRow = {
+  id: string;
+  organization_id: string;
+  type: string;
+  url: string;
+  category: string | null;
+  caption: string | null;
+  is_cover: boolean;
+  sort_order: number;
+  created_at: string;
+};
 
 export async function GET(
   request: NextRequest,
@@ -46,7 +58,7 @@ export async function GET(
     }
 
     // Явно указываем тип для результата запроса
-    const typedMedia = (media || []) as Database['public']['Tables']['school_media']['Row'][];
+    const typedMedia = (media || []) as SchoolMediaRow[];
     
     // Разделяем на фото и видео
     const photos = typedMedia
