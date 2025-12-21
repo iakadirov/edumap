@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
+import type { UserRow } from '@/types/user';
 
 // Админ-панель всегда динамическая (не кэшируется)
 export const dynamic = 'force-dynamic';
@@ -49,6 +50,9 @@ export default async function AdminUsersPage({
     console.error('Error fetching users:', error);
   }
 
+  // Явно указываем тип для результата запроса
+  const typedUsers = (users || []) as UserRow[];
+
   const totalPages = count ? Math.ceil(count / pageSize) : 0;
 
   return (
@@ -83,7 +87,7 @@ export default async function AdminUsersPage({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {users?.filter((u) => u.subscription_tier === 'premium').length || 0}
+                {typedUsers.filter((u) => u.subscription_tier === 'premium').length}
               </div>
             </CardContent>
           </Card>
@@ -93,7 +97,7 @@ export default async function AdminUsersPage({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {users?.filter((u) => ['super_admin', 'admin', 'moderator'].includes(u.role)).length || 0}
+                {typedUsers.filter((u) => ['super_admin', 'admin', 'moderator'].includes(u.role)).length}
               </div>
             </CardContent>
           </Card>
@@ -103,7 +107,7 @@ export default async function AdminUsersPage({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {users?.filter((u) => u.is_active).length || 0}
+                {typedUsers.filter((u) => u.is_active).length}
               </div>
             </CardContent>
           </Card>
@@ -119,7 +123,7 @@ export default async function AdminUsersPage({
           </CardHeader>
           <CardContent>
             <UsersTable
-              users={users || []}
+              users={typedUsers}
               currentPage={page}
               totalPages={totalPages}
               search={search}
