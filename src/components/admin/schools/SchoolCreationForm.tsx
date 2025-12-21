@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { saveTelegram } from '@/lib/utils/telegram';
 import { saveInstagram, saveFacebook, saveYouTube } from '@/lib/utils/social-media';
 import { normalizePhone } from '@/lib/utils/phone';
 import { normalizeWebsite } from '@/lib/utils/website';
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes';
+import { generateSlug, generateUniqueSlug } from '@/lib/utils/slug';
 import { BasicInfoSection } from './forms/BasicInfoSection';
 import { ContactsSection } from './forms/ContactsSection';
 import { EducationSection } from './forms/EducationSection';
@@ -52,14 +53,45 @@ interface WizardData {
 
 export function SchoolCreationForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [regions, setRegions] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
   const [loadingRegions, setLoadingRegions] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
+  const [loadingDuplicate, setLoadingDuplicate] = useState(false);
 
   const [brandId, setBrandId] = useState<string | null>(null);
+
+  // Автозаполнение данных из бренда при выборе бренда
+  useEffect(() => {
+    if (brandId) {
+      fetch(`/api/admin/brands/${brandId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.brand) {
+            const brand = data.brand;
+            // Заполняем только пустые поля, чтобы не перезаписывать уже введенные данные
+            setData((prev) => ({
+              ...prev,
+              name_uz: prev.name_uz || brand.name || '',
+              description: prev.description || brand.description || '',
+              logo_url: prev.logo_url || brand.logo_url || undefined,
+              banner_url: prev.banner_url || brand.banner_url || brand.cover_image_url || undefined,
+              phone: prev.phone || brand.phone || '',
+              website: prev.website || brand.website || '',
+              instagram: prev.instagram || brand.instagram || '',
+              facebook: prev.facebook || brand.facebook || '',
+              youtube: prev.youtube || brand.youtube || '',
+              telegram: prev.telegram || brand.telegram || '',
+            }));
+          }
+        })
+        .catch((err) => console.error('Error loading brand data:', err));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [brandId]);
 
   const [data, setData] = useState<WizardData>({
     name_uz: '',
@@ -129,13 +161,104 @@ export function SchoolCreationForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.region_id]);
 
-  const generateSlug = (text: string): string => {
-    return text
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
+  // Загружаем данные для дублирования
+  useEffect(() => {
+    const duplicateId = searchParams.get('duplicate');
+    if (duplicateId) {
+      loadDuplicateData(duplicateId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const loadDuplicateData = async (schoolId: string) => {
+    setLoadingDuplicate(true);
+    try {
+      const response = await fetch(`/api/admin/schools/${schoolId}/duplicate`);
+      if (!response.ok) {
+        throw new Error('Failed to load school data');
+      }
+      const { organization, school_details } = await response.json();
+
+      // Генерируем базовый slug из названия
+      const baseSlug = generateSlug(organization.name_uz || organization.name || 'school');
+      
+      // Получаем список существующих slugs для генерации уникального
+      try {
+        const slugsResponse = await fetch('/api/admin/schools/slugs');
+        if (slugsResponse.ok) {
+          const slugsData = await slugsResponse.json();
+          const existingSlugs = slugsData.slugs || [];
+          // Генерируем уникальный slug с суффиксом
+          const uniqueSlug = generateUniqueSlug(baseSlug, existingSlugs);
+          // Сохраняем slug в состоянии (можно использовать для отображения, но он будет перегенерирован при сохранении)
+        }
+      } catch (err) {
+        console.error('Error fetching slugs:', err);
+        // Продолжаем без проверки уникальности, slug будет проверен при сохранении
+      }
+
+      // Предзаполняем данные организации
+      setData((prev) => ({
+        ...prev,
+        name_uz: organization.name_uz || organization.name || '',
+        description: organization.description || '',
+        logo_url: organization.logo_url || undefined,
+        banner_url: organization.cover_image_url || organization.banner_url || undefined,
+        phone: organization.phone || '',
+        email: organization.email || '',
+        website: organization.website || '',
+        telegram: organization.telegram || '',
+        instagram: organization.instagram || '',
+        facebook: organization.facebook || '',
+        youtube: organization.youtube || '',
+        region_id: organization.region_id || null,
+        district_id: organization.district_id || null,
+        address: organization.address || '',
+        landmark: organization.landmark || '',
+        lat: organization.lat || undefined,
+        lng: organization.lng || undefined,
+        phone2: organization.phone_secondary 
+          ? { phone: organization.phone_secondary, comment: organization.phone_secondary_comment || '' }
+          : undefined,
+        phone3: organization.phone_admission
+          ? { phone: organization.phone_admission, comment: organization.phone_admission_comment || '' }
+          : undefined,
+      }));
+
+      // Предзаполняем данные school_details
+      if (school_details) {
+        setData((prev) => ({
+          ...prev,
+          school_type: school_details.school_type || 'private',
+          accepted_grades: school_details.accepted_grades || [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+          primary_languages: school_details.primary_language 
+            ? [school_details.primary_language, ...(school_details.additional_languages || [])]
+            : ['uzbek'],
+          curriculum: school_details.curriculum || ['national'],
+          pricing_tiers: school_details.pricing_tiers || [],
+        }));
+      }
+
+      // Устанавливаем brand_id если есть
+      if (organization.brand_id) {
+        setBrandId(organization.brand_id);
+      }
+
+      // Загружаем районы если выбран регион
+      if (organization.region_id) {
+        fetch(`/api/districts?region=${organization.region_id}`)
+          .then((res) => res.json())
+          .then((districtsList) => {
+            setDistricts(Array.isArray(districtsList) ? districtsList : []);
+          })
+          .catch((err) => console.error('Error loading districts:', err));
+      }
+    } catch (err) {
+      console.error('Error loading duplicate data:', err);
+      setError('Maktab ma\'lumotlarini yuklashda xatolik yuz berdi');
+    } finally {
+      setLoadingDuplicate(false);
+    }
   };
 
   const validateForm = (): boolean => {
@@ -171,7 +294,24 @@ export function SchoolCreationForm() {
     setError(null);
 
     try {
-      const slug = generateSlug(data.name_uz || 'school');
+      // Генерируем slug и проверяем уникальность
+      const baseSlug = generateSlug(data.name_uz || 'school');
+      
+      // Получаем список существующих slugs для проверки уникальности
+      let uniqueSlug = baseSlug;
+      try {
+        const slugsResponse = await fetch('/api/admin/schools/slugs');
+        if (slugsResponse.ok) {
+          const slugsData = await slugsResponse.json();
+          const existingSlugs = slugsData.slugs || [];
+          uniqueSlug = generateUniqueSlug(baseSlug, existingSlugs);
+        }
+      } catch (err) {
+        console.error('Error fetching slugs:', err);
+        // Используем базовый slug, проверка будет на сервере
+      }
+      
+      const slug = uniqueSlug;
 
       // Нормализуем социальные сети
       const normalizedTelegram = saveTelegram(data.telegram);

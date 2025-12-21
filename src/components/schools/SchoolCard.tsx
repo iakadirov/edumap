@@ -43,32 +43,50 @@ export function SchoolCard({ school }: SchoolCardProps) {
   
   // Предварительно получаем thumbnail версии для карточки
   useEffect(() => {
+    let isMounted = true;
+    
     // Получаем thumbnail версию логотипа
     if (school.logo_url) {
       getThumbnailUrl(school.logo_url, true)
         .then((thumbnailUrl) => {
-          setLogoUrl(thumbnailUrl);
+          if (isMounted) {
+            setLogoUrl(thumbnailUrl);
+          }
         })
         .catch((error) => {
           console.error('Failed to get logo thumbnail URL:', error);
-          // Используем оригинальный URL, если thumbnail недоступен
-          setLogoUrl(school.logo_url);
+          if (isMounted) {
+            // Используем оригинальный URL, если thumbnail недоступен
+            setLogoUrl(school.logo_url);
+          }
         });
+    } else {
+      setLogoUrl(null);
     }
 
     // Получаем thumbnail версию баннера
     if (school.cover_image_url) {
       getThumbnailUrl(school.cover_image_url, true)
         .then((thumbnailUrl) => {
-          setCoverImageUrl(thumbnailUrl);
+          if (isMounted) {
+            setCoverImageUrl(thumbnailUrl);
+          }
         })
         .catch((error) => {
           console.error('Failed to get cover thumbnail URL:', error);
-          // Используем оригинальный URL, если thumbnail недоступен
-          setCoverImageUrl(school.cover_image_url);
+          if (isMounted) {
+            // Используем оригинальный URL, если thumbnail недоступен
+            setCoverImageUrl(school.cover_image_url);
+          }
         });
+    } else {
+      setCoverImageUrl(null);
     }
-  }, [school.logo_url, school.cover_image_url]);
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [school.id, school.logo_url, school.cover_image_url]);
   
   // Обрабатываем school_details (может быть массивом или объектом)
   const details = Array.isArray(school.school_details)

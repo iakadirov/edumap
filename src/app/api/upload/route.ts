@@ -154,10 +154,14 @@ export async function POST(request: NextRequest) {
     const url = await getFileUrl(key, 3600); // URL действителен 1 час
 
     // Создаем thumbnail версию для логотипов и баннеров
+    // НЕ создаем thumbnail для временных файлов (temp/)
     let thumbnailKey: string | null = null;
     let thumbnailUrl: string | null = null;
     
-    if ((type === 'logo' || type === 'cover') && isImage) {
+    const isTempFile = key.startsWith('temp/');
+    const shouldCreateThumbnail = (type === 'logo' || type === 'cover') && isImage && !isTempFile;
+    
+    if (shouldCreateThumbnail) {
       try {
         thumbnailKey = await createThumbnailFromFile(file, key, type);
         thumbnailUrl = await getFileUrl(thumbnailKey, 3600);

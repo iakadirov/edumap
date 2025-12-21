@@ -45,10 +45,14 @@ export async function GET(request: NextRequest) {
     }
     // Для валидных ключей разрешаем публичный доступ (для изображений на публичных страницах)
 
-    if (!key) {
+    // Проверяем существование файла перед созданием presigned URL
+    const { fileExists } = await import('@/lib/storage');
+    const exists = await fileExists(key);
+    
+    if (!exists) {
       return NextResponse.json(
-        { error: 'Key parameter is required' },
-        { status: 400 }
+        { error: 'File not found', key },
+        { status: 404 }
       );
     }
 

@@ -405,6 +405,52 @@ export function BasicInfoForm({
 
   const [districts, setDistricts] = useState(initialDistricts);
 
+  // Автозаполнение данных из бренда при выборе бренда
+  useEffect(() => {
+    if (brandId) {
+      fetch(`/api/admin/brands/${brandId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.brand) {
+            const brand = data.brand;
+            // Заполняем только пустые поля, чтобы не перезаписывать уже введенные данные
+            if (!nameUz && brand.name) {
+              setNameUz(brand.name);
+            }
+            if (!logoUrl && brand.logo_url) {
+              setLogoUrl(brand.logo_url);
+            }
+            if (!bannerUrl && (brand.banner_url || brand.cover_image_url)) {
+              setBannerUrl(brand.banner_url || brand.cover_image_url);
+            }
+            if (!phone && brand.phone) {
+              setPhone(brand.phone);
+            }
+            if (!website && brand.website) {
+              setWebsite(brand.website);
+            }
+            if (!instagram && brand.instagram) {
+              setInstagram(brand.instagram);
+            }
+            if (!facebook && brand.facebook) {
+              setFacebook(brand.facebook);
+            }
+            if (!youtube && brand.youtube) {
+              setYoutube(brand.youtube);
+            }
+            if (!telegram && brand.telegram) {
+              setTelegram(brand.telegram);
+            }
+            if (!description && brand.description) {
+              setDescription(brand.description);
+            }
+          }
+        })
+        .catch((err) => console.error('Error loading brand data:', err));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [brandId]);
+
   // Загружаем районы при изменении региона
   useEffect(() => {
     if (regionId) {
@@ -699,6 +745,14 @@ export function BasicInfoForm({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Brand Search - перемещено в начало */}
+          <div className="pb-4 border-b">
+            <BrandSearch
+              value={brandId}
+              onChange={setBrandId}
+            />
+          </div>
+          
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="name_uz" className="flex items-center gap-2">
@@ -784,14 +838,6 @@ export function BasicInfoForm({
                 onChange={(url) => setBannerUrl(url || null)}
                 type="cover"
                 previewSize="w-full h-32"
-              />
-            </div>
-            
-            {/* Brand Search */}
-            <div className="md:col-span-2">
-              <BrandSearch
-                value={brandId}
-                onChange={setBrandId}
               />
             </div>
           </div>

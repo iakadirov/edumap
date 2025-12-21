@@ -69,7 +69,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { name, slug, logo_url, website, founder, description, founded_year, phone, email, instagram, facebook, youtube } = body;
+    const { name, slug, logo_url, banner_url, cover_image_url, short_description, website, founder, description, founded_year, phone, email, telegram, instagram, facebook, youtube } = body;
 
     const supabase = await createClient();
 
@@ -108,12 +108,16 @@ export async function PUT(
     if (name !== undefined) updateData.name = name;
     if (slug !== undefined) updateData.slug = slug;
     if (logo_url !== undefined) updateData.logo_url = logo_url || null;
+    if (banner_url !== undefined) updateData.banner_url = banner_url || null;
+    if (cover_image_url !== undefined) updateData.cover_image_url = cover_image_url || null;
+    if (short_description !== undefined) updateData.short_description = short_description || null;
     if (website !== undefined) updateData.website = website || null;
     if (founder !== undefined) updateData.founder = founder || null;
     if (description !== undefined) updateData.description = description || null;
     if (founded_year !== undefined) updateData.founded_year = founded_year || null;
     if (phone !== undefined) updateData.phone = phone || null;
     if (email !== undefined) updateData.email = email || null;
+    if (telegram !== undefined) updateData.telegram = telegram || null;
     if (instagram !== undefined) updateData.instagram = instagram || null;
     if (facebook !== undefined) updateData.facebook = facebook || null;
     if (youtube !== undefined) updateData.youtube = youtube || null;

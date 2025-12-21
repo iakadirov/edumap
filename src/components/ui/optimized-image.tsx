@@ -29,7 +29,12 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
     srcString.includes('storage.yandexcloud.net') ||
     isStorageKey;
   
-  const [currentSrc, setCurrentSrc] = useState<string | undefined>(undefined);
+  // Инициализируем currentSrc для presigned URLs сразу
+  const [currentSrc, setCurrentSrc] = useState<string | undefined>(
+    !isStorageKey && srcString && (srcString.startsWith('http') || srcString.startsWith('/')) 
+      ? srcString 
+      : undefined
+  );
   const [retryCount, setRetryCount] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(isStorageKey);
@@ -42,7 +47,12 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
   useEffect(() => {
     // Если это не ключ файла, просто устанавливаем src
     if (!isStorageKey) {
-      setCurrentSrc(srcString || undefined);
+      // Для presigned URLs устанавливаем сразу, если URL валидный
+      if (srcString && (srcString.startsWith('http') || srcString.startsWith('/'))) {
+        setCurrentSrc(srcString);
+      } else {
+        setCurrentSrc(undefined);
+      }
       setRetryCount(0);
       setIsLoading(false);
       loadedKeyRef.current = null;
@@ -60,7 +70,7 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
       setIsLoading(false);
       return;
     }
-
+    
     fetchingKeyRef.current = srcString;
     setIsLoading(true);
     setIsRefreshing(true);
@@ -70,9 +80,21 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
         if (response.ok) {
           return response.json();
         }
-        throw new Error('Failed to get presigned URL');
+        // Если файл не найден (404), это нормально - файл может не существовать
+        // Не устанавливаем currentSrc, чтобы компонент вернул null
+        if (response.status === 404) {
+          console.warn(`File not found in storage: ${srcString}`);
+          setCurrentSrc(undefined);
+          loadedKeyRef.current = null;
+          return null;
+        }
+        throw new Error(`Failed to get presigned URL: ${response.status}`);
       })
       .then((data) => {
+        if (!data) {
+          // 404 case - уже обработано выше
+          return;
+        }
         if (data.url) {
           setCurrentSrc(data.url);
           loadedKeyRef.current = srcString; // Сохраняем, что для этого ключа URL загружен
@@ -83,6 +105,8 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
       })
       .catch((error) => {
         console.error('Failed to get presigned URL for storage key:', error);
+        // Если это storage key и API вернул ошибку, оставляем currentSrc undefined
+        // Компонент вернет null, и родительский компонент может показать placeholder
         setCurrentSrc(undefined);
         loadedKeyRef.current = null;
       })
@@ -122,6 +146,41 @@ export function OptimizedImage({ src, ...props }: ImageProps) {
 
   // Обработчик ошибки загрузки изображения
   const handleError = async () => {
+    
+    // Если это thumbnail и он не загрузился, пытаемся получить оригинальный файл
+    if (srcString.includes('_thumb.')) {
+      // Извлекаем оригинальный ключ из thumbnail URL
+      try {
+        const { extractKeyFromPresignedUrl } = await import('@/lib/utils/image-url');
+        const { getOriginalKeyFromThumbnail } = await import('@/lib/utils/image-thumbnail');
+        
+        let originalKey: string | null = null;
+        if (isPresignedUrl(srcString)) {
+          const thumbnailKey = extractKeyFromPresignedUrl(srcString);
+          if (thumbnailKey) {
+            originalKey = getOriginalKeyFromThumbnail(thumbnailKey);
+          }
+        } else if (srcString.includes('/')) {
+          // Если это уже ключ
+          originalKey = getOriginalKeyFromThumbnail(srcString);
+        }
+        
+        if (originalKey) {
+          // Получаем presigned URL для оригинального файла
+          const response = await fetch(`/api/storage/url?key=${encodeURIComponent(originalKey)}&expires=3600`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.url) {
+              setCurrentSrc(data.url);
+              return;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to get original file:', error);
+      }
+    }
+    
     // Если это presigned URL и мы еще не превысили лимит попыток
     if (isPresignedUrl(srcString) && retryCount < maxRetries && !isRefreshing) {
       setIsRefreshing(true);

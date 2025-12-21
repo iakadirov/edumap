@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/contexts/ToastContext';
 import { saveInstagram, saveFacebook, saveYouTube } from '@/lib/utils/social-media';
-import { Upload, X, Loader2, Image as ImageIcon, Building2, Globe, User, Calendar, Phone, Mail, FileText } from 'lucide-react';
+import { Upload, X, Loader2, Image as ImageIcon, Building2, Globe, User, Calendar, Phone, Mail, FileText, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { normalizePhone } from '@/lib/utils/phone';
@@ -20,12 +20,16 @@ interface BrandFormProps {
     name: string;
     slug: string;
     logo_url?: string | null;
+    banner_url?: string | null;
+    cover_image_url?: string | null;
+    short_description?: string | null;
     website?: string | null;
     founder?: string | null;
     description?: string | null;
     founded_year?: number | null;
     phone?: string | null;
     email?: string | null;
+    telegram?: string | null;
     instagram?: string | null;
     facebook?: string | null;
     youtube?: string | null;
@@ -265,12 +269,15 @@ export function BrandForm({ brand }: BrandFormProps) {
   const [name, setName] = useState(brand?.name || '');
   const [slug, setSlug] = useState(brand?.slug || '');
   const [logoUrl, setLogoUrl] = useState(brand?.logo_url || null);
+  const [bannerUrl, setBannerUrl] = useState(brand?.banner_url || brand?.cover_image_url || null);
+  const [shortDescription, setShortDescription] = useState(brand?.short_description || '');
   const [website, setWebsite] = useState(brand?.website || '');
   const [founder, setFounder] = useState(brand?.founder || '');
   const [description, setDescription] = useState(brand?.description || '');
   const [foundedYear, setFoundedYear] = useState(brand?.founded_year?.toString() || '');
   const [phone, setPhone] = useState(brand?.phone || '');
   const [email, setEmail] = useState(brand?.email || '');
+  const [telegram, setTelegram] = useState(brand?.telegram || '');
   const [instagram, setInstagram] = useState(brand?.instagram || '');
   const [facebook, setFacebook] = useState(brand?.facebook || '');
   const [youtube, setYoutube] = useState(brand?.youtube || '');
@@ -311,12 +318,16 @@ export function BrandForm({ brand }: BrandFormProps) {
         name,
         slug,
         logo_url: logoUrl || null,
+        banner_url: bannerUrl || null,
+        cover_image_url: bannerUrl || null, // Для обратной совместимости
+        short_description: shortDescription || null,
         website: website || null,
         founder: founder || null,
         description: description || null,
         founded_year: foundedYear ? parseInt(foundedYear) : null,
         phone: normalizePhone(phone) || null,
         email: email || null,
+        telegram: telegram || null,
         instagram: normalizedInstagram,
         facebook: normalizedFacebook,
         youtube: normalizedYouTube,
@@ -431,6 +442,32 @@ export function BrandForm({ brand }: BrandFormProps) {
                 previewSize="w-32 h-32"
               />
             </div>
+            <div className="space-y-2 md:col-span-2">
+              <ImageUploadField
+                label="Banner (qopqoq rasm)"
+                value={bannerUrl || undefined}
+                onChange={(url) => setBannerUrl(url || null)}
+                type="cover"
+                previewSize="w-full h-48"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="shortDescription" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Qisqa tavsif (160 belgigacha)
+              </Label>
+              <Textarea
+                id="shortDescription"
+                value={shortDescription}
+                onChange={(e) => setShortDescription(e.target.value)}
+                placeholder="Brend haqida qisqa ma'lumot..."
+                rows={2}
+                maxLength={160}
+              />
+              <p className="text-xs text-muted-foreground">
+                {shortDescription.length}/160 belgi
+              </p>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="founder" className="flex items-center gap-2">
                 <User className="w-4 h-4" />
@@ -506,6 +543,18 @@ export function BrandForm({ brand }: BrandFormProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="info@brand.uz"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="telegram" className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                Telegram
+              </Label>
+              <Input
+                id="telegram"
+                value={telegram}
+                onChange={(e) => setTelegram(e.target.value)}
+                placeholder="@username yoki https://t.me/username"
               />
             </div>
             <div className="space-y-2 md:col-span-2">

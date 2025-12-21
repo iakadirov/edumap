@@ -61,6 +61,14 @@ export function BasicInfoSection({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Brand Search - перемещено в начало */}
+        <div className="pb-4 border-b">
+          <BrandSearch
+            value={brandId}
+            onChange={onBrandChange}
+          />
+        </div>
+        
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="name_uz" className="flex items-center gap-2">
@@ -110,16 +118,6 @@ export function BasicInfoSection({
             <p className="text-sm text-muted-foreground">
               {data.description.length}/200 belgi
             </p>
-          </div>
-          <div className="space-y-2 md:col-span-2">
-            <Label className="flex items-center gap-2">
-              <LinkIcon className="w-4 h-4" />
-              Brend (ixtiyoriy)
-            </Label>
-            <BrandSearch
-              value={brandId}
-              onChange={onBrandChange}
-            />
           </div>
 
           {/* Logo and Banner Upload */}

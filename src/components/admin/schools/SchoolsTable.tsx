@@ -329,6 +329,9 @@ export function SchoolsTable({
                       <Button variant="ghost" size="sm" asChild>
                         <Link href={`/admin/schools/${school.id}`} prefetch={false}>Tahrirlash</Link>
                       </Button>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/admin/schools/new?duplicate=${school.id}`} prefetch={false}>Dublikat</Link>
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"

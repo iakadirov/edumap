@@ -146,8 +146,9 @@ export async function getThumbnailUrl(
   try {
     // Извлекаем ключ из URL, если это presigned URL
     let key: string | null = null;
+    const isPresigned = isPresignedUrl(originalUrlOrKey);
     
-    if (isPresignedUrl(originalUrlOrKey)) {
+    if (isPresigned) {
       key = extractKeyFromPresignedUrl(originalUrlOrKey);
     } else {
       // Если это уже ключ, используем его напрямую
@@ -156,6 +157,12 @@ export async function getThumbnailUrl(
     
     if (!key) {
       // Если не удалось извлечь ключ, возвращаем исходный URL
+      return originalUrlOrKey;
+    }
+
+    // Пропускаем thumbnail для временных файлов (temp/)
+    // Для temp/ файлов возвращаем ключ как есть - OptimizedImage получит presigned URL
+    if (key.startsWith('temp/')) {
       return originalUrlOrKey;
     }
 
@@ -168,16 +175,36 @@ export async function getThumbnailUrl(
     const thumbnailKey = getThumbnailKey(key);
     
     // Запрашиваем presigned URL для thumbnail через API
-    const response = await fetch(`/api/storage/url?key=${encodeURIComponent(thumbnailKey)}&expires=3600`);
+    const apiUrl = `/api/storage/url?key=${encodeURIComponent(thumbnailKey)}&expires=3600`;
     
-    if (!response.ok) {
-      // Если thumbnail не найден, возвращаем оригинальный URL
+    let response;
+    try {
+      response = await fetch(apiUrl);
+    } catch (fetchError) {
+      // Если ошибка сети, возвращаем оригинальный URL
       return originalUrlOrKey;
     }
     
-    const data = await response.json();
-    return data.url || originalUrlOrKey;
-  } catch (error) {
+    // Если thumbnail не найден (404) или нет доступа (403), возвращаем оригинальный URL
+    // Это нормально для старых изображений, у которых нет thumbnail версии
+    if (!response.ok) {
+      return originalUrlOrKey;
+    }
+    
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      return originalUrlOrKey;
+    }
+    
+    // Если URL не получен, возвращаем оригинальный
+    if (!data.url) {
+      return originalUrlOrKey;
+    }
+    
+    return data.url;
+  } catch (error: any) {
     console.error('Failed to get thumbnail URL:', error);
     // В случае ошибки возвращаем исходный URL
     return originalUrlOrKey;
