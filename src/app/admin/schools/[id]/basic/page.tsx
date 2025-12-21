@@ -5,6 +5,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
+import type { OrganizationRow } from '@/types/organization';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,11 +64,14 @@ export default async function BasicInfoPage({
     notFound();
   }
 
+  // Явно указываем тип для результата запроса
+  const typedOrganization = organization as OrganizationRow;
+
   // Получаем районы для выбранного региона
   const { data: districts } = await (supabase as any)
     .from('districts')
     .select('*')
-    .eq('region_id', (organization as any).region_id || 0)
+    .eq('region_id', typedOrganization.region_id || 0)
     .order('name_uz');
 
   return (
@@ -77,12 +81,12 @@ export default async function BasicInfoPage({
           <div>
             <h1 className="text-3xl font-bold">📝 Базовая информация</h1>
             <p className="text-muted-foreground mt-1">
-              {organization.name_uz || organization.name_ru || organization.name}
+              {typedOrganization.name_uz || typedOrganization.name_ru || typedOrganization.name}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" asChild>
-              <Link href={`/schools/${organization.slug}`} target="_blank">
+              <Link href={`/schools/${typedOrganization.slug}`} target="_blank">
                 <ExternalLink className="mr-2 h-4 w-4" />
                 Saytda ko'rish
               </Link>

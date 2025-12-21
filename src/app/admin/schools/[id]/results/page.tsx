@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { ExternalLink } from 'lucide-react';
+import type { OrganizationRow } from '@/types/organization';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +28,9 @@ export default async function ResultsPage({
   if (orgError || !organization) {
     notFound();
   }
+
+  // Явно указываем тип для результата запроса
+  const typedOrganization = organization as OrganizationRow;
 
   const { data: results } = await (supabase as any)
     .from('school_results')
@@ -56,14 +60,14 @@ export default async function ResultsPage({
             </Link>
             <h1 className="text-3xl font-bold">🏆 Результаты и достижения</h1>
             <p className="text-muted-foreground mt-1">
-              {organization.name_uz || organization.name_ru || organization.name}
+              {typedOrganization.name_uz || typedOrganization.name_ru || typedOrganization.name}
             </p>
             <p className="text-sm text-yellow-600 mt-2">
               ⚠️ Этот раздел сильно влияет на рейтинг школы!
             </p>
           </div>
           <Button variant="outline" asChild>
-            <Link href={`/schools/${organization.slug}`} target="_blank">
+            <Link href={`/schools/${typedOrganization.slug}`} target="_blank">
               <ExternalLink className="mr-2 h-4 w-4" />
               Saytda ko'rish
             </Link>
