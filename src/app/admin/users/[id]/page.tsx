@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
 import { getCurrentUser } from '@/lib/auth/middleware';
+import type { UserRow } from '@/types/user';
 
 // Админ-панель всегда динамическая (не кэшируется)
 export const dynamic = 'force-dynamic';
@@ -31,8 +32,11 @@ export default async function EditUserPage({
     notFound();
   }
 
+  // Явно указываем тип для результата запроса
+  const typedUser = user as UserRow;
+
   // Проверяем права: admin не может редактировать super_admin
-  if (user.role === 'super_admin' && currentUser?.role !== 'super_admin') {
+  if (typedUser.role === 'super_admin' && currentUser?.role !== 'super_admin') {
     redirect('/admin/users?error=cannot_edit_super_admin');
   }
 
@@ -44,7 +48,7 @@ export default async function EditUserPage({
           <div>
             <h1 className="text-3xl font-bold">Foydalanuvchini tahrirlash</h1>
             <p className="text-muted-foreground mt-1">
-              {user.full_name || user.email}
+              {typedUser.full_name || typedUser.email}
             </p>
           </div>
           <Button variant="outline" asChild>
@@ -61,7 +65,7 @@ export default async function EditUserPage({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <UserForm user={user} />
+            <UserForm user={typedUser} />
           </CardContent>
         </Card>
       </div>
