@@ -5,11 +5,9 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
 import { ExternalLink } from 'lucide-react';
-import type { Database } from '@/types/database';
+import type { BrandRow } from '@/types/brand';
 
 export const dynamic = 'force-dynamic';
-
-type BrandRow = Database['public']['Tables']['school_brands']['Row'];
 
 export default async function EditBrandPage({
   params,
