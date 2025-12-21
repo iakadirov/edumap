@@ -14,6 +14,22 @@ export default async function AdminDashboardPage() {
   noStore(); // Отключаем кэширование для админ-панели
   const supabase = await createClient();
 
+  // Типы для результатов запросов
+  type UserRow = {
+    id: string;
+    email: string;
+    full_name: string | null;
+    role: string;
+    created_at: string;
+  };
+
+  type SchoolRow = {
+    id: string;
+    name_uz: string | null;
+    status: string;
+    created_at: string;
+  };
+
   // Получаем статистику (оптимизировано - только нужные поля)
   const [
     { count: totalSchools },
@@ -44,6 +60,10 @@ export default async function AdminDashboardPage() {
       .order('created_at', { ascending: false })
       .limit(5),
   ]);
+
+  // Явно указываем типы для результатов запросов
+  const typedRecentUsers = (recentUsers || []) as UserRow[];
+  const typedRecentSchools = (recentSchools || []) as SchoolRow[];
 
   const stats = [
     {
@@ -111,8 +131,8 @@ export default async function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentUsers && recentUsers.length > 0 ? (
-                  recentUsers.map((user) => (
+                {typedRecentUsers && typedRecentUsers.length > 0 ? (
+                  typedRecentUsers.map((user) => (
                     <div key={user.id} className="flex items-center gap-3">
                       <Avatar className="h-9 w-9">
                         <AvatarFallback>
@@ -147,8 +167,8 @@ export default async function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentSchools && recentSchools.length > 0 ? (
-                  recentSchools.map((school) => (
+                {typedRecentSchools && typedRecentSchools.length > 0 ? (
+                  typedRecentSchools.map((school) => (
                     <div key={school.id} className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{school.name_uz}</p>
