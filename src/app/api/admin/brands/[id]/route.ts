@@ -91,8 +91,11 @@ export async function PUT(
       );
     }
 
+    // Явно указываем тип для результата запроса
+    const typedExisting = existing as { id: string; slug: string };
+
     // Если slug изменился, проверяем уникальность
-    if (slug && slug !== existing.slug) {
+    if (slug && slug !== typedExisting.slug) {
       const { data: slugExists } = await supabase
         .from('school_brands')
         .select('id')
