@@ -76,7 +76,6 @@ export async function PUT(
     // Обновляем организацию
     const { error: orgError } = await supabase
       .from('organizations')
-      // @ts-expect-error - Supabase type inference issue
       .update(organization)
       .eq('id', id);
 
@@ -99,7 +98,6 @@ export async function PUT(
       // Обновляем существующие детали
       const { error: detailsError } = await supabase
         .from('school_details')
-        // @ts-expect-error - Supabase type inference issue
         .update(school_details)
         .eq('organization_id', id);
 
@@ -114,7 +112,6 @@ export async function PUT(
       // Создаем новые детали с обязательными полями
       const { error: detailsError } = await supabase
         .from('school_details')
-        // @ts-expect-error - Supabase type inference issue
         .insert({
           organization_id: id,
           school_type: school_details.school_type || 'private',

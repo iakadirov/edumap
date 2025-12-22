@@ -1,14 +1,31 @@
 import { unstable_cache } from 'next/cache';
 import { createClient } from './server';
-import type { Database } from '@/types/database';
+import type { OrganizationRow } from '@/types/organization';
 import {
   getSchoolDetails,
   matchesFilters,
   type SchoolWithDetails as SchoolWithDetailsType
 } from '@/lib/utils/school-helpers';
 
-type Organization = Database['public']['Tables']['organizations']['Row'];
-type SchoolDetails = Database['public']['Tables']['school_details']['Row'];
+type Organization = OrganizationRow;
+
+// Тип для school_details
+type SchoolDetails = {
+  id: string;
+  organization_id: string;
+  school_type: string;
+  grade_from: number;
+  grade_to: number;
+  primary_language: string;
+  accepts_preparatory: boolean;
+  accepted_grades: number[] | null;
+  additional_languages: string[] | null;
+  curriculum: string[] | null;
+  fee_monthly_min: number | null;
+  fee_monthly_max: number | null;
+  pricing_tiers: unknown | null;
+  [key: string]: unknown;
+};
 
 type SchoolWithDetails = Organization & {
   school_details: SchoolDetails | SchoolDetails[] | null;
@@ -354,8 +371,10 @@ export async function getSchoolsWithFilters(filters: {
     });
   } else if (filters.sort === 'popularity') {
     filteredData.sort((a, b) => {
-      const aScore = (a.overall_rating || 0) * 0.7 + (a.reviews_count || 0) * 0.3;
-      const bScore = (b.overall_rating || 0) * 0.7 + (b.reviews_count || 0) * 0.3;
+      const typedA = a as SchoolWithDetails;
+      const typedB = b as SchoolWithDetails;
+      const aScore = (typedA.overall_rating || 0) * 0.7 + (typedA.reviews_count || 0) * 0.3;
+      const bScore = (typedB.overall_rating || 0) * 0.7 + (typedB.reviews_count || 0) * 0.3;
       return bScore - aScore;
     });
   }
@@ -658,6 +677,15 @@ export async function getSimilarSchools(schoolId: string, limit: number = 3) {
   if (!currentSchool) {
     return [];
   }
+
+  // Явно указываем тип для результата запроса
+  const typedCurrentSchool = currentSchool as Pick<Organization, 'district' | 'id'> & {
+    school_details: Array<{
+      school_type: string;
+      curriculum: string[] | null;
+      fee_monthly_min: number | null;
+    }> | null;
+  };
   
   let query = supabase
     .from('organizations')
@@ -680,8 +708,8 @@ export async function getSimilarSchools(schoolId: string, limit: number = 3) {
     .neq('id', schoolId);
   
   // Фильтруем по району, если есть
-  if (currentSchool.district) {
-    query = query.eq('district', currentSchool.district);
+  if (typedCurrentSchool.district) {
+    query = query.eq('district', typedCurrentSchool.district);
   }
   
   // Сортируем по рейтингу

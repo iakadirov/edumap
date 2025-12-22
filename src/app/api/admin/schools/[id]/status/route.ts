@@ -87,7 +87,6 @@ export async function PATCH(
     // Обновляем статус через service role клиент
     const { data: updated, error: updateError } = await adminClient
       .from('organizations')
-      // @ts-expect-error - Supabase type inference issue
       .update({ status })
       .eq('id', id)
       .select()
@@ -165,7 +164,6 @@ export async function POST(
     // Обновляем статус на pending
     const { error: updateError } = await supabase
       .from('organizations')
-      // @ts-expect-error - Supabase type inference issue
       .update({ status: 'pending' })
       .eq('id', id);
 
@@ -240,7 +238,6 @@ export async function PUT(
     // Обновляем статус
     const { error: updateError } = await supabase
       .from('organizations')
-      // @ts-expect-error - Supabase type inference issue
       .update({ status: newStatus })
       .eq('id', id);
 

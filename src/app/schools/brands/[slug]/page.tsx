@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
+import type { BrandRow } from '@/types/brand';
 import { BrandPage } from '@/components/schools/BrandPage';
 import { unstable_noStore as noStore } from 'next/cache';
 import type { Metadata } from 'next';
@@ -27,13 +28,16 @@ export async function generateMetadata({
     };
   }
 
+  // Явно указываем тип для результата запроса
+  const typedBrandMeta = brand as Pick<BrandRow, 'name' | 'description' | 'logo_url'>;
+
   return {
-    title: `${brand.name} — EduMap.uz`,
-    description: brand.description || `${brand.name} brendi maktablari`,
+    title: `${typedBrandMeta.name} — EduMap.uz`,
+    description: typedBrandMeta.description || `${typedBrandMeta.name} brendi maktablari`,
     openGraph: {
-      title: `${brand.name} — EduMap.uz`,
-      description: brand.description || `${brand.name} brendi maktablari`,
-      images: brand.logo_url ? [brand.logo_url] : [],
+      title: `${typedBrandMeta.name} — EduMap.uz`,
+      description: typedBrandMeta.description || `${typedBrandMeta.name} brendi maktablari`,
+      images: typedBrandMeta.logo_url ? [typedBrandMeta.logo_url] : [],
     },
   };
 }
@@ -58,6 +62,9 @@ export default async function BrandPageRoute({
     notFound();
   }
 
+  // Явно указываем тип для результата запроса
+  const typedBrandFull = brand as BrandRow;
+
   // Получаем школы бренда (только опубликованные)
   const { data: schools, error: schoolsError } = await supabase
     .from('organizations')
@@ -65,7 +72,7 @@ export default async function BrandPageRoute({
       *,
       school_details (*)
     `)
-    .eq('brand_id', brand.id)
+    .eq('brand_id', typedBrandFull.id)
     .eq('status', 'published')
     .order('name_uz', { ascending: true });
 
@@ -73,6 +80,6 @@ export default async function BrandPageRoute({
     console.error('Error fetching schools:', schoolsError);
   }
 
-  return <BrandPage brand={brand} schools={schools || []} />;
+  return <BrandPage brand={typedBrandFull} schools={schools || []} />;
 }
 

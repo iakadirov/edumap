@@ -73,7 +73,6 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
-          detailed_          description?: string | null
           detailed_description?: string | null
           district?: string | null
           email?: string | null
@@ -123,7 +122,6 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
-          detailed_          description?: string | null
           detailed_description?: string | null
           district?: string | null
           email?: string | null

@@ -13,10 +13,24 @@ import {
 } from '@solar-icons/react-perf';
 import { refreshImageUrl, isPresignedUrl, getThumbnailUrl } from '@/lib/utils/image-url';
 import { OptimizedImage } from '@/components/ui/optimized-image';
-import type { Database } from '@/types/database';
+import type { OrganizationRow } from '@/types/organization';
 
-type Organization = Database['public']['Tables']['organizations']['Row'] & {
-  school_details?: Database['public']['Tables']['school_details']['Row'] | Database['public']['Tables']['school_details']['Row'][];
+// Тип для school_details
+type SchoolDetailsRow = {
+  id: string;
+  organization_id: string;
+  school_type: string;
+  grade_from: number;
+  grade_to: number;
+  primary_language: string;
+  fee_monthly_min: number | null;
+  fee_monthly_max: number | null;
+  pricing_tiers: unknown | null;
+  [key: string]: unknown;
+};
+
+type Organization = OrganizationRow & {
+  school_details?: SchoolDetailsRow | SchoolDetailsRow[] | null;
 };
 
 interface SchoolCardProps {

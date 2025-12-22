@@ -3,10 +3,27 @@
  * Устраняет дублирование кода
  */
 
-import type { Database } from '@/types/database';
+import type { OrganizationRow } from '@/types/organization';
 
-type Organization = Database['public']['Tables']['organizations']['Row'];
-type SchoolDetails = Database['public']['Tables']['school_details']['Row'];
+type Organization = OrganizationRow;
+
+// Тип для school_details
+type SchoolDetails = {
+  id: string;
+  organization_id: string;
+  school_type: string;
+  grade_from: number;
+  grade_to: number;
+  primary_language: string;
+  accepts_preparatory: boolean;
+  accepted_grades: number[] | null;
+  additional_languages: string[] | null;
+  curriculum: string[] | null;
+  fee_monthly_min: number | null;
+  fee_monthly_max: number | null;
+  pricing_tiers: unknown | null;
+  [key: string]: unknown;
+};
 
 export interface SchoolWithDetails extends Organization {
   school_details: SchoolDetails | SchoolDetails[] | null;
@@ -139,11 +156,11 @@ export function hasService(
 
   switch (service) {
     case 'transport':
-      return details.has_transport ?? false;
+      return (details.has_transport as boolean | undefined) ?? false;
     case 'meals':
-      return details.has_meals ?? false;
+      return (details.has_meals as boolean | undefined) ?? false;
     case 'extended_day':
-      return details.has_extended_day ?? false;
+      return (details.has_extended_day as boolean | undefined) ?? false;
     default:
       return false;
   }

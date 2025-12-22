@@ -131,7 +131,6 @@ export async function PUT(
 
     const { data: updatedBrand, error: updateError } = await supabase
       .from('school_brands')
-      // @ts-expect-error - Supabase type inference issue with school_brands table
       .update(updateData)
       .eq('id', id)
       .select()

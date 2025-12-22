@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { unstable_noStore as noStore } from 'next/cache';
+import type { OrganizationRow } from '@/types/organization';
 
 // Страница всегда динамическая (не кэшируется)
 export const dynamic = 'force-dynamic';
@@ -28,7 +29,10 @@ export default async function SchoolDashboardPage() {
     console.error('Error fetching schools:', error);
   }
 
-  const schoolCount = schools?.length || 0;
+  // Явно указываем тип для результата запроса
+  const typedSchools = (schools || []) as Pick<OrganizationRow, 'id' | 'name' | 'name_uz' | 'name_ru' | 'status' | 'created_at' | 'city' | 'district'>[];
+
+  const schoolCount = typedSchools.length;
 
   return (
     <div className="flex-1 overflow-auto">
@@ -59,9 +63,9 @@ export default async function SchoolDashboardPage() {
         </div>
 
         {/* Schools List */}
-        {schools && schools.length > 0 ? (
+        {typedSchools.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {schools.map((school) => (
+            {typedSchools.map((school) => (
               <Card key={school.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle>{school.name_uz || school.name_ru || school.name}</CardTitle>

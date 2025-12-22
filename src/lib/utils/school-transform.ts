@@ -3,10 +3,27 @@
  */
 
 import type { SchoolProfile } from '@/types/school';
-import type { Database } from '@/types/database';
+import type { OrganizationRow } from '@/types/organization';
 
-type Organization = Database['public']['Tables']['organizations']['Row'];
-type SchoolDetails = Database['public']['Tables']['school_details']['Row'];
+type Organization = OrganizationRow;
+
+// Тип для school_details
+type SchoolDetails = {
+  id: string;
+  organization_id: string;
+  school_type: string;
+  grade_from: number;
+  grade_to: number;
+  primary_language: string;
+  accepts_preparatory: boolean;
+  accepted_grades: number[] | null;
+  additional_languages: string[] | null;
+  curriculum: string[] | null;
+  fee_monthly_min: number | null;
+  fee_monthly_max: number | null;
+  pricing_tiers: unknown | null;
+  [key: string]: unknown;
+};
 
 interface SchoolWithDetails extends Organization {
   school_details: SchoolDetails | SchoolDetails[] | null;
@@ -61,7 +78,9 @@ export function transformSchoolToProfile(school: SchoolWithDetails): SchoolProfi
   if (details?.has_computer_lab) features.push('lab');
   
   // Формируем curriculum
-  const curriculum = details?.curriculum || [];
+  const curriculum = Array.isArray(details?.curriculum) 
+    ? details.curriculum.filter((c): c is string => typeof c === 'string')
+    : [];
   
   // Формируем контакты
   const contacts = {
@@ -85,15 +104,15 @@ export function transformSchoolToProfile(school: SchoolWithDetails): SchoolProfi
   // Формируем stats
   const stats = {
     foundedYear: school.founded_year || undefined,
-    studentsCount: details?.total_students || undefined,
-    teachersCount: details?.total_teachers || undefined,
+    studentsCount: details?.total_students ? Number(details.total_students) : undefined,
+    teachersCount: details?.total_teachers ? Number(details.total_teachers) : undefined,
     studentTeacherRatio: details?.total_students && details?.total_teachers
-      ? (details.total_students / details.total_teachers).toFixed(1)
+      ? (Number(details.total_students) / Number(details.total_teachers)).toFixed(1)
       : undefined,
     classSize: details?.avg_class_size
       ? {
-          min: Math.floor(details.avg_class_size * 0.8),
-          max: Math.ceil(details.avg_class_size * 1.2),
+          min: Math.floor(Number(details.avg_class_size) * 0.8),
+          max: Math.ceil(Number(details.avg_class_size) * 1.2),
         }
       : undefined,
   };
@@ -139,7 +158,7 @@ export function transformSchoolToProfile(school: SchoolWithDetails): SchoolProfi
     type: (details?.school_type as 'private' | 'international' | 'state_enhanced') || 'private',
     curriculum,
     accreditations: details?.has_international_accreditation
-      ? [details.accreditation_body || 'International']
+      ? [typeof details.accreditation_body === 'string' ? details.accreditation_body : 'International']
       : [],
     location,
     grades,
@@ -165,8 +184,8 @@ export function transformSchoolToProfile(school: SchoolWithDetails): SchoolProfi
           {
             name: 'Лицензия на образовательную деятельность',
             type: 'license' as const,
-            issuer: details.license_authority || '',
-            year: details.license_date
+            issuer: typeof details.license_authority === 'string' ? details.license_authority : '',
+            year: details.license_date && (typeof details.license_date === 'string' || details.license_date instanceof Date)
               ? new Date(details.license_date).getFullYear()
               : new Date().getFullYear(),
             url: '', // Можно добавить поле в БД

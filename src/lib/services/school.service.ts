@@ -9,10 +9,27 @@ import { normalizePhone } from '@/lib/utils/phone';
 import { normalizeWebsite } from '@/lib/utils/website';
 import { saveTelegram } from '@/lib/utils/telegram';
 import { saveInstagram, saveFacebook, saveYouTube } from '@/lib/utils/social-media';
-import type { Database } from '@/types/database';
+import type { OrganizationRow } from '@/types/organization';
 
-type Organization = Database['public']['Tables']['organizations']['Row'];
-type SchoolDetails = Database['public']['Tables']['school_details']['Row'];
+type Organization = OrganizationRow;
+
+// Тип для school_details
+type SchoolDetails = {
+  id: string;
+  organization_id: string;
+  school_type: string;
+  grade_from: number;
+  grade_to: number;
+  primary_language: string;
+  accepts_preparatory: boolean;
+  accepted_grades: number[] | null;
+  additional_languages: string[] | null;
+  curriculum: string[] | null;
+  fee_monthly_min: number | null;
+  fee_monthly_max: number | null;
+  pricing_tiers: unknown | null;
+  [key: string]: unknown;
+};
 
 export interface CreateSchoolDTO {
   organization: {
@@ -104,7 +121,9 @@ export class SchoolService {
       .select('slug')
       .like('slug', `${baseSlug}%`);
 
-    const slugs = existingSlugs?.map((s) => s.slug) || [];
+    // Явно указываем тип для результата запроса
+    const typedExistingSlugs = (existingSlugs || []) as Pick<OrganizationRow, 'slug'>[];
+    const slugs = typedExistingSlugs.map((s) => s.slug).filter((s): s is string => s !== null);
     const slug = generateUniqueSlug(baseSlug, slugs);
 
     // Нормализуем данные
@@ -127,11 +146,14 @@ export class SchoolService {
       throw new Error(`Failed to create organization: ${orgError?.message || 'Unknown error'}`);
     }
 
+    // Явно указываем тип для результата запроса
+    const typedNewOrg = newOrg as Organization;
+
     // Создаем детали школы
     const { error: detailsError } = await supabase
       .from('school_details')
       .insert({
-        organization_id: newOrg.id,
+        organization_id: typedNewOrg.id,
         school_type: dto.school_details.school_type as 'private' | 'state' | 'international',
         grade_from: dto.school_details.grade_from ?? 1,
         grade_to: dto.school_details.grade_to ?? 11,
@@ -147,12 +169,12 @@ export class SchoolService {
 
     if (detailsError) {
       // Откатываем создание организации
-      await supabase.from('organizations').delete().eq('id', newOrg.id);
+      await supabase.from('organizations').delete().eq('id', typedNewOrg.id);
       console.error('Error creating school details:', detailsError);
       throw new Error(`Failed to create school details: ${detailsError.message}`);
     }
 
-    return { id: newOrg.id, slug: newOrg.slug };
+    return { id: typedNewOrg.id, slug: typedNewOrg.slug };
   }
 
   /**
@@ -283,6 +305,8 @@ export class SchoolService {
       .select('slug')
       .eq('org_type', 'school');
 
-    return data?.map((s) => s.slug) || [];
+    // Явно указываем тип для результата запроса
+    const typedData = (data || []) as Pick<OrganizationRow, 'slug'>[];
+    return typedData.map((s) => s.slug).filter((s): s is string => s !== null);
   }
 }

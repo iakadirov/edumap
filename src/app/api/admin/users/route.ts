@@ -91,7 +91,6 @@ export async function POST(request: Request) {
 
     const { data: newUser, error: userError } = await clientToUse
       .from('users')
-      // @ts-expect-error - Supabase type inference issue
       .insert({
         auth_user_id: authUserId,
         email,

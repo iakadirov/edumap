@@ -119,7 +119,6 @@ export async function POST(request: Request) {
     // Создаем бренд
     const { data: newBrand, error: brandError } = await supabase
       .from('school_brands')
-      // @ts-expect-error - Supabase type inference issue with school_brands table
       .insert({
         name,
         slug,

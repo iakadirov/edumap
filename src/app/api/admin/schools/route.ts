@@ -69,7 +69,6 @@ export async function POST(request: Request) {
     // Создаем организацию
     const { data: newOrganization, error: orgError } = await supabase
       .from('organizations')
-      // @ts-expect-error - Supabase type inference issue
       .insert(organization)
       .select()
       .single();
@@ -88,7 +87,6 @@ export async function POST(request: Request) {
     // Создаем school_details с обязательными полями
     const { error: detailsError } = await supabase
       .from('school_details')
-      // @ts-expect-error - Supabase type inference issue
       .insert({
         organization_id: typedNewOrganization.id,
         school_type: school_details.school_type,

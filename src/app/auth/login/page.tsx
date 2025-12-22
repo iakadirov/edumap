@@ -46,7 +46,6 @@ export default function LoginPage() {
             // Пользователь не найден - создаем с ролью user по умолчанию
             const { error: insertError } = await supabase
               .from('users')
-              // @ts-expect-error - Supabase type inference issue
               .insert({
                 auth_user_id: data.user.id,
                 email: data.user.email || '',
@@ -92,7 +91,6 @@ export default function LoginPage() {
         // Обновляем last_login_at
         await supabase
           .from('users')
-          // @ts-expect-error - Supabase type inference issue
           .update({ last_login_at: new Date().toISOString() })
           .eq('auth_user_id', data.user.id);
 
