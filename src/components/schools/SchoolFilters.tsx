@@ -274,10 +274,10 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
   // Districts теперь загружаются реактивно через DistrictsLoader
 
   return (
-    <div className="w-full flex flex-col gap-4" style={{ width: '1092px' }}>
+    <div className="w-full flex flex-col gap-4">
       {/* Заголовок и кнопка сброса */}
       <div className="flex items-center justify-between w-full h-5">
-        <h3 className="text-base font-semibold text-black" style={{ width: '108px', height: '20px' }}>
+        <h3 className="text-base font-semibold text-black">
           Qidiruv filtrlari
         </h3>
         {hasActiveFilters && (
@@ -285,7 +285,6 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
             variant="ghost" 
             onClick={resetFilters} 
             className="flex items-center gap-1 h-5 p-0 text-base font-medium text-black hover:bg-transparent cursor-pointer"
-            style={{ width: '131px', height: '20px' }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2.5 5.5L5.5 2.5M5.5 2.5L8.5 5.5M5.5 2.5V11.5" stroke="#1C274C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -298,16 +297,14 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
 
       {/* Белая карточка с фильтрами */}
       <div 
-        className="bg-white rounded-[20px] p-5 flex flex-row items-end gap-5"
+        className="bg-white rounded-[20px] p-5 flex flex-row items-end gap-5 w-full"
         style={{ 
-          boxShadow: '0px 0px 2px rgba(0, 0, 0, 0.15)',
-          width: '1092px',
-          height: '116px'
+          boxShadow: '0px 0px 2px rgba(0, 0, 0, 0.15)'
         }}
       >
         {/* Район - Multi-select */}
-        <div className="flex flex-col gap-2 flex-1" style={{ width: '297.33px', height: '76px' }}>
-          <label className="text-base font-normal text-black" style={{ height: '20px' }}>
+        <div className="flex flex-col gap-2 flex-1">
+          <label className="text-base font-normal text-black">
             Tumanni tanlang
           </label>
           <DistrictsLoader
@@ -318,11 +315,11 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
         </div>
 
         {/* Язык обучения */}
-        <div className="flex flex-col gap-2 flex-1" style={{ width: '297.33px', height: '76px' }}>
-          <label className="text-base font-normal text-black" style={{ height: '20px' }}>
+        <div className="flex flex-col gap-2 flex-1">
+          <label className="text-base font-normal text-black">
             Ta'lim tilini tanlang
           </label>
-          <div className="flex flex-row items-center gap-3" style={{ height: '48px' }}>
+          <div className="flex flex-row items-center gap-3">
             {defaultLanguages.map((lang) => {
               const isSelected = filters.language?.includes(lang.id) || false;
               return (
@@ -354,11 +351,11 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
         </div>
 
         {/* Цена */}
-        <div className="flex flex-col gap-2 flex-1 relative" style={{ width: '297.33px', height: '76px' }}>
-          <label className="text-base font-normal text-black" style={{ height: '20px' }}>
+        <div className="flex flex-col gap-2 flex-1 relative">
+          <label className="text-base font-normal text-black">
             Maktab narxini belgilang
           </label>
-          <div className="flex items-center gap-2 relative" style={{ height: '48px' }}>
+          <div className="flex items-center gap-2 relative">
             <DropdownMenu open={priceDropdownOpen} onOpenChange={setPriceDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <div 
@@ -377,7 +374,7 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent 
-                className="w-[297.33px] p-4 bg-white border border-gray-200 rounded-b-xl shadow-lg"
+                className="p-4 bg-white border border-gray-200 rounded-b-xl shadow-lg"
                 align="start"
                 side="bottom"
                 sideOffset={0}
@@ -386,6 +383,7 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
                   borderTopLeftRadius: '0',
                   borderTopRightRadius: '0',
                   marginTop: '-1px',
+                  width: '100%',
                 }}
               >
                 <div className="space-y-4">

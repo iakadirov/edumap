@@ -6,6 +6,9 @@ import { RegionSelector } from '@/components/shared/RegionSelector';
 import {
   MapPointBold,
   BookBold,
+  SmileCircleBold,
+  SquareAcademicCapBold,
+  NotebookBold,
   AddCircleBold,
   AltArrowDownLinear,
 } from '@solar-icons/react-perf';
@@ -62,15 +65,28 @@ export function HomeTopBar() {
 
         {/* Навигация по типам организаций */}
         <div className="px-2 sm:px-4 py-1 bg-slate-100 rounded-xl flex items-center gap-3 sm:gap-6 overflow-x-auto">
-          <span
+          <Link
+            href="/kindergartens"
             className={cn(
-              'text-base font-medium cursor-not-allowed opacity-50',
-              'text-slate-600'
+              'px-2 py-[6px] flex items-center gap-1 transition-all',
+              activeOrgType === 'kindergartens'
+                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-green-500 rounded-lg'
+                : 'rounded-xl hover:bg-white/50'
             )}
-            title="Hozircha faqat maktablar bo'limi ishlaydi"
           >
-            Bog'chalar
-          </span>
+            <SmileCircleBold className={cn(
+              'h-5 w-5',
+              activeOrgType === 'kindergartens' ? 'text-green-500' : 'text-slate-600'
+            )} />
+            <span className={cn(
+              'text-base',
+              activeOrgType === 'kindergartens'
+                ? 'text-green-500 font-semibold'
+                : 'text-slate-600 font-medium'
+            )}>
+              Bog'chalar
+            </span>
+          </Link>
 
           <Link
             href="/schools"
@@ -95,25 +111,51 @@ export function HomeTopBar() {
             </span>
           </Link>
 
-          <span
+          <Link
+            href="/universities"
             className={cn(
-              'text-base font-medium cursor-not-allowed opacity-50',
-              'text-slate-600'
+              'px-2 py-[6px] flex items-center gap-1 transition-all',
+              activeOrgType === 'universities'
+                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-purple-600 rounded-lg'
+                : 'rounded-xl hover:bg-white/50'
             )}
-            title="Hozircha faqat maktablar bo'limi ishlaydi"
           >
-            Oliygohlar
-          </span>
+            <SquareAcademicCapBold className={cn(
+              'h-5 w-5',
+              activeOrgType === 'universities' ? 'text-purple-600' : 'text-slate-600'
+            )} />
+            <span className={cn(
+              'text-base',
+              activeOrgType === 'universities'
+                ? 'text-purple-600 font-semibold'
+                : 'text-slate-600 font-medium'
+            )}>
+              Oliygohlar
+            </span>
+          </Link>
 
-          <span
+          <Link
+            href="/courses"
             className={cn(
-              'text-base font-medium cursor-not-allowed opacity-50',
-              'text-slate-600'
+              'px-2 py-[6px] flex items-center gap-1 transition-all',
+              activeOrgType === 'courses'
+                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-orange-500 rounded-lg'
+                : 'rounded-xl hover:bg-white/50'
             )}
-            title="Hozircha faqat maktablar bo'limi ishlaydi"
           >
-            Kurslar
-          </span>
+            <NotebookBold className={cn(
+              'h-5 w-5',
+              activeOrgType === 'courses' ? 'text-orange-500' : 'text-slate-600'
+            )} />
+            <span className={cn(
+              'text-base',
+              activeOrgType === 'courses'
+                ? 'text-orange-500 font-semibold'
+                : 'text-slate-600 font-medium'
+            )}>
+              Kurslar
+            </span>
+          </Link>
         </div>
       </div>
 

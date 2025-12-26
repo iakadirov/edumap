@@ -126,40 +126,42 @@ export default async function SchoolsListPage({ searchParams }: SchoolsListPageP
   });
 
   return (
-    <div className="container-wrapper bg-white">
+    <div className="container-wrapper bg-white p-6 mt-6 rounded-3xl">
       {/* Синхронизация выбранной области с URL */}
       <RegionFilterSync />
       <div className="container-content pt-8">
-        <div className="container-inner">
-          {/* Основной контейнер */}
-          <div className="w-full flex flex-col gap-5">
-            {/* Заголовок */}
+        {/* Основной контейнер */}
+        <div className="w-full flex flex-col gap-5">
+          {/* Заголовок */}
+          <div className="container-inner">
             <h1 className="text-xl sm:text-2xl font-semibold text-black">
               Maktablar katalogi
             </h1>
+          </div>
 
-            {/* Фильтры сверху горизонтально */}
-            <div className="w-full">
-              <SchoolFilters 
-                cities={cities}
-                initialFilters={{
-                  district: params.district,
-                  city: params.city,
-                  school_type: params.school_type,
-                  price_min: params.price_min,
-                  price_max: params.price_max,
-                  language: params.language,
-                  curriculum: params.curriculum,
-                  grade: params.grade,
-                  rating_min: params.rating_min,
-                  has_transport: params.has_transport,
-                  has_meals: params.has_meals,
-                  has_extended_day: params.has_extended_day,
-                }}
-              />
-            </div>
+          {/* Фильтры сверху горизонтально - на всю ширину */}
+          <div className="w-full">
+            <SchoolFilters 
+              cities={cities}
+              initialFilters={{
+                district: params.district,
+                city: params.city,
+                school_type: params.school_type,
+                price_min: params.price_min,
+                price_max: params.price_max,
+                language: params.language,
+                curriculum: params.curriculum,
+                grade: params.grade,
+                rating_min: params.rating_min,
+                has_transport: params.has_transport,
+                has_meals: params.has_meals,
+                has_extended_day: params.has_extended_day,
+              }}
+            />
+          </div>
 
-            {/* Список школ - загружается отдельно через Suspense для streaming */}
+          {/* Список школ - загружается отдельно через Suspense для streaming */}
+          <div className="container-inner">
             <div className="w-full flex flex-col gap-4 sm:gap-5">
               <Suspense 
                 fallback={

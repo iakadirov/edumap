@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
-  MagniferBold,
   AddCircleBold,
 } from '@solar-icons/react-perf';
 import { usePathname } from 'next/navigation';
@@ -20,6 +19,48 @@ import { cn } from '@/lib/utils';
  */
 export function HomeMainNav() {
   const pathname = usePathname();
+
+  // Определяем тип организации для адаптации текстов
+  const getOrgType = () => {
+    if (pathname.startsWith('/kindergartens')) return 'kindergartens';
+    if (pathname.startsWith('/schools')) return 'schools';
+    if (pathname.startsWith('/universities')) return 'universities';
+    if (pathname.startsWith('/courses')) return 'courses';
+    return null;
+  };
+
+  const orgType = getOrgType();
+
+  // Адаптируем тексты в зависимости от типа организации
+  const getSelectText = () => {
+    switch (orgType) {
+      case 'kindergartens':
+        return "Bog'cha tanlash";
+      case 'schools':
+        return 'Maktab tanlash';
+      case 'universities':
+        return 'Oliygoh tanlash';
+      case 'courses':
+        return 'Kurs tanlash';
+      default:
+        return 'Maktab tanlash';
+    }
+  };
+
+  const getSelectHref = () => {
+    switch (orgType) {
+      case 'kindergartens':
+        return '/kindergartens';
+      case 'schools':
+        return '/schools';
+      case 'universities':
+        return '/universities';
+      case 'courses':
+        return '/courses';
+      default:
+        return '/schools';
+    }
+  };
 
   return (
     <>
@@ -40,15 +81,15 @@ export function HomeMainNav() {
         {/* Основная навигация */}
         <nav className="flex flex-wrap items-center gap-4 sm:gap-8">
           <Link
-            href="/schools"
+            href={getSelectHref()}
             className={cn(
               'text-lg font-medium transition-colors',
-              pathname.startsWith('/schools')
+              pathname.startsWith(getSelectHref())
                 ? 'text-black font-semibold'
                 : 'text-black hover:text-blue-600'
             )}
           >
-            Maktab tanlash
+            {getSelectText()}
           </Link>
           <Link
             href="/parents"
@@ -75,17 +116,8 @@ export function HomeMainNav() {
         </nav>
       </div>
 
-      {/* Правая часть: поиск и вход */}
+      {/* Правая часть: вход */}
       <div className="flex items-center gap-4 sm:gap-6 w-full lg:w-auto justify-end">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-5 w-5 text-gray-400 hover:text-gray-600"
-          aria-label="Qidirish"
-        >
-          <MagniferBold className="h-5 w-5" />
-        </Button>
-
         <Button
           asChild
           className="h-12 px-4 sm:px-5 py-3 bg-blue-600 hover:bg-blue-700 border-[1.5px] border-blue-600 rounded-2xl gap-1"

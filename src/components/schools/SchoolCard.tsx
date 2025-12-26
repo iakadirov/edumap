@@ -186,7 +186,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
   const educationTags = getEducationTags();
 
   return (
-    <div className="relative bg-white rounded-[20px] shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border border-gray-200 overflow-hidden">
+    <div className="relative bg-white rounded-[20px] border border-gray-200 overflow-hidden">
       {/* Адаптивная структура: вертикальная на мобильных, горизонтальная на десктопе */}
       <div className="flex flex-col sm:flex-row sm:items-stretch">
         {/* Изображение школы - только левые углы скруглены на десктопе, растягивается на всю высоту */}
@@ -206,7 +206,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
           
           {/* Логотип школы поверх изображения - в левом верхнем углу */}
           {logoUrl && (
-            <div className="absolute left-4 top-4 sm:left-5 sm:top-5 w-12 h-12 sm:w-16 sm:h-16 rounded-full shadow-[0px_0px_3px_0px_rgba(0,0,0,0.20)] border-2 border-white overflow-hidden bg-white z-10">
+            <div className="absolute left-4 top-4 sm:left-5 sm:top-5 w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 border-white overflow-hidden bg-white z-10">
               <OptimizedImage
                 src={logoUrl}
                 alt={`${school.name} logo`}

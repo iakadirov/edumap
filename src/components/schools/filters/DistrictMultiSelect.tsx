@@ -116,7 +116,12 @@ export function DistrictMultiSelect({
             <AltArrowDownLinear className="w-4 h-4 text-black flex-shrink-0" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[300px] p-0" align="start">
+        <DropdownMenuContent 
+          className="w-[var(--radix-dropdown-menu-trigger-width)] p-0" 
+          align="start"
+          side="bottom"
+          sideOffset={4}
+        >
           {/* Поиск */}
           <div className="p-2 border-b sticky top-0 bg-background z-10">
             <div className="relative">
@@ -211,7 +216,12 @@ export function DistrictMultiSelect({
             </span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[300px] p-0" align="start">
+        <DropdownMenuContent 
+          className="w-[var(--radix-dropdown-menu-trigger-width)] p-0" 
+          align="start"
+          side="bottom"
+          sideOffset={4}
+        >
           {/* Поиск */}
           <div className="p-2 border-b sticky top-0 bg-background z-10">
             <div className="relative">

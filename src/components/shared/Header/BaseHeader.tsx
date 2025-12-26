@@ -60,7 +60,7 @@ export function BaseHeader({ topBar, mainNav, children }: BaseHeaderProps) {
       {/* Нижняя строка - sticky, остается на месте при скролле */}
       <div className={cn(
         "sticky top-0 w-full bg-white z-50 transition-shadow duration-300",
-        isScrolled && "shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]"
+        "shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]"
       )}>
         <div className="container-wrapper">
           <div 
