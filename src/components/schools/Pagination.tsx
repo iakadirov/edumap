@@ -31,7 +31,9 @@ export function Pagination({
       } else {
         params.set('page', page.toString());
       }
-      router.push(`/schools/list?${params.toString()}`, { scroll: false });
+      router.push(`/schools/list?${params.toString()}`);
+      // Прокрутка наверх страницы
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     [router, searchParams]
   );
@@ -96,7 +98,7 @@ export function Pagination({
           size="icon"
           onClick={() => navigateToPage(1)}
           disabled={!hasPrevPage}
-          className="hidden sm:flex"
+          className="hidden sm:flex cursor-pointer"
           aria-label="Birinchi sahifa"
         >
           <ChevronsLeft className="h-4 w-4" />
@@ -108,6 +110,7 @@ export function Pagination({
           size="icon"
           onClick={() => navigateToPage(currentPage - 1)}
           disabled={!hasPrevPage}
+          className="cursor-pointer"
           aria-label="Oldingi sahifa"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -137,7 +140,7 @@ export function Pagination({
                 size="icon"
                 onClick={() => navigateToPage(pageNum)}
                 disabled={isActive}
-                className={isActive ? 'pointer-events-none' : ''}
+                className={isActive ? 'pointer-events-none' : 'cursor-pointer'}
                 aria-label={`Sahifa ${pageNum}`}
                 aria-current={isActive ? 'page' : undefined}
               >
@@ -153,6 +156,7 @@ export function Pagination({
           size="icon"
           onClick={() => navigateToPage(currentPage + 1)}
           disabled={!hasNextPage}
+          className="cursor-pointer"
           aria-label="Keyingi sahifa"
         >
           <ChevronRight className="h-4 w-4" />
@@ -164,7 +168,7 @@ export function Pagination({
           size="icon"
           onClick={() => navigateToPage(totalPages)}
           disabled={!hasNextPage}
-          className="hidden sm:flex"
+          className="hidden sm:flex cursor-pointer"
           aria-label="Oxirgi sahifa"
         >
           <ChevronsRight className="h-4 w-4" />
