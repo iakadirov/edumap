@@ -1,3 +1,5 @@
+'use client';
+
 import {
   MagniferBold,
   SortHorizontalBold,
@@ -10,65 +12,107 @@ const steps = [
     title: 'Qidiring',
     description: "Kerakli muassasani toping filterlar yordamida",
     icon: MagniferBold,
+    color: '#0d8bf2',
   },
   {
     id: 2,
     title: 'Solishtiring',
     description: "Narxlar, fikrlar va xususiyatlarni solishtiring",
     icon: SortHorizontalBold,
+    color: '#8147f5',
   },
   {
     id: 3,
     title: 'Tanlang',
     description: "To'g'ri qaror qiling va muassasa bilan bog'laning",
     icon: CheckCircleBold,
+    color: '#31ab08',
   },
 ];
 
 export function HowItWorks() {
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 sm:space-y-10 md:space-y-12">
       {/* Section header */}
-      <div className="text-center space-y-4">
-        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+      <div className="text-center space-y-3 sm:space-y-4 px-2">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-[-0.02em] text-[#0c1319]">
           Qanday ishlaydi?
         </h2>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg text-[#5a6c7d] max-w-2xl mx-auto">
           3 oddiy qadamda ideal ta'lim muassasasini toping
         </p>
       </div>
 
       {/* Steps */}
-      <div className="relative">
-        {/* Connection line (desktop) */}
-        <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-border -translate-y-1/2" />
+      <div className="relative max-w-4xl mx-auto">
+        {/* Connection line (desktop) - gradient */}
+        <div className="hidden md:block absolute top-[50px] sm:top-[60px] left-[16.67%] right-[16.67%] h-1">
+          <div className="w-full h-full bg-gradient-to-r from-[#0d8bf2] via-[#8147f5] to-[#31ab08] rounded-full opacity-20" />
+          {/* Animated progress dots */}
+          <div className="absolute inset-0 flex justify-between px-4">
+            <div className="w-2 h-2 rounded-full bg-[#0d8bf2] -translate-y-0.5 animate-pulse" style={{ animationDelay: '0s' }} />
+            <div className="w-2 h-2 rounded-full bg-[#8147f5] -translate-y-0.5 animate-pulse" style={{ animationDelay: '0.5s' }} />
+            <div className="w-2 h-2 rounded-full bg-[#31ab08] -translate-y-0.5 animate-pulse" style={{ animationDelay: '1s' }} />
+          </div>
+        </div>
 
-        <div className="grid gap-8 md:grid-cols-3 relative">
+        <div className="grid gap-6 sm:gap-8 grid-cols-1 md:grid-cols-3 relative">
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
-              <div key={step.id} className="relative">
+              <div key={step.id} className="relative group">
                 {/* Vertical line for mobile */}
                 {index < steps.length - 1 && (
-                  <div className="md:hidden absolute left-6 top-16 w-0.5 h-16 bg-border" />
+                  <div
+                    className="md:hidden absolute left-[24px] sm:left-[30px] top-[70px] sm:top-[80px] w-0.5 sm:w-1 h-12 sm:h-16 rounded-full"
+                    style={{
+                      background: `linear-gradient(to bottom, ${step.color}, ${steps[index + 1].color})`
+                    }}
+                  />
                 )}
 
-                <div className="flex flex-col items-center text-center">
-                  {/* Step number with icon */}
-                  <div className="relative z-10 mb-6">
-                    <div className="w-20 h-20 rounded-[12px] bg-background border-4 border-primary flex items-center justify-center shadow-lg">
-                      <Icon className="w-8 h-8 text-primary" />
+                <div className="flex md:flex-col items-start md:items-center gap-4 md:gap-0 md:text-center">
+                  {/* Step icon container */}
+                  <div className="relative z-10 md:mb-4 sm:md:mb-6 flex-shrink-0">
+                    {/* Outer ring with gradient */}
+                    <div
+                      className="w-[56px] h-[56px] sm:w-[80px] sm:h-[80px] md:w-[100px] md:h-[100px] lg:w-[120px] lg:h-[120px] rounded-2xl sm:rounded-3xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
+                      style={{
+                        background: `linear-gradient(135deg, ${step.color}15 0%, ${step.color}05 100%)`
+                      }}
+                    >
+                      {/* Inner icon container */}
+                      <div
+                        className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-white flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110"
+                        style={{
+                          boxShadow: `0 8px 32px ${step.color}20`
+                        }}
+                      >
+                        <Icon className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-10 lg:h-10" style={{ color: step.color }} />
+                      </div>
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 rounded-[12px] bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+
+                    {/* Step number badge */}
+                    <div
+                      className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-white text-sm sm:text-base md:text-lg shadow-lg transition-transform duration-300 group-hover:scale-110"
+                      style={{
+                        backgroundColor: step.color,
+                        boxShadow: `0 4px 12px ${step.color}40`
+                      }}
+                    >
                       {step.id}
                     </div>
                   </div>
 
                   {/* Content */}
-                  <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                  <p className="text-muted-foreground max-w-xs">
-                    {step.description}
-                  </p>
+                  <div className="flex-1 md:flex-none">
+                    <h3 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-[#0c1319]">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm sm:text-base text-[#5a6c7d] md:max-w-xs leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
                 </div>
               </div>
             );

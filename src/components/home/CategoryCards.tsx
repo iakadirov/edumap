@@ -54,24 +54,24 @@ const categories = [
 
 export function CategoryCards() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Section header */}
-      <div className="text-center space-y-4">
-        <h2 className="text-4xl md:text-5xl font-bold tracking-[-0.04em] text-[#0c1319]">
+      <div className="text-center space-y-3 sm:space-y-4 px-2">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-[-0.03em] sm:tracking-[-0.04em] text-[#0c1319]">
           Ta'lim muassasalarini tanlang
         </h2>
-        <p className="text-xl text-[#5a6c7d] max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg md:text-xl text-[#5a6c7d] max-w-2xl mx-auto">
           Barcha turdagi ta'lim muassasalari bitta platformada
         </p>
       </div>
 
       {/* Cards grid */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2">
         {categories.map((category) => {
           const Icon = category.icon;
           return (
             <Link key={category.id} href={category.href}>
-              <Card className="group relative overflow-hidden p-8 h-full bg-[#fafdff] border border-[#d1d9e3] rounded-[2rem] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-transparent">
+              <Card className="group relative overflow-hidden p-5 sm:p-6 md:p-8 h-full bg-[#fafdff] border border-[#d1d9e3] rounded-[20px] sm:rounded-[24px] md:rounded-[2rem] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-transparent">
                 {/* Hover gradient background */}
                 <div
                   className={cn(
@@ -84,29 +84,29 @@ export function CategoryCards() {
                 <div className="relative z-10">
                   {/* Icon */}
                   <div
-                    className="w-16 h-16 rounded-[12px] flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110"
+                    className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-[10px] sm:rounded-[12px] flex items-center justify-center mb-4 sm:mb-5 md:mb-6 transition-transform duration-300 group-hover:scale-110"
                     style={{ backgroundColor: `${category.color}15` }}
                   >
-                    <Icon className="w-8 h-8" style={{ color: category.color }} />
+                    <Icon className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" style={{ color: category.color }} />
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-2xl font-bold tracking-[-0.03em] mb-3 text-[#0c1319]">
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold tracking-[-0.02em] sm:tracking-[-0.03em] mb-2 sm:mb-3 text-[#0c1319]">
                     {category.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-[#5a6c7d] mb-2 text-lg">
+                  <p className="text-[#5a6c7d] mb-1 sm:mb-2 text-sm sm:text-base md:text-lg">
                     {category.description}
                   </p>
-                  <p className="text-sm text-[#5a6c7d]/80 mb-6">
+                  <p className="text-xs sm:text-sm text-[#5a6c7d]/80 mb-4 sm:mb-5 md:mb-6">
                     {category.subtext}
                   </p>
 
                   {/* Link */}
-                  <span className="inline-flex items-center gap-2 text-[#0d8bf2] font-semibold group-hover:gap-3 transition-all">
+                  <span className="inline-flex items-center gap-1.5 sm:gap-2 text-[#0d8bf2] text-sm sm:text-base font-semibold group-hover:gap-2 sm:group-hover:gap-3 transition-all">
                     Batafsil
-                    <AltArrowRightBold className="w-5 h-5" />
+                    <AltArrowRightBold className="w-4 h-4 sm:w-5 sm:h-5" />
                   </span>
                 </div>
               </Card>

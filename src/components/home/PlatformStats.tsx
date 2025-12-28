@@ -15,9 +15,7 @@ const stats = [
     suffix: '+',
     label: "Ta'lim muassasalari",
     icon: BuildingsBold,
-    gradient: 'from-blue-500 to-blue-600',
-    iconBg: 'bg-blue-500/10',
-    iconColor: 'text-blue-600',
+    color: '#0d8bf2',
   },
   {
     id: 'regions',
@@ -25,9 +23,7 @@ const stats = [
     suffix: '',
     label: 'Viloyat va shahar',
     icon: MapBold,
-    gradient: 'from-green-500 to-green-600',
-    iconBg: 'bg-green-500/10',
-    iconColor: 'text-green-600',
+    color: '#31ab08',
   },
   {
     id: 'reviews',
@@ -35,9 +31,7 @@ const stats = [
     suffix: 'K+',
     label: 'Fikrlar va sharhlar',
     icon: ChatSquareBold,
-    gradient: 'from-purple-500 to-purple-600',
-    iconBg: 'bg-purple-500/10',
-    iconColor: 'text-purple-600',
+    color: '#8147f5',
   },
   {
     id: 'rating',
@@ -45,9 +39,7 @@ const stats = [
     suffix: '',
     label: "O'rtacha reyting",
     icon: StarBold,
-    gradient: 'from-orange-500 to-orange-600',
-    iconBg: 'bg-orange-500/10',
-    iconColor: 'text-orange-600',
+    color: '#ef6e2e',
     isDecimal: true,
   },
 ];
@@ -93,7 +85,6 @@ function CountUp({
       if (!startTime) startTime = currentTime;
       const progress = Math.min((currentTime - startTime) / duration, 1);
 
-      // Easing function for smooth animation
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);
       const currentValue = startValue + (end - startValue) * easeOutQuart;
 
@@ -116,43 +107,72 @@ function CountUp({
 
 export function PlatformStats() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-      {stats.map((stat) => {
-        const Icon = stat.icon;
-        return (
-          <div
-            key={stat.id}
-            className="group relative overflow-hidden rounded-[24px] bg-white border border-gray-100 p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-          >
-            {/* Gradient accent line at top */}
-            <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient}`} />
-            
-            <div className="flex flex-col gap-4">
-              {/* Icon */}
-              <div className={`w-12 h-12 rounded-[12px] ${stat.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
-                <Icon className={`w-6 h-6 ${stat.iconColor}`} />
-              </div>
+    <div className="relative">
+      {/* Background card */}
+      <div className="absolute inset-0 bg-white rounded-[20px] sm:rounded-[24px] md:rounded-[32px] shadow-sm" />
 
-              {/* Number */}
-              <div className="flex items-baseline gap-1">
-                <span className={`text-4xl md:text-5xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
-                  <CountUp end={stat.value} isDecimal={stat.isDecimal} />
-                </span>
-                {stat.suffix && (
-                  <span className={`text-2xl md:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
-                    {stat.suffix}
+      {/* Stats grid */}
+      <div className="relative grid grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          const isLast = index === stats.length - 1;
+
+          return (
+            <div
+              key={stat.id}
+              className="relative p-4 sm:p-6 md:p-8 group"
+            >
+              {/* Vertical divider (desktop) */}
+              {!isLast && (
+                <div className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-12 sm:h-16 bg-gradient-to-b from-transparent via-gray-200 to-transparent" />
+              )}
+
+              {/* Horizontal divider for 2x2 grid (mobile/tablet) */}
+              {index < 2 && (
+                <div className="lg:hidden absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 sm:w-3/4 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+              )}
+
+              {/* Vertical divider for 2x2 grid (mobile/tablet) */}
+              {(index === 0 || index === 2) && (
+                <div className="lg:hidden absolute right-0 top-1/2 -translate-y-1/2 w-px h-12 sm:h-16 bg-gradient-to-b from-transparent via-gray-200 to-transparent" />
+              )}
+
+              <div className="flex flex-col items-center text-center gap-2 sm:gap-3">
+                {/* Icon with colored background */}
+                <div
+                  className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                  style={{ backgroundColor: `${stat.color}15` }}
+                >
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" style={{ color: stat.color }} />
+                </div>
+
+                {/* Number */}
+                <div className="flex items-baseline gap-0.5">
+                  <span
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold"
+                    style={{ color: stat.color }}
+                  >
+                    <CountUp end={stat.value} isDecimal={stat.isDecimal} />
                   </span>
-                )}
-              </div>
+                  {stat.suffix && (
+                    <span
+                      className="text-lg sm:text-xl md:text-2xl font-bold"
+                      style={{ color: stat.color }}
+                    >
+                      {stat.suffix}
+                    </span>
+                  )}
+                </div>
 
-              {/* Label */}
-              <div className="text-sm md:text-base font-medium text-gray-600">
-                {stat.label}
+                {/* Label */}
+                <div className="text-xs sm:text-sm md:text-base font-medium text-[#5a6c7d]">
+                  {stat.label}
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

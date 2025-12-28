@@ -1,24 +1,29 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   AddCircleBold,
+  HamburgerMenuLinear,
+  CloseCircleBold,
 } from '@solar-icons/react-perf';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 /**
  * Основная навигация Header для раздела школ
- * 
+ *
  * Features:
  * - Логотип
  * - Навигационные ссылки (Maktab tanlash, Ota-onalar uchun, Olimpiadalar)
- * - Поиск и кнопка входа
+ * - Мобильное меню (hamburger)
+ * - Кнопка входа
  */
 export function SchoolsMainNav() {
   const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Определяем тип организации для адаптации текстов
   const getOrgType = () => {
@@ -62,75 +67,137 @@ export function SchoolsMainNav() {
     }
   };
 
+  const navLinks = [
+    { href: getSelectHref(), label: getSelectText() },
+    { href: '/parents', label: 'Ota-onalar uchun' },
+    { href: '/olympiads', label: 'Olimpiadalar' },
+  ];
+
   return (
     <>
-      {/* Левая часть: логотип и навигация */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
-        {/* Логотип */}
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/images/logo/logo.svg"
-            alt="EduMap.uz"
-            width={128}
-            height={32}
-            className="h-8 w-auto"
-            priority
-          />
-        </Link>
+      {/* Логотип */}
+      <Link href="/" className="flex items-center flex-shrink-0">
+        <Image
+          src="/images/logo/logo.svg"
+          alt="EduMap.uz"
+          width={128}
+          height={32}
+          className="h-7 sm:h-8 w-auto"
+          priority
+        />
+      </Link>
 
-        {/* Основная навигация */}
-        <nav className="flex flex-wrap items-center gap-4 sm:gap-8">
+      {/* Desktop навигация */}
+      <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+        {navLinks.map((link) => (
           <Link
-            href={getSelectHref()}
+            key={link.href}
+            href={link.href}
             className={cn(
-              'text-lg font-medium transition-colors',
-              pathname.startsWith(getSelectHref())
+              'text-base lg:text-lg font-medium transition-colors whitespace-nowrap',
+              pathname.startsWith(link.href)
                 ? 'text-black font-semibold'
                 : 'text-black hover:text-blue-600'
             )}
           >
-            {getSelectText()}
+            {link.label}
           </Link>
-          <Link
-            href="/parents"
-            className={cn(
-              'text-lg font-medium transition-colors',
-              pathname.startsWith('/parents')
-                ? 'text-black font-semibold'
-                : 'text-black hover:text-blue-600'
-            )}
-          >
-            Ota-onalar uchun
-          </Link>
-          <Link
-            href="/olympiads"
-            className={cn(
-              'text-lg font-medium transition-colors',
-              pathname.startsWith('/olympiads')
-                ? 'text-black font-semibold'
-                : 'text-black hover:text-blue-600'
-            )}
-          >
-            Olimpiadalar
-          </Link>
-        </nav>
-      </div>
+        ))}
+      </nav>
 
-      {/* Правая часть: вход */}
-      <div className="flex items-center gap-4 sm:gap-6 w-full lg:w-auto justify-end">
+      {/* Правая часть */}
+      <div className="flex items-center gap-2 sm:gap-4">
+        {/* Кнопка входа - скрыта на мобильных, показана в меню */}
         <Button
           asChild
-          className="h-12 px-4 sm:px-5 py-3 bg-blue-600 hover:bg-blue-700 border-[1.5px] border-blue-600 rounded-[12px] gap-1"
+          className="hidden sm:flex h-10 sm:h-11 md:h-12 px-3 sm:px-4 md:px-5 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 border-[1.5px] border-blue-600 rounded-[10px] sm:rounded-[12px] gap-1"
         >
           <Link href="/auth/login">
-            <AddCircleBold className="h-6 w-6 text-white" />
-            <span className="text-base font-semibold text-white">
+            <AddCircleBold className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+            <span className="text-sm sm:text-base font-semibold text-white">
               Kirish
             </span>
           </Link>
         </Button>
+
+        {/* Hamburger menu button - только на мобильных */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden h-10 w-10 rounded-xl"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label={isMobileMenuOpen ? 'Yopish' : 'Menyu'}
+        >
+          {isMobileMenuOpen ? (
+            <CloseCircleBold className="h-6 w-6 text-slate-700" />
+          ) : (
+            <HamburgerMenuLinear className="h-6 w-6 text-slate-700" />
+          )}
+        </Button>
+      </div>
+
+      {/* Mobile menu overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/20 z-40"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile menu */}
+      <div
+        className={cn(
+          'md:hidden fixed top-0 right-0 h-full w-[280px] bg-white z-50 shadow-xl transform transition-transform duration-300 ease-in-out',
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        )}
+      >
+        {/* Mobile menu header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <span className="text-lg font-semibold text-slate-800">Menyu</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-10 w-10 rounded-xl"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <CloseCircleBold className="h-6 w-6 text-slate-700" />
+          </Button>
+        </div>
+
+        {/* Mobile navigation links */}
+        <nav className="p-4 space-y-2">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={cn(
+                'block px-4 py-3 rounded-xl text-base font-medium transition-colors',
+                pathname.startsWith(link.href)
+                  ? 'bg-blue-50 text-blue-600 font-semibold'
+                  : 'text-slate-700 hover:bg-gray-50'
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Mobile login button */}
+        <div className="p-4 border-t border-gray-100">
+          <Button
+            asChild
+            className="w-full h-12 bg-blue-600 hover:bg-blue-700 rounded-xl gap-2"
+          >
+            <Link href="/auth/login" onClick={() => setIsMobileMenuOpen(false)}>
+              <AddCircleBold className="h-5 w-5 text-white" />
+              <span className="text-base font-semibold text-white">
+                Kirish
+              </span>
+            </Link>
+          </Button>
+        </div>
       </div>
     </>
   );
 }
-
