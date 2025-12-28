@@ -513,7 +513,7 @@ export async function getDistrictsWithCounts(regionId?: number | null) {
   const districtIds = districts.map((d: any) => d.id);
   
   // Если districtIds пуст, пропускаем подсчет
-  const countMap = new Map<number, number>();
+  const countMap: Map<number, number> = new Map();
   if (districtIds.length > 0) {
     const { data: schoolsCount, error: countError } = await supabase
       .from('organizations')

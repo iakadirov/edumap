@@ -1,11 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDate } from '@/lib/utils/date';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { unstable_noStore as noStore } from 'next/cache';
+import Link from 'next/link';
 
 // Админ-панель всегда динамическая (не кэшируется)
 export const dynamic = 'force-dynamic';
@@ -200,16 +200,16 @@ export default async function AdminDashboardPage() {
             <CardContent>
               <div className="space-y-2">
                 <Button className="w-full justify-start" variant="outline" asChild>
-                  <a href="/admin/schools">Yangi maktab qoʻshish</a>
+                  <Link href="/admin/schools">Yangi maktab qoʻshish</Link>
                 </Button>
                 <Button className="w-full justify-start" variant="outline" asChild>
-                  <a href="/admin/users">Foydalanuvchi yaratish</a>
+                  <Link href="/admin/users">Foydalanuvchi yaratish</Link>
                 </Button>
                 <Button className="w-full justify-start" variant="outline" asChild>
-                  <a href="/admin/analytics">Analitikani koʻrish</a>
+                  <Link href="/admin/analytics">Analitikani koʻrish</Link>
                 </Button>
                 <Button className="w-full justify-start" variant="outline" asChild>
-                  <a href="/admin/settings">Sozlamalar</a>
+                  <Link href="/admin/settings">Sozlamalar</Link>
                 </Button>
               </div>
             </CardContent>

@@ -143,7 +143,7 @@ export function calculateSectionProgress(
   // Специальная обработка для basic раздела
   if (section === 'basic') {
     // Для name проверяем, что хотя бы одно поле (name_uz или name_ru) заполнено
-    const filledRequired = requiredFields.filter((field) => {
+    const filledRequiredCount = requiredFields.filter((field) => {
       // Для name_uz проверяем, что хотя бы одно название есть
       if (field === 'name_uz') {
         const nameUz = data.name_uz;
@@ -180,7 +180,7 @@ export function calculateSectionProgress(
 
     const requiredProgress =
       requiredFields.length > 0
-        ? (filledRequired / requiredFields.length) * 70
+        ? (filledRequiredCount / requiredFields.length) * 70
         : 0;
 
     // Считаем заполненные важные поля (вес 30%)

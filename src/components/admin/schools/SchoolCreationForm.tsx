@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { saveTelegram } from '@/lib/utils/telegram';
 import { saveInstagram, saveFacebook, saveYouTube } from '@/lib/utils/social-media';
@@ -528,7 +529,7 @@ export function SchoolCreationForm() {
       {/* Submit Button */}
       <div className="flex items-center justify-end gap-4 pt-4">
         <Button variant="outline" asChild>
-          <a href="/admin/schools">Bekor qilish</a>
+          <Link href="/admin/schools">Bekor qilish</Link>
         </Button>
         <Button onClick={handleSubmit} disabled={loading} size="lg">
           {loading ? 'Yaratilmoqda...' : 'Maktabni yaratish ✓'}

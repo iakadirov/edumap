@@ -28,7 +28,7 @@ export function normalizeInstagram(input: string | null | undefined): SocialMedi
     return null;
   }
 
-  const cleaned = trimmed.replace(/\s+/g, '');
+  const cleanedInput = trimmed.replace(/\s+/g, '');
 
   const patterns = [
     // https://instagram.com/username или https://www.instagram.com/username
@@ -40,7 +40,7 @@ export function normalizeInstagram(input: string | null | undefined): SocialMedi
   ];
 
   for (const pattern of patterns) {
-    const match = cleaned.match(pattern);
+    const match = cleanedInput.match(pattern);
     if (match && match[1]) {
       const username = match[1].toLowerCase();
       return {
@@ -74,66 +74,66 @@ export function normalizeFacebook(input: string | null | undefined): SocialMedia
     return null;
   }
 
-  const cleaned = trimmed.replace(/\s+/g, '');
+  const cleanedFb = trimmed.replace(/\s+/g, '');
 
   // Если это уже полный URL (начинается с http:// или https://), возвращаем как есть
-  if (/^https?:\/\//i.test(cleaned)) {
+  if (/^https?:\/\//i.test(cleanedFb)) {
     // Проверяем, что это URL Facebook
-    if (/facebook\.com|fb\.com/i.test(cleaned)) {
+    if (/facebook\.com|fb\.com/i.test(cleanedFb)) {
       // Извлекаем username или ID из URL
-      const usernameMatch = cleaned.match(/(?:facebook|fb)\.com\/([^/?]+)/i);
-      const idMatch = cleaned.match(/profile\.php\?id=(\d+)/i);
-      
+      const usernameMatch = cleanedFb.match(/(?:facebook|fb)\.com\/([^/?]+)/i);
+      const idMatch = cleanedFb.match(/profile\.php\?id=(\d+)/i);
+
       if (usernameMatch && usernameMatch[1]) {
         const username = usernameMatch[1];
         return {
           username,
-          url: cleaned,
+          url: cleanedFb,
           display: username,
         };
       } else if (idMatch && idMatch[1]) {
         return {
           username: idMatch[1],
-          url: cleaned,
+          url: cleanedFb,
           display: `ID: ${idMatch[1]}`,
         };
       } else {
         // Если не удалось извлечь username/ID, все равно возвращаем URL как есть
         return {
-          username: cleaned,
-          url: cleaned,
-          display: cleaned,
+          username: cleanedFb,
+          url: cleanedFb,
+          display: cleanedFb,
         };
       }
     } else {
       // Если это не Facebook URL, все равно возвращаем как есть
       return {
-        username: cleaned,
-        url: cleaned,
-        display: cleaned,
+        username: cleanedFb,
+        url: cleanedFb,
+        display: cleanedFb,
       };
     }
   }
 
   // Если это просто username (без http://), добавляем базовый URL
-  if (/^[a-zA-Z0-9._-]+$/.test(cleaned)) {
-    const url = `https://facebook.com/${cleaned}`;
+  if (/^[a-zA-Z0-9._-]+$/.test(cleanedFb)) {
+    const url = `https://facebook.com/${cleanedFb}`;
     return {
-      username: cleaned.toLowerCase(),
+      username: cleanedFb.toLowerCase(),
       url: url,
-      display: cleaned,
+      display: cleanedFb,
     };
   }
 
   // Для любых других случаев возвращаем как есть, но гарантируем валидный URL
-  let finalUrl = cleaned;
-  if (!cleaned.startsWith('http://') && !cleaned.startsWith('https://')) {
-    finalUrl = `https://${cleaned}`;
+  let finalUrl = cleanedFb;
+  if (!cleanedFb.startsWith('http://') && !cleanedFb.startsWith('https://')) {
+    finalUrl = `https://${cleanedFb}`;
   }
   return {
-    username: cleaned,
+    username: cleanedFb,
     url: finalUrl,
-    display: cleaned,
+    display: cleanedFb,
   };
 }
 
@@ -157,7 +157,7 @@ export function normalizeYouTube(input: string | null | undefined): SocialMediaD
     return null;
   }
 
-  const cleaned = trimmed.replace(/\s+/g, '');
+  const cleanedYt = trimmed.replace(/\s+/g, '');
 
   const patterns = [
     // https://youtube.com/@channel
@@ -171,7 +171,7 @@ export function normalizeYouTube(input: string | null | undefined): SocialMediaD
   ];
 
   for (const pattern of patterns) {
-    const match = cleaned.match(pattern);
+    const match = cleanedYt.match(pattern);
     if (match && match[1]) {
       const channel = match[1];
       // Убираем @ если есть, чтобы username был чистым

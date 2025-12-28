@@ -92,7 +92,6 @@ export async function generateSchoolsListTitle(params: {
   school_type?: string;
 }): Promise<string> {
   const locationParts: string[] = [];
-  const districtNames: string[] = [];
   
   // Город
   if (params.city) {
@@ -120,11 +119,12 @@ export async function generateSchoolsListTitle(params: {
   }
   
   // Районы (поддержка до 4 районов)
+  const districtNames: string[] = [];
   if (params.district) {
     const districtIds = params.district.split(',').filter(Boolean).slice(0, 4); // Лимит 4 района
     if (districtIds.length > 0) {
       let firstRegionId: number | null = null;
-      
+
       // Получаем названия всех выбранных районов
       for (const districtIdStr of districtIds) {
         const districtId = parseInt(districtIdStr, 10);

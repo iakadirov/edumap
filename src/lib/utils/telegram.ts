@@ -31,7 +31,7 @@ export function normalizeTelegram(input: string | null | undefined): TelegramDat
   }
 
   // Убираем пробелы
-  const cleaned = trimmed.replace(/\s+/g, '');
+  const cleanedTg = trimmed.replace(/\s+/g, '');
 
   // Паттерны для распознавания
   const patterns = [
@@ -44,7 +44,7 @@ export function normalizeTelegram(input: string | null | undefined): TelegramDat
   ];
 
   for (const pattern of patterns) {
-    const match = cleaned.match(pattern);
+    const match = cleanedTg.match(pattern);
     if (match && match[1]) {
       const username = match[1].toLowerCase();
       return {
