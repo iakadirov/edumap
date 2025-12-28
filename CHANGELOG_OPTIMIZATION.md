@@ -152,3 +152,25 @@
 - ✅ 98.8% ESLint ошибок исправлено
 - ✅ Error Boundaries добавлены для обработки ошибок
 - ✅ Пагинация для списка школ
+
+---
+
+## Этап 5: 404 страницы-заглушки
+
+**Статус**: ✅ Завершено
+
+### Созданные файлы:
+- [x] `src/app/not-found.tsx` - Глобальная 404 страница
+- [x] `src/app/admin/not-found.tsx` - 404 для админ-панели
+- [x] `src/app/brands/[slug]/not-found.tsx` - 404 для брендов
+- [x] `src/app/(main)/universities/not-found.tsx` - Заглушка "В разработке" для университетов
+- [x] `src/app/(main)/kindergartens/not-found.tsx` - Заглушка "В разработке" для детских садов
+- [x] `src/app/(main)/courses/not-found.tsx` - Заглушка "В разработке" для курсов
+- [x] `src/app/school/not-found.tsx` - 404 для кабинета школы
+- [x] `src/app/(main)/about/not-found.tsx` - 404 для страницы "О нас"
+
+### Особенности:
+- Все страницы на узбекском языке
+- Единый дизайн с использованием UI компонентов
+- Для разделов в разработке (universities, kindergartens, courses) показывается сообщение "Bu bo'lim hozircha ishlab chiqilmoqda"
+- Навигация на главную страницу и каталог школ
