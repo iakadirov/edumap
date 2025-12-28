@@ -297,8 +297,9 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
 
       {/* Белая карточка с фильтрами */}
       <div 
-        className="bg-white rounded-[20px] p-5 flex flex-row items-end gap-5 w-full"
+        className="rounded-[20px] p-5 flex flex-row items-end gap-5 w-full"
         style={{ 
+          backgroundColor: 'var(--background)',
           boxShadow: '0px 0px 2px rgba(0, 0, 0, 0.15)'
         }}
       >
@@ -333,9 +334,9 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
                       : [...current, lang.id];
                     updateFilters({ language: updated.length > 0 ? updated : [] });
                   }}
-                  className="flex items-center justify-center px-4 py-3.5 flex-1 h-12 rounded-xl transition-colors cursor-pointer"
+                  className="flex items-center justify-center px-4 py-3.5 flex-1 h-12 rounded-[12px] transition-colors cursor-pointer"
                   style={{
-                    background: isSelected ? '#0077ff' : '#F7FCFE',
+                    background: isSelected ? '#0077ff' : '#fff',
                     border: isSelected ? '1px solid #0077ff' : '1px solid #DDEBF0',
                     height: '48px',
                     color: isSelected ? '#ffffff' : '#000000'
@@ -359,9 +360,9 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
             <DropdownMenu open={priceDropdownOpen} onOpenChange={setPriceDropdownOpen}>
               <DropdownMenuTrigger asChild>
                 <div 
-                  className="flex items-center px-4 py-3.5 gap-2.5 flex-1 h-12 rounded-xl cursor-pointer"
+                  className="flex items-center px-4 py-3.5 gap-2.5 flex-1 h-12 rounded-[12px] cursor-pointer"
                   style={{
-                    background: '#F7FCFE',
+                    background: '#fff',
                     border: '1px solid #DDEBF0',
                     height: '48px'
                   }}
@@ -419,9 +420,9 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="flex items-center px-4 py-3.5 gap-1 h-12 rounded-xl cursor-pointer"
+                  className="flex items-center px-4 py-3.5 gap-1 h-12 rounded-[12px] cursor-pointer"
                   style={{
-                    background: '#F7FCFE',
+                    background: '#fff',
                     border: '1px solid #DDEBF0',
                     width: '100px',
                     height: '48px'
@@ -437,7 +438,7 @@ export function SchoolFilters({ cities, initialFilters, onFiltersChange }: Schoo
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent 
-                className="w-[400px] p-6 bg-white border border-gray-200 rounded-xl shadow-lg max-h-[600px] overflow-y-auto"
+                className="w-[400px] p-6 bg-white border border-gray-200 rounded-[12px] shadow-lg max-h-[600px] overflow-y-auto"
                 align="end"
                 side="bottom"
                 sideOffset={8}

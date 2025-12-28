@@ -217,7 +217,7 @@ export function ResultsForm({ organization, initialResults = [] }: ResultsFormPr
 
   return (
     <form className="space-y-8">
-      <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+      <div className="flex items-center justify-between p-3 bg-muted rounded-[24px]">
         <span className="text-sm text-muted-foreground">
           {formatAutosaveStatus(autosaveStatus)}
         </span>
@@ -227,7 +227,7 @@ export function ResultsForm({ organization, initialResults = [] }: ResultsFormPr
       </div>
 
       {error && (
-        <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+        <div className="p-4 rounded-[24px] bg-destructive/10 text-destructive border border-destructive/20">
           {error}
         </div>
       )}

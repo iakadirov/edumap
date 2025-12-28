@@ -122,14 +122,14 @@ export function PlatformStats() {
         return (
           <div
             key={stat.id}
-            className="group relative overflow-hidden rounded-2xl bg-white border border-gray-100 p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            className="group relative overflow-hidden rounded-[24px] bg-white border border-gray-100 p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
           >
             {/* Gradient accent line at top */}
             <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.gradient}`} />
             
             <div className="flex flex-col gap-4">
               {/* Icon */}
-              <div className={`w-12 h-12 rounded-xl ${stat.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
+              <div className={`w-12 h-12 rounded-[12px] ${stat.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
                 <Icon className={`w-6 h-6 ${stat.iconColor}`} />
               </div>
 

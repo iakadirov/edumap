@@ -50,7 +50,7 @@ export function HomeTopBar() {
         {/* Мобильная версия выбора города */}
         <Button
           variant="ghost"
-          className="lg:hidden h-11 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl gap-1"
+          className="lg:hidden h-11 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-[12px] gap-1"
           onClick={() => {
             const button = document.querySelector('[data-region-selector]') as HTMLElement;
             button?.click();
@@ -64,14 +64,14 @@ export function HomeTopBar() {
         </Button>
 
         {/* Навигация по типам организаций */}
-        <div className="px-2 sm:px-4 py-1 bg-slate-100 rounded-xl flex items-center gap-3 sm:gap-6 overflow-x-auto">
+        <div className="px-2 sm:px-4 py-1 bg-slate-100 rounded-[12px] flex items-center gap-3 sm:gap-6 overflow-x-auto">
           <Link
             href="/kindergartens"
             className={cn(
               'px-2 py-[6px] flex items-center gap-1 transition-all',
               activeOrgType === 'kindergartens'
-                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-green-500 rounded-lg'
-                : 'rounded-xl hover:bg-white/50'
+                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-green-500 rounded-[12px]'
+                : 'rounded-[12px] hover:bg-white/50'
             )}
           >
             <SmileCircleBold className={cn(
@@ -93,8 +93,8 @@ export function HomeTopBar() {
             className={cn(
               'px-2 py-[6px] flex items-center gap-1 transition-all',
               activeOrgType === 'schools'
-                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-blue-600 rounded-lg'
-                : 'rounded-xl hover:bg-white/50'
+                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-blue-600 rounded-[12px]'
+                : 'rounded-[12px] hover:bg-white/50'
             )}
           >
             <BookBold className={cn(
@@ -116,8 +116,8 @@ export function HomeTopBar() {
             className={cn(
               'px-2 py-[6px] flex items-center gap-1 transition-all',
               activeOrgType === 'universities'
-                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-purple-600 rounded-lg'
-                : 'rounded-xl hover:bg-white/50'
+                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-purple-600 rounded-[12px]'
+                : 'rounded-[12px] hover:bg-white/50'
             )}
           >
             <SquareAcademicCapBold className={cn(
@@ -139,8 +139,8 @@ export function HomeTopBar() {
             className={cn(
               'px-2 py-[6px] flex items-center gap-1 transition-all',
               activeOrgType === 'courses'
-                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-orange-500 rounded-lg'
-                : 'rounded-xl hover:bg-white/50'
+                ? 'bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 border-orange-500 rounded-[12px]'
+                : 'rounded-[12px] hover:bg-white/50'
             )}
           >
             <NotebookBold className={cn(
@@ -164,7 +164,7 @@ export function HomeTopBar() {
         <Button
           variant="outline"
           asChild
-          className="h-11 px-3 sm:px-4 py-3 bg-white border-[1.5px] border-slate-200 rounded-xl gap-1 hover:bg-gray-50"
+          className="h-11 px-3 sm:px-4 py-3 bg-white border-[1.5px] border-slate-200 rounded-[12px] gap-1 hover:bg-gray-50"
         >
           <Link href="/admin/schools/new">
             <AddCircleBold className="h-5 w-5 text-slate-600" />

@@ -152,7 +152,7 @@ async function findDistrictId(districtName: string | undefined, city: string | u
   }
   
   // Ищем район в БД
-  let query = supabase
+  const query = supabase
     .from('districts')
     .select('id, name_uz, name_ru')
     .eq('region_id', regionId);

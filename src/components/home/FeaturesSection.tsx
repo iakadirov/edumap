@@ -65,7 +65,7 @@ export function FeaturesSection() {
           const Icon = feature.icon;
           return (
             <div key={feature.id} className="text-center p-6">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <div className="w-14 h-14 rounded-[12px] bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <Icon className="w-7 h-7 text-primary" />
               </div>
               <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>

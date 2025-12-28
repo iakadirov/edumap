@@ -56,10 +56,10 @@ export function HowItWorks() {
                 <div className="flex flex-col items-center text-center">
                   {/* Step number with icon */}
                   <div className="relative z-10 mb-6">
-                    <div className="w-20 h-20 rounded-full bg-background border-4 border-primary flex items-center justify-center shadow-lg">
+                    <div className="w-20 h-20 rounded-[12px] bg-background border-4 border-primary flex items-center justify-center shadow-lg">
                       <Icon className="w-8 h-8 text-primary" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                    <div className="absolute -top-2 -right-2 w-8 h-8 rounded-[12px] bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
                       {step.id}
                     </div>
                   </div>

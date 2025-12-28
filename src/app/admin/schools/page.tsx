@@ -69,7 +69,7 @@ export default async function AdminSchoolsPage({
 
   // Получаем прогресс заполненности для всех школ параллельно
   const schoolIds = typedSchools.map(s => s.id);
-  let progressMap = new Map<string, number>();
+  const progressMap = new Map<string, number>();
   
   if (schoolIds.length > 0) {
     try {

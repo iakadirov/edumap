@@ -344,7 +344,7 @@ export async function getSchoolsWithFilters(filters: {
 
   // Фильтрация на клиенте для сложных фильтров
   // Используем централизованную функцию matchesFilters
-  let filteredData = data.filter((school) =>
+  const filteredData = data.filter((school) =>
     matchesFilters(school as SchoolWithDetailsType, {
       school_type: filters.school_type,
       price_min: filters.price_min,
@@ -513,7 +513,7 @@ export async function getDistrictsWithCounts(regionId?: number | null) {
   const districtIds = districts.map((d: any) => d.id);
   
   // Если districtIds пуст, пропускаем подсчет
-  let countMap = new Map<number, number>();
+  const countMap = new Map<number, number>();
   if (districtIds.length > 0) {
     const { data: schoolsCount, error: countError } = await supabase
       .from('organizations')

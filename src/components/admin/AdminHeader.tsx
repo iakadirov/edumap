@@ -98,7 +98,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
               />
             </svg>
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-destructive rounded-full" />
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-destructive rounded-md" />
           </Button>
 
           {/* Settings */}
@@ -129,7 +129,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
           {/* User Profile */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+              <Button variant="ghost" className="relative h-9 w-9 rounded-md">
                 <Avatar className="h-9 w-9">
                   <AvatarImage src={user.avatar_url || undefined} alt={user.full_name || user.email} />
                   <AvatarFallback>

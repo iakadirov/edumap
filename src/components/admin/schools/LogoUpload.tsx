@@ -156,7 +156,7 @@ export function LogoUpload({
       <div className="flex items-start gap-4">
         {/* Preview */}
         {preview && (
-          <div className="relative w-32 h-32 rounded-lg border border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center">
+          <div className="relative w-32 h-32 rounded-[24px] border border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center">
             <img
               src={preview}
               alt="Логотип школы"
@@ -166,7 +166,7 @@ export function LogoUpload({
               <button
                 type="button"
                 onClick={handleRemove}
-                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-[12px] hover:bg-red-600 transition-colors"
                 aria-label="Удалить логотип"
               >
                 <X className="h-4 w-4" />

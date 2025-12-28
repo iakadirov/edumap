@@ -159,7 +159,7 @@ export function TeachersForm({
 
   return (
     <form className="space-y-8">
-      <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+      <div className="flex items-center justify-between p-3 bg-muted rounded-[24px]">
         <span className="text-sm text-muted-foreground">
           {formatAutosaveStatus(autosaveStatus)}
         </span>
@@ -169,7 +169,7 @@ export function TeachersForm({
       </div>
 
       {error && (
-        <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+        <div className="p-4 rounded-[24px] bg-destructive/10 text-destructive border border-destructive/20">
           {error}
         </div>
       )}
@@ -357,12 +357,12 @@ export function TeachersForm({
             <Card key={index}>
               <CardContent className="p-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                  <div className="w-16 h-16 bg-muted rounded-[24px] flex items-center justify-center">
                     {member.photo_url ? (
                       <img
                         src={member.photo_url}
                         alt={member.name}
-                        className="w-full h-full object-cover rounded-lg"
+                        className="w-full h-full object-cover rounded-[24px]"
                       />
                     ) : (
                       <span className="text-2xl">👤</span>

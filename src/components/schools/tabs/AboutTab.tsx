@@ -108,7 +108,7 @@ export function AboutTab({ school }: AboutTabProps) {
             <Card key={stat.label} className="text-center">
               <CardContent className="pt-6 pb-4">
                 <div
-                  className={`w-12 h-12 rounded-xl ${colorClasses[stat.color]} flex items-center justify-center mx-auto mb-3`}
+                  className={`w-12 h-12 rounded-[24px] ${colorClasses[stat.color]} flex items-center justify-center mx-auto mb-3`}
                 >
                   <stat.icon className="w-6 h-6" />
                 </div>
@@ -134,7 +134,7 @@ export function AboutTab({ school }: AboutTabProps) {
             {school.photos.slice(0, 4).map((photo, idx) => (
               <div
                 key={photo.id || idx}
-                className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition"
+                className="aspect-square rounded-[24px] overflow-hidden cursor-pointer hover:opacity-90 transition"
               >
                 <OptimizedImage
                   src={photo.url}
@@ -147,7 +147,7 @@ export function AboutTab({ school }: AboutTabProps) {
               </div>
             ))}
             {school.photos.length > 4 && (
-              <div className="aspect-square rounded-lg bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition">
+              <div className="aspect-square rounded-[24px] bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition">
                 <span className="text-lg font-semibold text-gray-600">
                   +{school.photos.length - 4}
                 </span>
@@ -161,7 +161,7 @@ export function AboutTab({ school }: AboutTabProps) {
       {school.videos && school.videos.length > 0 && (
         <section>
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Видео о школе</h2>
-          <div className="aspect-video rounded-xl overflow-hidden bg-gray-100 relative group cursor-pointer">
+          <div className="aspect-video rounded-[24px] overflow-hidden bg-gray-100 relative group cursor-pointer">
             <OptimizedImage
               src={school.videos[0].url}
               alt={school.videos[0].caption || 'Видео о школе'}
@@ -170,7 +170,7 @@ export function AboutTab({ school }: AboutTabProps) {
               sizes="(max-width: 768px) 100vw, 800px"
             />
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/40 transition">
-              <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-[24px] bg-white/90 flex items-center justify-center">
                 <PlayBold className="w-8 h-8 text-gray-900 ml-1" />
               </div>
             </div>
@@ -186,10 +186,10 @@ export function AboutTab({ school }: AboutTabProps) {
             {school.documents.map((doc, idx) => (
               <div
                 key={idx}
-                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition"
+                className="flex items-center justify-between p-4 border border-gray-200 rounded-[24px] hover:border-gray-300 transition"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-[24px] bg-red-50 flex items-center justify-center">
                     <FileTextBold className="w-5 h-5 text-red-500" />
                   </div>
                   <div>

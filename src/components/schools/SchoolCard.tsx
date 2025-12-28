@@ -14,6 +14,8 @@ import {
 import { refreshImageUrl, isPresignedUrl, getThumbnailUrl } from '@/lib/utils/image-url';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import type { OrganizationRow } from '@/types/organization';
+import { useRegion } from '@/contexts/RegionContext';
+import { getRegionById, getDistrictById } from '@/lib/utils/regions-data';
 
 // Тип для school_details
 type SchoolDetailsRow = {
@@ -50,10 +52,13 @@ interface SchoolCardProps {
  * - Футер с ценой и кнопками действий
  */
 export function SchoolCard({ school }: SchoolCardProps) {
+  const { selectedRegion } = useRegion();
   // Состояние для обновленного URL логотипа (thumbnail версия для карточки)
   const [logoUrl, setLogoUrl] = useState<string | null>(school.logo_url || null);
   // Состояние для thumbnail версии баннера
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(school.cover_image_url || school.banner_url || null);
+  // Состояние для названия региона или района
+  const [locationName, setLocationName] = useState<string | null>(null);
   
   // Предварительно получаем thumbnail версии для карточки
   useEffect(() => {
@@ -102,6 +107,42 @@ export function SchoolCard({ school }: SchoolCardProps) {
       isMounted = false;
     };
   }, [school.id, school.logo_url, school.cover_image_url, school.banner_url]);
+
+  // Получаем название региона или района в зависимости от выбранного фильтра
+  useEffect(() => {
+    // Когда выбран "Узбекистан" (selectedRegion === null) - показываем регион
+    if (selectedRegion === null && school.region_id) {
+      getRegionById(school.region_id)
+        .then((region) => {
+          if (region) {
+            setLocationName(region.name_uz);
+          } else {
+            setLocationName(null);
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to get region name:', error);
+          setLocationName(null);
+        });
+    } 
+    // Когда выбран конкретный регион (selectedRegion !== null) - показываем район
+    else if (selectedRegion !== null && school.district_id) {
+      getDistrictById(school.district_id)
+        .then((district) => {
+          if (district) {
+            setLocationName(district.name_uz);
+          } else {
+            setLocationName(null);
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to get district name:', error);
+          setLocationName(null);
+        });
+    } else {
+      setLocationName(null);
+    }
+  }, [selectedRegion, school.region_id, school.district_id]);
   
   // Обрабатываем school_details (может быть массивом или объектом)
   const details = Array.isArray(school.school_details)
@@ -186,11 +227,11 @@ export function SchoolCard({ school }: SchoolCardProps) {
   const educationTags = getEducationTags();
 
   return (
-    <div className="relative bg-white rounded-[20px] border border-gray-200 overflow-hidden">
+    <div className="relative bg-white rounded-[24px] border border-gray-200 overflow-hidden">
       {/* Адаптивная структура: вертикальная на мобильных, горизонтальная на десктопе */}
       <div className="flex flex-col sm:flex-row sm:items-stretch">
         {/* Изображение школы - только левые углы скруглены на десктопе, растягивается на всю высоту */}
-        <div className="relative w-full sm:w-64 md:w-80 h-48 sm:h-auto sm:self-stretch flex-shrink-0 overflow-hidden rounded-t-[20px] sm:rounded-tl-[20px] sm:rounded-bl-[20px] sm:rounded-tr-none sm:rounded-br-none">
+        <div className="relative w-full sm:w-64 md:w-80 h-48 sm:h-auto sm:self-stretch flex-shrink-0 overflow-hidden rounded-t-[24px] sm:rounded-tl-[24px] sm:rounded-bl-[24px] sm:rounded-tr-none sm:rounded-br-none">
           {coverImageUrl ? (
             <OptimizedImage
               src={coverImageUrl}
@@ -206,7 +247,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
           
           {/* Логотип школы поверх изображения - в левом верхнем углу */}
           {logoUrl && (
-            <div className="absolute left-4 top-4 sm:left-5 sm:top-5 w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 border-white overflow-hidden bg-white z-10">
+            <div className="absolute left-4 top-4 sm:left-5 sm:top-5 w-12 h-12 sm:w-16 sm:h-16 rounded-[12px] border-2 border-white overflow-hidden bg-white z-10">
               <OptimizedImage
                 src={logoUrl}
                 alt={`${school.name} logo`}
@@ -227,12 +268,20 @@ export function SchoolCard({ school }: SchoolCardProps) {
             <div className="flex-1 min-w-0">
               {/* Название и верификация */}
               <div className="flex items-center gap-1.5 mb-3 sm:mb-2">
-                <h3 className="text-xl sm:text-2xl font-semibold text-black truncate">
-                  {school.name}
-                </h3>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xl sm:text-2xl font-semibold text-black truncate">
+                    {school.name}
+                  </h3>
+                  {/* Показываем регион, когда выбран "Узбекистан", или район, когда выбран конкретный регион */}
+                  {locationName && (
+                    <p className="text-sm sm:text-base text-zinc-500 font-normal mt-1">
+                      {locationName}
+                    </p>
+                  )}
+                </div>
                 {school.is_verified && (
                   <div className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center flex-shrink-0">
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 bg-blue-600 rounded flex items-center justify-center">
                       <CheckCircleBold className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" />
                     </div>
                   </div>
@@ -272,7 +321,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
                     {educationTags.map((tag, index) => (
                       <div
                         key={index}
-                        className={`px-2.5 sm:px-3 py-2 sm:py-2.5 ${tag.bgColor} rounded-lg flex items-center`}
+                        className={`px-2.5 sm:px-3 py-2 sm:py-2.5 ${tag.bgColor} rounded-[12px] flex items-center`}
                       >
                         <span className="text-xs sm:text-sm font-medium text-black">
                           {tag.label}
@@ -286,7 +335,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
 
             {/* Правая колонка с бейджем рейтинга */}
             {school.overall_rating && (
-              <div className="pl-2 sm:pl-2.5 pr-1.5 py-1 bg-emerald-50 rounded-lg flex items-center gap-1.5 flex-shrink-0 self-start sm:self-auto">
+              <div className="pl-2 sm:pl-2.5 pr-1.5 py-1 bg-emerald-50 rounded-[12px] flex items-center gap-1.5 flex-shrink-0 self-start sm:self-auto">
                 <span className="text-xs sm:text-sm font-medium text-black">
                   Reyting:
                 </span>
@@ -299,7 +348,7 @@ export function SchoolCard({ school }: SchoolCardProps) {
           </div>
 
           {/* Футер с ценой и кнопками */}
-          <div className="px-4 sm:px-5 py-2.5 bg-slate-100 border-t border-slate-200 rounded-b-[20px] sm:rounded-br-[20px] sm:rounded-bl-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+          <div className="px-4 sm:px-5 py-2.5 bg-slate-100 border-t border-slate-200 rounded-b-[24px] sm:rounded-br-[24px] sm:rounded-bl-none flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
             {/* Цена */}
             <div className="flex items-center gap-1">
               <span className="text-base sm:text-lg font-medium text-black">
@@ -318,16 +367,16 @@ export function SchoolCard({ school }: SchoolCardProps) {
 
             {/* Кнопки действий */}
             <div className="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
-              <button className="p-2 bg-white rounded-full hover:bg-gray-50 transition-colors" aria-label="Дополнительные действия">
+              <button className="p-2 bg-white rounded-[12px] hover:bg-gray-50 transition-colors" aria-label="Дополнительные действия">
                 <MenuDotsCircleLinear className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
               </button>
-              <button className="p-2 bg-white rounded-full hover:bg-gray-50 transition-colors" aria-label="Добавить в избранное">
+              <button className="p-2 bg-white rounded-[12px] hover:bg-gray-50 transition-colors" aria-label="Добавить в избранное">
                 <HeartLinear className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
               </button>
               <Button
                 asChild
                 variant="outline"
-                className="px-3 sm:px-4 py-2 sm:py-3 bg-white border border-violet-100 rounded-lg hover:bg-gray-50 text-sm sm:text-base"
+                className="px-3 sm:px-4 py-2 sm:py-3 bg-white border border-violet-100 rounded-[12px] hover:bg-gray-50 text-sm sm:text-base"
               >
                 <Link href={`/schools/${school.slug || school.id}`} prefetch={true}>
                   Batafsil

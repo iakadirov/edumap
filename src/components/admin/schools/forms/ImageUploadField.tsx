@@ -115,7 +115,7 @@ export function ImageUploadField({
       <Label>{label}</Label>
       <div
         className={cn(
-          'border-2 border-dashed rounded-lg p-4 flex flex-col items-center justify-center',
+          'border-2 border-dashed rounded-[24px] p-4 flex flex-col items-center justify-center',
           preview ? 'border-primary' : 'border-muted-foreground/25',
           previewSize
         )}

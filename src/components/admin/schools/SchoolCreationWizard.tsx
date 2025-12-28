@@ -321,7 +321,7 @@ export function SchoolCreationWizard({
           {[1, 2, 3].map((step) => (
             <div key={step} className="flex items-center flex-1">
               <div
-                className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${
+                className={`flex items-center justify-center w-8 h-8 rounded-[12px] border-2 ${
                   currentStep >= step
                     ? 'bg-primary text-primary-foreground border-primary'
                     : 'bg-background border-muted text-muted-foreground'
@@ -342,7 +342,7 @@ export function SchoolCreationWizard({
 
         {/* Error Message */}
         {error && (
-          <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20 mb-4">
+          <div className="p-4 rounded-[24px] bg-destructive/10 text-destructive border border-destructive/20 mb-4">
             {error}
           </div>
         )}

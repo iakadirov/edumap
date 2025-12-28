@@ -102,7 +102,7 @@ export function AdmissionTab({ school }: AdmissionTabProps) {
               <Card key={step.step}>
                 <CardContent className="pt-6">
                   <div className="flex gap-4">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold flex-shrink-0">
+                    <div className="w-8 h-8 rounded-[12px] bg-blue-100 text-blue-600 flex items-center justify-center font-bold flex-shrink-0">
                       {step.step}
                     </div>
                     <div className="flex-1">

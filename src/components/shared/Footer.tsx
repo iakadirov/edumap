@@ -65,7 +65,7 @@ export function Footer() {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-white text-primary hover:bg-white/90 rounded-full px-8 py-6 text-base font-semibold"
+                  className="bg-white text-primary hover:bg-white/90 rounded-[12px] px-8 py-6 text-base font-semibold"
                 >
                   <Link href="/schools">
                     Hozir bepul baholashni boshlash
@@ -210,7 +210,7 @@ export function Footer() {
                 <div className="space-y-4">
                   {/* Language Selector */}
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-sm text-muted-foreground cursor-pointer hover:bg-muted transition-colors">
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-[12px] border border-border bg-background text-sm text-muted-foreground cursor-pointer hover:bg-muted transition-colors">
                       <GlobusBold className="w-4 h-4" />
                       <span>O'zbek</span>
                     </div>
@@ -224,7 +224,7 @@ export function Footer() {
                         href={social.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-10 h-10 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary hover:bg-muted/50 transition-all"
+                        className="w-10 h-10 rounded-[12px] border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary hover:bg-muted/50 transition-all"
                         aria-label={social.name}
                         title={social.name}
                       >

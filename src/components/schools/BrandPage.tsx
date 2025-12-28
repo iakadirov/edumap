@@ -53,7 +53,7 @@ export function BrandPage({ brand, schools }: BrandPageProps) {
                   alt={brand.name}
                   width={120}
                   height={120}
-                  className="rounded-lg object-cover border-4 border-background shadow-lg"
+                  className="rounded-[24px] object-cover border-4 border-background shadow-lg"
                 />
               </div>
             )}
@@ -107,7 +107,7 @@ export function BrandPage({ brand, schools }: BrandPageProps) {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-card border rounded-lg p-6 space-y-6 sticky top-4">
+            <div className="bg-card border rounded-[24px] p-6 space-y-6 sticky top-4">
               <h3 className="text-lg font-semibold">Kontaktlar</h3>
               
               {brand.website && (

@@ -28,7 +28,7 @@ function createS3Client() {
 }
 
 // Lazy initialization клиента
-let s3Client: S3Client | null = null;
+const s3Client: S3Client | null = null;
 
 function getS3Client(): S3Client {
   // Всегда создаем новый клиент, чтобы избежать проблем с кэшированием

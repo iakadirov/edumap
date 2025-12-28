@@ -3,6 +3,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { getRegionById, getDistrictById } from '@/lib/utils/regions-data';
 
 const schoolTypeLabels: Record<string, string> = {
   private: 'xususiy',
@@ -91,7 +92,7 @@ export async function generateSchoolsListTitle(params: {
   school_type?: string;
 }): Promise<string> {
   const locationParts: string[] = [];
-  let districtNames: string[] = [];
+  const districtNames: string[] = [];
   
   // Город
   if (params.city) {
@@ -193,6 +194,83 @@ export async function generateSchoolsListTitle(params: {
   
   // Общий формат
   return `${locationParts.join(', ')} ${schoolTypeLabel || 'maktablar'} ro'yxati`;
+}
+
+/**
+ * Генерировать заголовок страницы списка школ в формате:
+ * "[Region], [District1], [District2] tumani hududidagi maktablar ro'yxati"
+ */
+export async function generateSchoolsListPageTitle(params: {
+  region?: string;
+  district?: string;
+}): Promise<string> {
+  // Если нет фильтров, возвращаем общий заголовок
+  if (!params.region && !params.district) {
+    return "Maktablar katalogi";
+  }
+
+  let regionName: string | null = null;
+  const districtNames: string[] = [];
+
+  // Получаем название региона, если выбран
+  if (params.region) {
+    const regionId = parseInt(params.region, 10);
+    if (!isNaN(regionId)) {
+      const region = await getRegionById(regionId);
+      if (region) {
+        regionName = region.name_uz;
+      }
+    }
+  }
+
+  // Получаем названия районов (до 4 штук)
+  // Если регион не выбран, но есть районы, получаем регион из первого района
+  if (params.district) {
+    const districtIds = params.district.split(',').filter(Boolean).slice(0, 4);
+    let firstDistrictRegionId: number | null = null;
+    
+    for (const districtIdStr of districtIds) {
+      const districtId = parseInt(districtIdStr, 10);
+      if (!isNaN(districtId)) {
+        const district = await getDistrictById(districtId);
+        if (district) {
+          districtNames.push(district.name_uz);
+          // Сохраняем region_id первого района, если регион еще не получен
+          if (!regionName && firstDistrictRegionId === null && district.region_id) {
+            firstDistrictRegionId = district.region_id;
+          }
+        }
+      }
+    }
+
+    // Если регион не был выбран, но есть районы, получаем регион из первого района
+    if (!regionName && firstDistrictRegionId !== null) {
+      const region = await getRegionById(firstDistrictRegionId);
+      if (region) {
+        regionName = region.name_uz;
+      }
+    }
+  }
+
+  // Если есть регион и районы
+  if (regionName && districtNames.length > 0) {
+    const districtsPart = districtNames.join(', ');
+    return `${regionName}, ${districtsPart} hududidagi maktablar ro'yxati`;
+  }
+
+  // Если есть только регион
+  if (regionName && districtNames.length === 0) {
+    return `${regionName} hududidagi maktablar ro'yxati`;
+  }
+
+  // Если есть только районы без региона (маловероятно, но обрабатываем)
+  if (!regionName && districtNames.length > 0) {
+    const districtsPart = districtNames.join(', ');
+    return `${districtsPart} hududidagi maktablar ro'yxati`;
+  }
+
+  // Fallback
+  return "Maktablar katalogi";
 }
 
 /**

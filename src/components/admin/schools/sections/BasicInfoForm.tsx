@@ -217,7 +217,7 @@ function ImageUploadField({
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      <div className={cn('border-2 border-dashed rounded-lg p-4 flex items-center justify-center overflow-hidden', previewSize)}>
+      <div className={cn('border-2 border-dashed rounded-[24px] p-4 flex items-center justify-center overflow-hidden', previewSize)}>
         {preview ? (
           <div className={cn('relative', type === 'logo' ? 'w-32 h-32' : 'w-full h-32')}>
             <img
@@ -225,7 +225,7 @@ function ImageUploadField({
               alt={label}
               className={cn(
                 'w-full h-full rounded',
-                type === 'logo' ? 'rounded-full object-contain' : 'rounded-lg object-cover'
+                type === 'logo' ? 'rounded-full object-contain' : 'rounded-[24px] object-cover'
               )}
               onError={async (e) => {
                 try {
@@ -738,7 +738,7 @@ export function BasicInfoForm({
 
       {/* Ошибки */}
       {error && (
-        <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+        <div className="p-4 rounded-[24px] bg-destructive/10 text-destructive border border-destructive/20">
           {error}
         </div>
       )}
@@ -1279,7 +1279,7 @@ export function BasicInfoForm({
                 {pricingTiers.map((tier, index) => (
                   <div
                     key={index}
-                    className="flex gap-3 items-start p-3 border rounded-lg"
+                    className="flex gap-3 items-start p-3 border rounded-[24px]"
                   >
                     <div className="flex-1">
                       <Label className="text-xs text-muted-foreground mb-2 block">

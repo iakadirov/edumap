@@ -126,7 +126,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                'flex items-center gap-3 px-3 py-2 rounded-[12px] text-sm font-medium transition-colors',
                 isActive
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -143,7 +143,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       <div className="p-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-3 w-full rounded-lg p-2 hover:bg-muted transition-colors">
+            <button className="flex items-center gap-3 w-full rounded-[12px] p-2 hover:bg-muted transition-colors">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user.avatar_url || undefined} alt={user.full_name || user.email} />
                 <AvatarFallback className="text-xs">

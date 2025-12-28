@@ -79,7 +79,7 @@ export async function GET(
       .single();
 
     // В зависимости от раздела получаем дополнительные данные
-    let sectionData: any = {};
+    const sectionData: any = {};
 
     if (section === 'teachers') {
       const { data: staff } = await (supabase as any)

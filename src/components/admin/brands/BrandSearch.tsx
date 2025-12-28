@@ -105,7 +105,7 @@ export function BrandSearch({ value, onChange, label = "Brend qo'shish (ixtiyori
       </Label>
       
       {selectedBrand ? (
-        <div className="flex items-center gap-3 p-3 border rounded-lg bg-muted/50">
+        <div className="flex items-center gap-3 p-3 border rounded-[24px] bg-muted/50">
           {selectedBrand.logo_url ? (
             <div className="relative w-10 h-10 rounded overflow-hidden">
               <OptimizedImage
@@ -156,7 +156,7 @@ export function BrandSearch({ value, onChange, label = "Brend qo'shish (ixtiyori
           </div>
           
           {showResults && brands.length > 0 && (
-            <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg max-h-60 overflow-auto">
+            <div className="absolute z-50 w-full mt-1 bg-popover border rounded-[12px] shadow-lg max-h-60 overflow-auto">
               {brands.map((brand) => (
                 <button
                   key={brand.id}
@@ -192,7 +192,7 @@ export function BrandSearch({ value, onChange, label = "Brend qo'shish (ixtiyori
           )}
           
           {showResults && searchQuery.length >= 2 && !loading && brands.length === 0 && (
-            <div className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg p-3 text-sm text-muted-foreground">
+            <div className="absolute z-50 w-full mt-1 bg-popover border rounded-[12px] shadow-lg p-3 text-sm text-muted-foreground">
               Brend topilmadi
             </div>
           )}

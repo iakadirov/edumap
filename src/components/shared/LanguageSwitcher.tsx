@@ -28,7 +28,7 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="h-11 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl gap-1"
+          className="h-11 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-[12px] gap-1"
         >
           <GlobusBold className="h-5 w-5 text-slate-600" />
           <span className="text-base font-medium text-slate-600">

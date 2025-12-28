@@ -63,7 +63,7 @@ export function ErrorDisplay({
     <div
       ref={firstErrorRef}
       className={cn(
-        'p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20 space-y-3',
+        'p-4 rounded-[12px] bg-destructive/10 text-destructive border border-destructive/20 space-y-3',
         className
       )}
     >

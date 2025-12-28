@@ -99,9 +99,9 @@ export function DistrictMultiSelect({
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            className="flex items-center justify-between w-full px-4 py-3.5 gap-2.5 h-12 rounded-xl text-left cursor-pointer"
+            className="flex items-center justify-between w-full px-4 py-3.5 gap-2.5 h-12 rounded-[12px] text-left cursor-pointer"
             style={{
-              background: '#F7FCFE',
+              background: '#fff',
               border: '1px solid #DDEBF0',
               height: '48px'
             }}
@@ -309,7 +309,7 @@ export function DistrictMultiSelect({
               <span>{option.name_uz || option.name}</span>
               <button
                 onClick={(e) => removeDistrict(option.id, e)}
-                className="ml-1 rounded-full hover:bg-secondary-foreground/20 p-0.5 transition-colors"
+                className="ml-1 rounded hover:bg-secondary-foreground/20 p-0.5 transition-colors"
                 aria-label={`Remove ${option.name_uz || option.name}`}
               >
                 <CloseCircleBold className="h-3 w-3" />

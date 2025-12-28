@@ -54,7 +54,7 @@ export function SchoolHero({ school }: SchoolHeroProps) {
   return (
     <section className="school-hero space-y-6">
       {/* Cover Image */}
-      <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden rounded-xl">
+      <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden rounded-[24px]">
         <OptimizedImage
           src={school.coverImage}
           alt={school.name}
@@ -66,14 +66,14 @@ export function SchoolHero({ school }: SchoolHeroProps) {
         
         {/* Rank Badge on Photo */}
         {school.rating.rank && (
-          <div className="absolute bottom-4 left-4 bg-gradient-to-r from-amber-500 to-yellow-400 text-white px-3 py-2 rounded-lg font-bold shadow-lg">
+          <div className="absolute bottom-4 left-4 bg-gradient-to-r from-amber-500 to-yellow-400 text-white px-3 py-2 rounded-[24px] font-bold shadow-lg">
             #{school.rating.rank} в рейтинге
           </div>
         )}
         
         {/* Photos Count */}
         {school.photosCount !== undefined && school.photosCount > 0 && (
-          <button className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-black/80 transition">
+          <button className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-2 rounded-[24px] flex items-center gap-2 hover:bg-black/80 transition">
             <CameraBold className="w-4 h-4" />
             <span>{school.photosCount} фото</span>
           </button>
@@ -83,7 +83,7 @@ export function SchoolHero({ school }: SchoolHeroProps) {
       {/* School Info */}
       <div className="flex flex-col md:flex-row gap-6">
         {/* Logo */}
-        <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-gray-100 flex-shrink-0">
+        <div className="w-20 h-20 rounded-[24px] overflow-hidden border-2 border-gray-100 flex-shrink-0">
           <OptimizedImage
             src={school.logo}
             alt={`${school.name} logo`}
@@ -176,9 +176,9 @@ export function SchoolHero({ school }: SchoolHeroProps) {
           </div>
           
           {/* Quick Info Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 bg-gray-50 rounded-xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 bg-gray-50 rounded-[24px]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-[24px] bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <BookBold className="w-5 h-5 text-blue-600" />
               </div>
               <div className="min-w-0">
@@ -190,7 +190,7 @@ export function SchoolHero({ school }: SchoolHeroProps) {
             </div>
             
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-[24px] bg-green-100 flex items-center justify-center flex-shrink-0">
                 <GlobusBold className="w-5 h-5 text-green-600" />
               </div>
               <div className="min-w-0">
@@ -202,7 +202,7 @@ export function SchoolHero({ school }: SchoolHeroProps) {
             </div>
             
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-[24px] bg-purple-100 flex items-center justify-center flex-shrink-0">
                 <UserBold className="w-5 h-5 text-purple-600" />
               </div>
               <div className="min-w-0">
@@ -223,7 +223,7 @@ export function SchoolHero({ school }: SchoolHeroProps) {
                 return (
                   <span
                     key={feature}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-[12px] text-sm"
                   >
                     <span>{config.icon}</span>
                     <span>{config.label}</span>

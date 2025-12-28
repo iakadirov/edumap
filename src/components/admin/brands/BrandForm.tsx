@@ -200,7 +200,7 @@ function ImageUploadField({
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      <div className={cn('border-2 border-dashed rounded-lg p-4', previewSize)}>
+      <div className={cn('border-2 border-dashed rounded-[24px] p-4', previewSize)}>
         {preview ? (
           <div className="relative w-full h-full">
             <img
@@ -377,7 +377,7 @@ export function BrandForm({ brand }: BrandFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+        <div className="p-4 rounded-[24px] bg-destructive/10 text-destructive border border-destructive/20">
           {error}
         </div>
       )}

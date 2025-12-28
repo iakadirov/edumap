@@ -101,7 +101,7 @@ export function Testimonials() {
             {/* Author */}
             <div className="flex items-center justify-center gap-4">
               {/* Avatar placeholder */}
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-[12px] bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
                 <span className="text-lg font-semibold text-primary">
                   {activeTestimonial.author.charAt(0)}
                 </span>
@@ -124,7 +124,7 @@ export function Testimonials() {
             key={index}
             onClick={() => handleDotClick(index)}
             className={cn(
-              'w-2.5 h-2.5 rounded-full transition-all',
+              'w-2.5 h-2.5 rounded-[12px] transition-all',
               index === activeIndex
                 ? 'bg-primary w-8'
                 : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'

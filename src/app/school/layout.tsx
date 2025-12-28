@@ -30,7 +30,7 @@ export default async function SchoolLayout({
   return (
     <div className="flex min-h-screen bg-[#F4F4F6]">
       <AdminSidebar user={user} />
-      <main className="flex-1 flex flex-col overflow-auto mt-3 mr-3 mb-3 ml-0 rounded-xl bg-[#e4e4e8] border border-[#eaeaea] h-[calc(100vh-24px)] max-h-[calc(100vh-24px)]">
+      <main className="flex-1 flex flex-col overflow-auto mt-3 mr-3 mb-3 ml-0 rounded-[24px] bg-[#e4e4e8] border border-[#eaeaea] h-[calc(100vh-24px)] max-h-[calc(100vh-24px)]">
         <AdminHeader user={user} />
         <div className="flex-1 bg-[#F9F9F9]">
           <Suspense fallback={<AdminLoading />}>

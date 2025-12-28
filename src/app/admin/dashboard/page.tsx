@@ -224,8 +224,8 @@ export default async function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                <div className="h-2 w-2 rounded-full bg-primary" />
+              <div className="flex items-center gap-4 p-3 rounded-[24px] bg-muted/50">
+                <div className="h-2 w-2 rounded bg-primary" />
                 <div className="flex-1">
                   <p className="text-sm">
                     <span className="font-medium">Yangi maktab</span> qoʻshildi
@@ -233,8 +233,8 @@ export default async function AdminDashboardPage() {
                   <p className="text-xs text-muted-foreground">2 soat oldin</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                <div className="h-2 w-2 rounded-full bg-green-500" />
+              <div className="flex items-center gap-4 p-3 rounded-[24px] bg-muted/50">
+                <div className="h-2 w-2 rounded bg-green-500" />
                 <div className="flex-1">
                   <p className="text-sm">
                     <span className="font-medium">3 ta foydalanuvchi</span> roʻyxatdan oʻtdi
@@ -242,8 +242,8 @@ export default async function AdminDashboardPage() {
                   <p className="text-xs text-muted-foreground">5 soat oldin</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                <div className="h-2 w-2 rounded-full bg-blue-500" />
+              <div className="flex items-center gap-4 p-3 rounded-[24px] bg-muted/50">
+                <div className="h-2 w-2 rounded bg-blue-500" />
                 <div className="flex-1">
                   <p className="text-sm">
                     <span className="font-medium">Maktab maʼlumotlari</span> yangilandi

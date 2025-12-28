@@ -120,7 +120,7 @@ export function HomeMainNav() {
       <div className="flex items-center gap-4 sm:gap-6 w-full lg:w-auto justify-end">
         <Button
           asChild
-          className="h-12 px-4 sm:px-5 py-3 bg-blue-600 hover:bg-blue-700 border-[1.5px] border-blue-600 rounded-2xl gap-1"
+          className="h-12 px-4 sm:px-5 py-3 bg-blue-600 hover:bg-blue-700 border-[1.5px] border-blue-600 rounded-[12px] gap-1"
         >
           <Link href="/auth/login">
             <AddCircleBold className="h-6 w-6 text-white" />

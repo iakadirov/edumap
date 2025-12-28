@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { SchoolsList } from '../schools-list';
 import { RegionFilterSync } from '@/components/schools/RegionFilterSync';
-import { generateSchoolsListTitle, generateSchoolsListDescription } from '@/lib/utils/page-titles';
+import { generateSchoolsListTitle, generateSchoolsListDescription, generateSchoolsListPageTitle } from '@/lib/utils/page-titles';
 import type { Metadata } from 'next';
 
 // Динамический импорт SchoolFilters для уменьшения bundle size
@@ -13,7 +13,7 @@ const SchoolFilters = dynamic(
   {
     ssr: true, // Все равно рендерим на сервере для SEO
     loading: () => (
-      <div className="h-96 bg-muted animate-pulse rounded-lg" />
+      <div className="h-96 bg-muted animate-pulse rounded-[24px]" />
     ),
   }
 );
@@ -117,28 +117,27 @@ export default async function SchoolsListPage({ searchParams }: SchoolsListPageP
     cities = [];
   }
 
-  // Генерируем динамический заголовок
-  const pageTitle = await generateSchoolsListTitle({
+  // Генерируем динамический заголовок для мета-тегов
+  const metaTitle = await generateSchoolsListTitle({
     region: params.region,
     district: params.district,
     city: params.city,
     school_type: params.school_type,
   });
 
+  // Генерируем динамический заголовок для страницы
+  const pageTitle = await generateSchoolsListPageTitle({
+    region: params.region,
+    district: params.district,
+  });
+
   return (
-    <div className="container-wrapper bg-white p-6 mt-6 rounded-3xl">
-      {/* Синхронизация выбранной области с URL */}
-      <RegionFilterSync />
-      <div className="container-content pt-8">
+    <div className="container-wrapper pt-6 pb-0">
+      <div className="container-content">
+        {/* Синхронизация выбранной области с URL */}
+        <RegionFilterSync />
         {/* Основной контейнер */}
         <div className="w-full flex flex-col gap-5">
-          {/* Заголовок */}
-          <div className="container-inner">
-            <h1 className="text-xl sm:text-2xl font-semibold text-black">
-              Maktablar katalogi
-            </h1>
-          </div>
-
           {/* Фильтры сверху горизонтально - на всю ширину */}
           <div className="w-full">
             <SchoolFilters 
@@ -158,6 +157,13 @@ export default async function SchoolsListPage({ searchParams }: SchoolsListPageP
                 has_extended_day: params.has_extended_day,
               }}
             />
+          </div>
+
+          {/* Заголовок - после фильтров, но до количества школ */}
+          <div className="container-inner">
+            <h1 className="text-xl sm:text-2xl font-semibold text-black">
+              {pageTitle}
+            </h1>
           </div>
 
           {/* Список школ - загружается отдельно через Suspense для streaming */}

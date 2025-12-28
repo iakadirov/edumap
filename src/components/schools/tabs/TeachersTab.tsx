@@ -100,7 +100,7 @@ export function TeachersTab({ school }: TeachersTabProps) {
                 <CardContent className="pt-6">
                   <div className="flex gap-4">
                     {leader.photoUrl && (
-                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-20 h-20 rounded-[12px] overflow-hidden flex-shrink-0">
                         <OptimizedImage
                           src={leader.photoUrl}
                           alt={leader.name}

@@ -87,7 +87,7 @@ export function SimilarSchools({ currentSchool }: SimilarSchoolsProps) {
           <Link
             key={school.id}
             href={`/schools/${school.slug}`}
-            className="block border border-gray-200 rounded-xl overflow-hidden hover:border-blue-200 hover:shadow-md transition"
+            className="block border border-gray-200 rounded-[24px] overflow-hidden hover:border-blue-200 hover:shadow-md transition"
           >
             {/* Image */}
             <div className="aspect-[16/10] relative">

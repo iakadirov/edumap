@@ -202,7 +202,7 @@ export function EducationSection({
               {data.pricing_tiers.map((tier, index) => (
                 <div
                   key={index}
-                  className="flex gap-2 items-end p-3 border rounded-lg"
+                  className="flex gap-2 items-end p-3 border rounded-[24px]"
                 >
                   <div className="flex-1">
                     <Label className="text-xs text-muted-foreground">

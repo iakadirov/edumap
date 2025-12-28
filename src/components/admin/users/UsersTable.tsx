@@ -162,7 +162,7 @@ export function UsersTable({
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="rounded-[12px] border">
         <Table>
           <TableHeader>
             <TableRow>

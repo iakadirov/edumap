@@ -129,7 +129,7 @@ function InstitutionCard({ institution, orgType }: { institution: PopularInstitu
       href={href}
       className="group block"
     >
-      <div className="relative overflow-hidden rounded-2xl bg-white border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      <div className="relative overflow-hidden rounded-[24px] bg-white border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
         {/* Cover image */}
         <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
           {coverThumbnail ? (
@@ -151,12 +151,12 @@ function InstitutionCard({ institution, orgType }: { institution: PopularInstitu
           {/* Logo overlay */}
           {logoThumbnail && (
             <div className="absolute bottom-0 left-4 translate-y-1/2">
-              <div className="relative w-16 h-16 rounded-xl bg-white p-2 shadow-lg">
+              <div className="relative w-16 h-16 rounded-[12px] bg-white p-2 shadow-lg">
                 <OptimizedImage
                   src={logoThumbnail}
                   alt={`${displayName} logo`}
                   fill
-                  className="object-contain rounded-lg"
+                  className="object-contain rounded-[24px]"
                 />
               </div>
             </div>
@@ -245,7 +245,7 @@ export function PopularInstitutionsClient({ institutions }: PopularInstitutionsC
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
                 className={cn(
-                  'inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200',
+                  'inline-flex items-center gap-2 px-6 py-3 rounded-[12px] text-sm font-semibold transition-all duration-200',
                   isActive
                     ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -275,7 +275,7 @@ export function PopularInstitutionsClient({ institutions }: PopularInstitutionsC
       {/* View all button */}
       {activeInstitutions.length > 0 && activeCategoryData && (
         <div className="text-center">
-          <Button asChild variant="outline" size="lg" className="rounded-xl">
+          <Button asChild variant="outline" size="lg" className="rounded-[12px]">
             <Link href={activeCategoryData.href}>
               Barcha {activeCategoryData.label.toLowerCase()}ni ko'rish
             </Link>

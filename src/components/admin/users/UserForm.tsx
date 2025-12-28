@@ -110,7 +110,7 @@ export function UserForm({ user }: UserFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {error && (
-        <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+        <div className="p-4 rounded-[24px] bg-destructive/10 text-destructive border border-destructive/20">
           {error}
         </div>
       )}

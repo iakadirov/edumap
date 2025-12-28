@@ -107,7 +107,7 @@ export function SchoolSidebar({
           
           {/* Open Enrollment Badge */}
           {school.hasOpenEnrollment && (
-            <div className="mt-4 flex items-center gap-2 text-green-700 bg-green-50 px-3 py-2 rounded-lg">
+            <div className="mt-4 flex items-center gap-2 text-green-700 bg-green-50 px-3 py-2 rounded-[12px]">
               <CalendarBold className="w-4 h-4" />
               <span className="text-sm font-medium">
                 Открыт набор на {school.enrollmentYear || new Date().getFullYear() + 1}
@@ -161,7 +161,7 @@ export function SchoolSidebar({
                 href={`https://t.me/${formatTelegram(school.contacts.telegram)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition"
+                className="w-9 h-9 flex items-center justify-center rounded-[12px] bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition"
                 title="Telegram"
               >
                 <ChatRoundBold className="w-4 h-4" />
@@ -172,7 +172,7 @@ export function SchoolSidebar({
                 href={`https://instagram.com/${formatInstagram(school.contacts.instagram)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-pink-100 hover:text-pink-600 transition"
+                className="w-9 h-9 flex items-center justify-center rounded-[12px] bg-gray-100 text-gray-600 hover:bg-pink-100 hover:text-pink-600 transition"
                 title="Instagram"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -185,7 +185,7 @@ export function SchoolSidebar({
                 href={school.contacts.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition"
+                className="w-9 h-9 flex items-center justify-center rounded-[12px] bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition"
                 title="Facebook"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -205,7 +205,7 @@ export function SchoolSidebar({
           </CardHeader>
           <CardContent>
             {/* Map */}
-            <div className="aspect-[4/3] bg-gray-100 rounded-lg mb-3 overflow-hidden">
+            <div className="aspect-[4/3] bg-gray-100 rounded-[12px] mb-3 overflow-hidden">
               <iframe
                 src={`https://yandex.ru/map-widget/v1/?pt=${school.location.coordinates.lng},${school.location.coordinates.lat}&z=15&l=map`}
                 width="100%"
@@ -247,7 +247,7 @@ export function SchoolSidebar({
           {onCompareToggle && (
             <button
               onClick={onCompareToggle}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition text-left"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-[12px] hover:bg-gray-50 transition text-left"
             >
               <Checkbox checked={isInComparison} />
               <span className="text-gray-700">Добавить к сравнению</span>
@@ -258,7 +258,7 @@ export function SchoolSidebar({
           {onSaveToggle && (
             <button
               onClick={onSaveToggle}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition text-left"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-[12px] hover:bg-gray-50 transition text-left"
             >
               <HeartBold
                 className={`w-5 h-5 ${isSaved ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
@@ -283,14 +283,14 @@ export function SchoolSidebar({
                 // Можно добавить toast уведомление
               }
             }}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition text-left"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-[12px] hover:bg-gray-50 transition text-left"
           >
             <ShareBold className="w-5 h-5 text-gray-400" />
             <span className="text-gray-700">Поделиться</span>
           </button>
           
           {/* Report */}
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition text-left text-gray-500">
+          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-[12px] hover:bg-gray-50 transition text-left text-gray-500">
             <DangerCircleBold className="w-5 h-5" />
             <span>Сообщить о проблеме</span>
           </button>

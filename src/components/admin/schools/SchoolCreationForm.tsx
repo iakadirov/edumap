@@ -91,7 +91,7 @@ export function SchoolCreationForm() {
         })
         .catch((err) => console.error('Error loading brand data:', err));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [brandId]);
 
   const [data, setData] = useState<WizardData>({
@@ -168,7 +168,7 @@ export function SchoolCreationForm() {
     if (duplicateId) {
       loadDuplicateData(duplicateId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [searchParams]);
 
   const loadDuplicateData = async (schoolId: string) => {
@@ -442,7 +442,7 @@ export function SchoolCreationForm() {
     <div className="space-y-6">
       {/* Error Message */}
       {error && (
-        <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+        <div className="p-4 rounded-[24px] bg-destructive/10 text-destructive border border-destructive/20">
           {error}
         </div>
       )}

@@ -28,7 +28,7 @@ export function normalizeInstagram(input: string | null | undefined): SocialMedi
     return null;
   }
 
-  let cleaned = trimmed.replace(/\s+/g, '');
+  const cleaned = trimmed.replace(/\s+/g, '');
 
   const patterns = [
     // https://instagram.com/username или https://www.instagram.com/username
@@ -74,7 +74,7 @@ export function normalizeFacebook(input: string | null | undefined): SocialMedia
     return null;
   }
 
-  let cleaned = trimmed.replace(/\s+/g, '');
+  const cleaned = trimmed.replace(/\s+/g, '');
 
   // Если это уже полный URL (начинается с http:// или https://), возвращаем как есть
   if (/^https?:\/\//i.test(cleaned)) {
@@ -157,7 +157,7 @@ export function normalizeYouTube(input: string | null | undefined): SocialMediaD
     return null;
   }
 
-  let cleaned = trimmed.replace(/\s+/g, '');
+  const cleaned = trimmed.replace(/\s+/g, '');
 
   const patterns = [
     // https://youtube.com/@channel

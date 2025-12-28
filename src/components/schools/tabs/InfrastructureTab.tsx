@@ -117,7 +117,7 @@ export function InfrastructureTab({ school }: InfrastructureTabProps) {
             {infrastructure.facilities.map((facility, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-2 p-3 border rounded-lg bg-gray-50"
+                className="flex items-center gap-2 p-3 border rounded-[12px] bg-gray-50"
               >
                 <span className="text-green-600">✓</span>
                 <span className="text-gray-700">{facility}</span>
@@ -135,7 +135,7 @@ export function InfrastructureTab({ school }: InfrastructureTabProps) {
             {infrastructure.sports.map((sport, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-2 p-3 border rounded-lg bg-gray-50"
+                className="flex items-center gap-2 p-3 border rounded-[12px] bg-gray-50"
               >
                 <span className="text-green-600">✓</span>
                 <span className="text-gray-700">{sport}</span>
@@ -153,7 +153,7 @@ export function InfrastructureTab({ school }: InfrastructureTabProps) {
             {infrastructure.security.map((item, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-2 p-3 border rounded-lg bg-gray-50"
+                className="flex items-center gap-2 p-3 border rounded-[12px] bg-gray-50"
               >
                 <span className="text-green-600">✓</span>
                 <span className="text-gray-700">{item}</span>

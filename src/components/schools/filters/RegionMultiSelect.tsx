@@ -177,7 +177,7 @@ export function RegionMultiSelect({
               <span>{option.name_uz || option.name}</span>
               <button
                 onClick={(e) => removeRegion(option.id, e)}
-                className="ml-1 rounded-full hover:bg-secondary-foreground/20 p-0.5 transition-colors"
+                className="ml-1 rounded hover:bg-secondary-foreground/20 p-0.5 transition-colors"
                 aria-label={`Remove ${option.name_uz || option.name}`}
               >
                 <CloseCircleBold className="h-3 w-3" />

@@ -108,9 +108,9 @@ function ToastItem({
 
   return (
     <div
-      className={`${getToastStyles()} border rounded-lg p-4 shadow-lg flex items-start gap-3 min-w-[300px] max-w-md animate-in slide-in-from-top-5`}
+      className={`${getToastStyles()} border rounded-[24px] p-4 shadow-lg flex items-start gap-3 min-w-[300px] max-w-md animate-in slide-in-from-top-5`}
     >
-      <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center font-bold">
+      <div className="flex-shrink-0 w-6 h-6 rounded-[12px] flex items-center justify-center font-bold">
         {getIcon()}
       </div>
       <div className="flex-1">

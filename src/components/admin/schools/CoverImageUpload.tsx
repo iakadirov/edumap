@@ -159,7 +159,7 @@ export function CoverImageUpload({
       <div className="flex flex-col gap-4">
         {/* Preview */}
         {preview && (
-          <div className="relative w-full h-64 rounded-lg border border-gray-200 overflow-hidden bg-gray-50">
+          <div className="relative w-full h-64 rounded-[24px] border border-gray-200 overflow-hidden bg-gray-50">
             <OptimizedImage
               src={preview}
               alt="Обложка школы"
@@ -171,7 +171,7 @@ export function CoverImageUpload({
               <button
                 type="button"
                 onClick={handleRemove}
-                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-[12px] hover:bg-red-600 transition-colors shadow-lg"
                 aria-label="Удалить обложку"
               >
                 <X className="h-4 w-4" />

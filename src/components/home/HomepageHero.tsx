@@ -150,11 +150,11 @@ export function HomepageHero() {
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => searchQuery.trim().length >= 2 && setShowResults(true)}
               placeholder="Qidiruv: maktab nomi, hudud yoki kalit so'z..."
-              className="w-full h-14 pl-14 pr-36 rounded-2xl border-2 border-transparent bg-[#fafdff] text-[#0c1319] placeholder:text-[#5a6c7d] focus:border-[#0d8bf2] focus:outline-none focus:ring-4 focus:ring-[#0d8bf2]/10 transition-all shadow-sm"
+              className="w-full h-14 pl-14 pr-36 rounded-[24px] border-2 border-transparent bg-[#fafdff] text-[#0c1319] placeholder:text-[#5a6c7d] focus:border-[#0d8bf2] focus:outline-none focus:ring-4 focus:ring-[#0d8bf2]/10 transition-all shadow-sm"
             />
             <Button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-10 rounded-xl px-6 bg-[#0d8bf2] hover:bg-[#0b7dd9] text-white font-semibold transition-all"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-10 rounded-[12px] px-6 bg-[#0d8bf2] hover:bg-[#0b7dd9] text-white font-semibold transition-all"
             >
               Qidirish
             </Button>
@@ -163,7 +163,7 @@ export function HomepageHero() {
 
         {/* Search results dropdown */}
         {showResults && (results.length > 0 || isLoading) && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-[#d1d9e3] overflow-hidden z-50">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-[24px] shadow-lg border border-[#d1d9e3] overflow-hidden z-50">
             {isLoading ? (
               <div className="p-4 text-center text-[#5a6c7d]">
                 Qidirilmoqda...
@@ -181,7 +181,7 @@ export function HomepageHero() {
                         <img
                           src={result.logo_url}
                           alt={result.name}
-                          className="w-10 h-10 rounded-lg object-cover"
+                          className="w-10 h-10 rounded-[24px] object-cover"
                         />
                       )}
                       <div className="flex-1 min-w-0">
@@ -217,7 +217,7 @@ export function HomepageHero() {
               key={category.id}
               href={category.href}
               className={cn(
-                'inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-semibold transition-all',
+                'inline-flex items-center gap-2 px-6 py-3 rounded-[24px] text-sm font-semibold transition-all',
                 'bg-[#fafdff] text-[#0c1319] hover:bg-white hover:shadow-md hover:-translate-y-0.5 border border-transparent hover:border-[#d1d9e3]'
               )}
             >

@@ -143,7 +143,7 @@ export function calculateSectionProgress(
   // Специальная обработка для basic раздела
   if (section === 'basic') {
     // Для name проверяем, что хотя бы одно поле (name_uz или name_ru) заполнено
-    let filledRequired = requiredFields.filter((field) => {
+    const filledRequired = requiredFields.filter((field) => {
       // Для name_uz проверяем, что хотя бы одно название есть
       if (field === 'name_uz') {
         const nameUz = data.name_uz;

@@ -276,7 +276,7 @@ export function MediaManager({
       </Card>
 
       {error && (
-        <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+        <div className="p-4 rounded-[24px] bg-destructive/10 text-destructive border border-destructive/20">
           {error}
         </div>
       )}
@@ -286,7 +286,7 @@ export function MediaManager({
         <Card>
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-4">⭐ Обложка (отображается в карточке)</h3>
-            <div className="relative w-full h-64 rounded-lg overflow-hidden border-2 border-primary">
+            <div className="relative w-full h-64 rounded-[24px] overflow-hidden border-2 border-primary">
               <OptimizedImage
                 src={coverMedia.url}
                 alt={coverMedia.caption || 'Cover'}
@@ -321,7 +321,7 @@ export function MediaManager({
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="relative group aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-colors"
+                    className="relative group aspect-square rounded-[24px] overflow-hidden border-2 border-transparent hover:border-primary transition-colors"
                   >
                     {item.type === 'photo' ? (
                       <OptimizedImage

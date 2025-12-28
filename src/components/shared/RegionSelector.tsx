@@ -128,7 +128,7 @@ export function RegionSelector() {
         onClick={() => setIsDialogOpen(true)}
         data-region-selector
         className={cn(
-          'gap-1 h-11 px-4 py-3 rounded-xl',
+          'gap-1 h-11 px-4 py-3 rounded-[12px]',
           'bg-gray-100 hover:bg-gray-200',
           'border-none',
           !selectedRegion && 'text-muted-foreground'

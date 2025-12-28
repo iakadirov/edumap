@@ -148,9 +148,9 @@ export function ReviewsTab({ school }: ReviewsTabProps) {
                 {ratingCategories.map((cat) => (
                   <div key={cat.key} className="flex items-center gap-3">
                     <div className="w-32 text-sm text-gray-600">{cat.label}</div>
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-gray-100 rounded overflow-hidden">
                       <div
-                        className="h-full bg-amber-400 rounded-full"
+                        className="h-full bg-amber-400 rounded"
                         style={{ width: `${(cat.value / 5) * 100}%` }}
                       />
                     </div>
@@ -190,7 +190,7 @@ export function ReviewsTab({ school }: ReviewsTabProps) {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
-          className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+          className="px-3 py-2 border border-gray-200 rounded-[24px] text-sm bg-white"
         >
           <option value="newest">Сначала новые</option>
           <option value="oldest">Сначала старые</option>
@@ -229,7 +229,7 @@ function ReviewCard({ review }: { review: Review }) {
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             {/* Avatar */}
-            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+            <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden">
               {review.author.avatar ? (
                 <OptimizedImage
                   src={review.author.avatar}
@@ -321,7 +321,7 @@ function ReviewCard({ review }: { review: Review }) {
         
         {/* School Response */}
         {review.schoolResponse && (
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+          <div className="mt-4 p-4 bg-blue-50 rounded-[24px] border-l-4 border-blue-400">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm font-medium text-blue-800">💬 Ответ от школы</span>
               <span className="text-xs text-blue-600">{review.schoolResponse.date}</span>

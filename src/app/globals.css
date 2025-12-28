@@ -45,11 +45,11 @@
 }
 
 :root {
-  --radius: 1.5rem; /* Увеличено для сильно скруглённых углов */
+  --radius: 0.75rem; /* 12px - для кнопок и форм */
   
-  /* Контейнерная система - ширина 1200px без отступов */
+  /* Контейнерная система - ширина 1200px с боковыми отступами 24px */
   --container-wrapper: 1200px;
-  --container-wrapper-padding: 0px;
+  --container-wrapper-padding: 24px;
   --container-content: 1200px;
   --container-content-padding: 0px;
   --container-inner: 1200px;
@@ -177,13 +177,16 @@
     padding-right: var(--container-content-padding);
     padding-top: 0;
     padding-bottom: 0;
-    border-radius: 24px;
+    border-radius: 1.5rem; /* 24px для sections */
+    background-color: white;
+    padding: 24px;
   }
   
   /* Белый фон и отступы для container-content внутри section */
   section .container-content {
     background-color: #ffffff;
     padding: 32px 24px 24px 24px;
+    border-radius: 1.5rem; /* 24px для sections */
   }
   
   /* Белый фон для container-content только на странице школы */

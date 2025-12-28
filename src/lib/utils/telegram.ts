@@ -31,7 +31,7 @@ export function normalizeTelegram(input: string | null | undefined): TelegramDat
   }
 
   // Убираем пробелы
-  let cleaned = trimmed.replace(/\s+/g, '');
+  const cleaned = trimmed.replace(/\s+/g, '');
 
   // Паттерны для распознавания
   const patterns = [

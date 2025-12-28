@@ -109,7 +109,7 @@ export function BrandList({ brands, currentPage, totalPages, search: initialSear
       </form>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="rounded-[12px] border">
         <Table>
           <TableHeader>
             <TableRow>

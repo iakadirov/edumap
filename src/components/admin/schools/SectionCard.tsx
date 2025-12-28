@@ -83,7 +83,7 @@ export function SectionsGrid({ sections, schoolId, level }: SectionsGridProps) {
   };
 
   return (
-    <div className={cn('space-y-4 p-4 rounded-lg border', levelColors[level])}>
+    <div className={cn('space-y-4 p-4 rounded-[24px] border', levelColors[level])}>
       <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         {levelLabels[level]}
       </h3>

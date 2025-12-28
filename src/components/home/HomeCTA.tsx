@@ -6,13 +6,13 @@ export function HomeCTA() {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* For parents/students */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-blue-700 p-8 md:p-12 text-white">
+      <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-primary to-blue-700 p-8 md:p-12 text-white">
         {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-[24px] -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-[24px] translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative z-10 space-y-6">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-[12px] bg-white/20 flex items-center justify-center">
             <MagniferLinear className="w-7 h-7" />
           </div>
 
@@ -37,13 +37,13 @@ export function HomeCTA() {
       </div>
 
       {/* For institutions */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-800 to-slate-900 p-8 md:p-12 text-white">
+      <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-slate-800 to-slate-900 p-8 md:p-12 text-white">
         {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-[24px] -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-[24px] translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative z-10 space-y-6">
-          <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-[12px] bg-white/10 flex items-center justify-center">
             <AddCircleBold className="w-7 h-7" />
           </div>
 

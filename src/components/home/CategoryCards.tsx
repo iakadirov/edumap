@@ -84,7 +84,7 @@ export function CategoryCards() {
                 <div className="relative z-10">
                   {/* Icon */}
                   <div
-                    className="w-16 h-16 rounded-3xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110"
+                    className="w-16 h-16 rounded-[12px] flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110"
                     style={{ backgroundColor: `${category.color}15` }}
                   >
                     <Icon className="w-8 h-8" style={{ color: category.color }} />

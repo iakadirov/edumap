@@ -405,7 +405,7 @@ export function YandexMap({
   return (
     <div className={`space-y-2 ${className}`}>
       <Label>📍 Укажите местоположение на карте</Label>
-      <div className="relative rounded-lg overflow-hidden border border-gray-200">
+      <div className="relative rounded-[24px] overflow-hidden border border-gray-200">
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
             <div className="text-sm text-muted-foreground">Загрузка карты...</div>

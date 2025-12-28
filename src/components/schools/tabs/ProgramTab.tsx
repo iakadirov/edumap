@@ -117,7 +117,7 @@ export function ProgramTab({ school }: ProgramTabProps) {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Языки обучения</h2>
           <div className="space-y-2">
             {school.program.languages.map((lang, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 border rounded-lg">
+              <div key={idx} className="flex items-center justify-between p-3 border rounded-[12px]">
                 <span className="font-medium text-gray-900">{lang.name}</span>
                 <span className="text-sm text-gray-500">{lang.level}</span>
               </div>
