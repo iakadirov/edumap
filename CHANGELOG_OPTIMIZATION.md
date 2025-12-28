@@ -124,6 +124,26 @@
 1. `8f0d293` - feat: UI improvements, favicons, and code style fixes
 2. `a68e3a6` - fix: reduce ESLint errors from 346 to 4, update config and add types
 3. `592e670` - feat: add Error Boundaries for better error handling
+4. `pending` - feat: add pagination to schools list
+
+---
+
+## Этап 4: Пагинация для списка школ
+
+**Статус**: ✅ Завершено
+
+### Реализованные функции:
+- [x] `getSchoolsWithFilters` теперь возвращает `PaginatedSchoolsResult`
+- [x] Добавлена константа `SCHOOLS_PER_PAGE = 12`
+- [x] Создан компонент `Pagination` с навигацией по страницам
+- [x] URL параметр `?page=N` для сохранения состояния
+- [x] Показ общего количества школ и текущей страницы
+
+### Созданные/измененные файлы:
+- [x] `src/components/schools/Pagination.tsx` - новый компонент пагинации
+- [x] `src/lib/supabase/queries.ts` - добавлена пагинация в запрос
+- [x] `src/app/schools/schools-list.tsx` - интеграция пагинации
+- [x] `src/app/schools/list/page.tsx` - поддержка параметра page
 
 ### Проект готов к деплою
 
@@ -131,3 +151,4 @@
 - ✅ TypeScript компилируется без ошибок
 - ✅ 98.8% ESLint ошибок исправлено
 - ✅ Error Boundaries добавлены для обработки ошибок
+- ✅ Пагинация для списка школ

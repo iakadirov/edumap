@@ -73,6 +73,7 @@ interface SchoolsListPageProps {
     has_meals?: string;
     has_extended_day?: string;
     sort?: SortOption;
+    page?: string;
   }> | {
     region?: string; // ID области
     district?: string;
@@ -88,6 +89,7 @@ interface SchoolsListPageProps {
     has_meals?: string;
     has_extended_day?: string;
     sort?: SortOption;
+    page?: string;
   };
 }
 

@@ -210,13 +210,24 @@ export async function getSchoolWithBranches(slug: string) {
 /**
  * Получить школы с фильтрами
  */
-export type SortOption = 
+export type SortOption =
   | 'rating_desc'
   | 'rating_asc'
   | 'price_asc'
   | 'price_desc'
   | 'reviews_desc'
   | 'popularity';
+
+export const SCHOOLS_PER_PAGE = 12;
+
+export interface PaginatedSchoolsResult {
+  schools: SchoolWithDetails[];
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
 
 export async function getSchoolsWithFilters(filters: {
   districts?: string[]; // Массив ID районов (теперь это district_id из таблицы districts)
@@ -233,7 +244,9 @@ export async function getSchoolsWithFilters(filters: {
   has_meals?: boolean;
   has_extended_day?: boolean;
   sort?: SortOption;
-}) {
+  page?: number;
+  limit?: number;
+}): Promise<PaginatedSchoolsResult> {
   const supabase = await createClient();
   
   // Оптимизация: выбираем только нужные поля для списка
@@ -281,8 +294,7 @@ export async function getSchoolsWithFilters(filters: {
       )
     `)
     .eq('org_type', 'school')
-    .in('status', ['active', 'published']) // Поддержка старых и новых статусов
-    .limit(100); // Ограничиваем для производительности
+    .in('status', ['active', 'published']); // Поддержка старых и новых статусов
 
   // Фильтр по области (region_id)
   if (filters.region !== null && filters.region !== undefined) {
@@ -339,7 +351,14 @@ export async function getSchoolsWithFilters(filters: {
   }
 
   if (!data) {
-    return [];
+    return {
+      schools: [],
+      totalCount: 0,
+      currentPage: 1,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPrevPage: false,
+    };
   }
 
   // Фильтрация на клиенте для сложных фильтров
@@ -379,7 +398,23 @@ export async function getSchoolsWithFilters(filters: {
     });
   }
 
-  return filteredData;
+  // Пагинация
+  const page = filters.page || 1;
+  const limit = filters.limit || SCHOOLS_PER_PAGE;
+  const totalCount = filteredData.length;
+  const totalPages = Math.ceil(totalCount / limit);
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const paginatedSchools = filteredData.slice(startIndex, endIndex) as SchoolWithDetails[];
+
+  return {
+    schools: paginatedSchools,
+    totalCount,
+    currentPage: page,
+    totalPages,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
+  };
 }
 
 /**
