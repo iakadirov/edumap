@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
-import { Header } from '@/components/shared/Header';
-import { Footer } from '@/components/shared/Footer';
+import { Layout } from '@/components/shared/Layout';
 import { RegionProvider } from '@/contexts/RegionContext';
 
 export const metadata: Metadata = {
@@ -10,10 +9,9 @@ export const metadata: Metadata = {
 
 /**
  * Layout для раздела университетов (universities)
- * 
+ *
  * TODO: Bu bo'lim keyingi bosqichda ishlab chiqiladi
- * Hozircha umumiy Header va Footer ishlatiladi
- * 
+ *
  * @see docs/FUTURE_MODULES.md
  */
 export default function UniversitiesLayout({
@@ -23,14 +21,7 @@ export default function UniversitiesLayout({
 }) {
   return (
     <RegionProvider>
-      <div className="flex min-h-screen flex-col">
-        {/* TODO: UniversitiesHeader ni qo'shing */}
-        <Header />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
-      </div>
+      <Layout>{children}</Layout>
     </RegionProvider>
   );
 }

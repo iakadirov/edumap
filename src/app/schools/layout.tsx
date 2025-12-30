@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
-import { SchoolsHeader } from '@/components/schools/Header/SchoolsHeader';
-import { Footer } from '@/components/shared/Footer';
+import { Layout } from '@/components/shared/Layout';
 import { RegionProvider } from '@/contexts/RegionContext';
 
 export const metadata: Metadata = {
@@ -10,11 +9,10 @@ export const metadata: Metadata = {
 
 /**
  * Layout для раздела школ
- * 
+ *
  * Features:
- * - Использует SchoolsHeader с раздел-специфичной навигацией
+ * - Использует общий Layout с единым Header
  * - Подключает RegionProvider для работы с регионами
- * - Общий Footer
  */
 export default function SchoolsLayout({
   children,
@@ -23,13 +21,7 @@ export default function SchoolsLayout({
 }) {
   return (
     <RegionProvider>
-      <div className="flex min-h-screen flex-col">
-        <SchoolsHeader />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
-      </div>
+      <Layout>{children}</Layout>
     </RegionProvider>
   );
 }

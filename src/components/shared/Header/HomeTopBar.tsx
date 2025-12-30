@@ -102,7 +102,7 @@ export function HomeTopBar() {
 
           {/* Навигация по типам организаций - с горизонтальной прокруткой на мобильных */}
           <div className="flex-1 sm:flex-none overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
-            <div className="px-1.5 sm:px-2 md:px-4 py-1 bg-slate-100 rounded-[10px] sm:rounded-[12px] flex items-center gap-1 sm:gap-3 md:gap-6 min-w-max">
+            <div className="px-1.5 sm:px-2 md:px-4 py-1 bg-slate-100 rounded-[10px] sm:rounded-[12px] flex items-center gap-1 sm:gap-3 md:gap-3 min-w-max">
               {orgTypes.map((org) => {
                 const Icon = org.icon;
                 const isActive = activeOrgType === org.id;
