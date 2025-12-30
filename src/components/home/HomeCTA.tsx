@@ -62,7 +62,7 @@ export function HomeCTA() {
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Large circle */}
-          <div className="absolute -top-12 sm:-top-20 -right-12 sm:-right-20 w-40 sm:w-64 h-40 sm:h-64 rounded-full bg-[#8147f5]/10" />
+          <div className="absolute -top-12 sm:-top-20 -right-12 sm:-right-20 w-40 sm:w-64 h-40 sm:h-64 rounded-full bg-[#0d8bf2]/10" />
           <div className="absolute -bottom-6 sm:-bottom-10 -left-6 sm:-left-10 w-24 sm:w-40 h-24 sm:h-40 rounded-full bg-[#0d8bf2]/5" />
 
           {/* Grid pattern - hidden on mobile */}
@@ -75,16 +75,16 @@ export function HomeCTA() {
           />
 
           {/* Gradient accent line */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0d8bf2] via-[#8147f5] to-[#0d8bf2]" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0d8bf2] via-[#38bdf8] to-[#0d8bf2]" />
 
           {/* Floating shapes - hidden on mobile */}
-          <div className="hidden sm:block absolute top-1/3 right-1/4 w-4 h-4 bg-[#8147f5]/30 rounded-lg rotate-12 animate-pulse" style={{ animationDuration: '4s' }} />
+          <div className="hidden sm:block absolute top-1/3 right-1/4 w-4 h-4 bg-[#38bdf8]/30 rounded-lg rotate-12 animate-pulse" style={{ animationDuration: '4s' }} />
           <div className="hidden sm:block absolute bottom-1/4 left-1/4 w-3 h-3 bg-[#0d8bf2]/20 rounded-full animate-pulse" style={{ animationDuration: '3s', animationDelay: '1.5s' }} />
         </div>
 
         <div className="relative z-10 space-y-4 sm:space-y-5 md:space-y-6">
           {/* Icon */}
-          <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#8147f5]/30 to-[#0d8bf2]/30 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#0d8bf2]/30 to-[#38bdf8]/30 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
             <AddCircleBold className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
           </div>
 

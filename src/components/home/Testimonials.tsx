@@ -21,7 +21,7 @@ const testimonials = [
     role: 'Talaba',
     location: 'Samarqand',
     rating: 5,
-    color: '#8147f5',
+    color: '#0284c7',
   },
   {
     id: 3,

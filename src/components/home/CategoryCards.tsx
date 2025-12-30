@@ -37,8 +37,8 @@ const categories = [
     subtext: 'Davlat va xususiy OTMlar',
     icon: SquareAcademicCapBold,
     href: '/universities',
-    color: '#8147f5',
-    bgGradient: 'from-purple-50 to-purple-100/30',
+    color: '#0284c7',
+    bgGradient: 'from-sky-50 to-sky-100/30',
   },
   {
     id: 'courses',

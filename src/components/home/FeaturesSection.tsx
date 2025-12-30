@@ -27,7 +27,7 @@ const features = [
     title: "Qulay qidiruv",
     description: "Filterlar va solishtirish imkoniyati",
     icon: MagniferBold,
-    color: '#8147f5',
+    color: '#0284c7',
   },
   {
     id: 'reviews',

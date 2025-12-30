@@ -77,9 +77,9 @@
   --muted: #e9edf1;
   --muted-foreground: #5a6c7d;
   
-  /* Accent colors для категорий */
-  --accent: #8147f5; /* Фиолетовый */
-  --accent-foreground: #ffffff;
+  /* Accent colors - светло-синий для hover состояний */
+  --accent: #e0f2fe; /* Светло-синий (sky-100) */
+  --accent-foreground: #0c1319;
   --destructive: #ef6e2e; /* Оранжевый для ошибок */
   --border: #d1d9e3;
   --input: #fafdff;

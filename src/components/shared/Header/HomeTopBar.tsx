@@ -59,8 +59,8 @@ export function HomeTopBar() {
       href: '/universities',
       label: 'Oliygohlar',
       icon: SquareAcademicCapBold,
-      activeColor: 'text-purple-600',
-      borderColor: 'border-purple-600',
+      activeColor: 'text-sky-600',
+      borderColor: 'border-sky-600',
     },
     {
       id: 'courses',
@@ -111,7 +111,7 @@ export function HomeTopBar() {
                     key={org.id}
                     href={org.href}
                     className={cn(
-                      'px-1.5 sm:px-2 py-1 sm:py-[6px] flex items-center gap-0.5 sm:gap-1 transition-all flex-shrink-0',
+                      'px-1.5 sm:px-2 py-1 sm:py-[6px] flex items-center gap-0.5 sm:gap-1 flex-shrink-0',
                       isActive
                         ? `bg-white shadow-[0px_0px_2px_0px_rgba(0,0,0,0.15)] border-l-2 ${org.borderColor} rounded-[10px] sm:rounded-[12px]`
                         : 'rounded-[10px] sm:rounded-[12px] hover:bg-white/50'

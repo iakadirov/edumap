@@ -19,7 +19,7 @@ const steps = [
     title: 'Solishtiring',
     description: "Narxlar, fikrlar va xususiyatlarni solishtiring",
     icon: SortHorizontalBold,
-    color: '#8147f5',
+    color: '#0284c7',
   },
   {
     id: 3,
@@ -47,11 +47,11 @@ export function HowItWorks() {
       <div className="relative max-w-4xl mx-auto">
         {/* Connection line (desktop) - gradient */}
         <div className="hidden md:block absolute top-[50px] sm:top-[60px] left-[16.67%] right-[16.67%] h-1">
-          <div className="w-full h-full bg-gradient-to-r from-[#0d8bf2] via-[#8147f5] to-[#31ab08] rounded-full opacity-20" />
+          <div className="w-full h-full bg-gradient-to-r from-[#0d8bf2] via-[#0284c7] to-[#31ab08] rounded-full opacity-20" />
           {/* Animated progress dots */}
           <div className="absolute inset-0 flex justify-between px-4">
             <div className="w-2 h-2 rounded-full bg-[#0d8bf2] -translate-y-0.5 animate-pulse" style={{ animationDelay: '0s' }} />
-            <div className="w-2 h-2 rounded-full bg-[#8147f5] -translate-y-0.5 animate-pulse" style={{ animationDelay: '0.5s' }} />
+            <div className="w-2 h-2 rounded-full bg-[#0284c7] -translate-y-0.5 animate-pulse" style={{ animationDelay: '0.5s' }} />
             <div className="w-2 h-2 rounded-full bg-[#31ab08] -translate-y-0.5 animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
         </div>

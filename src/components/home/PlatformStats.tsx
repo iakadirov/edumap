@@ -31,7 +31,7 @@ const stats = [
     suffix: 'K+',
     label: 'Fikrlar va sharhlar',
     icon: ChatSquareBold,
-    color: '#8147f5',
+    color: '#0284c7',
   },
   {
     id: 'rating',

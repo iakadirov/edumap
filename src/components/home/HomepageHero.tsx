@@ -33,7 +33,7 @@ const categories = [
     label: 'OTM',
     icon: SquareAcademicCapBold,
     href: '/universities',
-    color: '#8147f5',
+    color: '#0284c7',
   },
   {
     id: 'courses',
@@ -156,7 +156,7 @@ export function HomepageHero() {
 
         {/* Floating dots pattern - hidden on mobile */}
         <div className="hidden sm:block absolute top-20 left-[15%] w-2 h-2 rounded-full bg-[#0d8bf2]/20 animate-bounce" style={{ animationDuration: '3s' }} />
-        <div className="hidden sm:block absolute top-40 right-[20%] w-3 h-3 rounded-full bg-[#8147f5]/20 animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
+        <div className="hidden sm:block absolute top-40 right-[20%] w-3 h-3 rounded-full bg-[#0284c7]/20 animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
         <div className="hidden md:block absolute bottom-32 left-[25%] w-2.5 h-2.5 rounded-full bg-[#31ab08]/20 animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '1s' }} />
         <div className="hidden md:block absolute bottom-40 right-[30%] w-2 h-2 rounded-full bg-[#ef6e2e]/20 animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }} />
       </div>
@@ -194,7 +194,7 @@ export function HomepageHero() {
         <form onSubmit={handleSearch} className="w-full">
           <div className="relative group">
             {/* Glow effect on focus */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#0d8bf2]/20 via-[#8147f5]/20 to-[#0d8bf2]/20 rounded-[20px] sm:rounded-[28px] opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity duration-300" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#0d8bf2]/20 via-[#38bdf8]/20 to-[#0d8bf2]/20 rounded-[20px] sm:rounded-[28px] opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity duration-300" />
 
             <div className="relative">
               <MagniferLinear className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5a6c7d] z-10" />
