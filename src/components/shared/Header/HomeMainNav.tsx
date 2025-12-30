@@ -105,8 +105,8 @@ export function HomeMainNav() {
         ))}
       </nav>
 
-      {/* Правая часть */}
-      <div className="flex items-center gap-2 sm:gap-4">
+      {/* Правая часть - ml-auto для выравнивания справа */}
+      <div className="flex items-center gap-2 sm:gap-4 ml-auto">
         {/* Кнопка входа - скрыта на мобильных, показана в меню */}
         <Button
           asChild

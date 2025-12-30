@@ -143,11 +143,11 @@ export function RegionSelector() {
 
       {/* Модальное окно выбора области */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="!w-[calc(100vw-2rem)] !max-w-[1020px] sm:!w-[1020px] px-4 sm:px-6">
+        <DialogContent className="!w-[calc(100vw-2rem)] !max-w-[1152px] sm:!w-[1152px] px-4 sm:px-6">
           <DialogHeader>
-            <DialogTitle className="text-xl sm:text-2xl">Viloyatingizni tanlang</DialogTitle>
+            <DialogTitle className="text-xl sm:text-2xl">Hududni tanlang</DialogTitle>
             <DialogDescription className="text-sm sm:text-base">
-              Qaysi viloyatda joylashgan maktablarni ko'rmoqchisiz?
+              Qaysi hududdagi muassasalarni ko'rmoqchisiz?
             </DialogDescription>
           </DialogHeader>
           
