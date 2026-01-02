@@ -1,0 +1,88 @@
+/**
+ * EduMap Design System - Border Radius Tokens
+ *
+ * Consistent rounding for a modern, friendly aesthetic.
+ * Larger radii for bigger elements, smaller for compact ones.
+ */
+
+:root {
+  /* ========================================
+   * Base Radius Scale
+   * ======================================== */
+  --radius-none: 0;
+  --radius-xs: 0.25rem;     /* 4px - tiny elements */
+  --radius-sm: 0.5rem;      /* 8px - small elements, badges */
+  --radius-md: 0.75rem;     /* 12px - buttons, inputs */
+  --radius-lg: 1rem;        /* 16px - cards, containers */
+  --radius-xl: 1.25rem;     /* 20px - large cards */
+  --radius-2xl: 1.5rem;     /* 24px - sections, modals */
+  --radius-3xl: 2rem;       /* 32px - hero sections */
+  --radius-4xl: 2.5rem;     /* 40px - extra large containers */
+  --radius-full: 9999px;    /* Pills, avatars */
+
+  /* ========================================
+   * Semantic Radius
+   * ======================================== */
+
+  /* Form elements */
+  --radius-button: var(--radius-md);      /* 12px */
+  --radius-input: var(--radius-md);       /* 12px */
+  --radius-checkbox: var(--radius-xs);    /* 4px */
+  --radius-switch: var(--radius-full);    /* pill */
+
+  /* Content containers */
+  --radius-card: var(--radius-2xl);       /* 24px */
+  --radius-card-sm: var(--radius-lg);     /* 16px */
+  --radius-section: var(--radius-2xl);    /* 24px */
+  --radius-modal: var(--radius-2xl);      /* 24px */
+
+  /* Interactive elements */
+  --radius-badge: var(--radius-sm);       /* 8px */
+  --radius-tag: var(--radius-full);       /* pill */
+  --radius-avatar: var(--radius-full);    /* circle */
+  --radius-icon-btn: var(--radius-md);    /* 12px */
+
+  /* Overlays */
+  --radius-dropdown: var(--radius-lg);    /* 16px */
+  --radius-tooltip: var(--radius-sm);     /* 8px */
+  --radius-popover: var(--radius-lg);     /* 16px */
+}
+
+/* ========================================
+ * Radius Utility Classes
+ * ======================================== */
+
+@layer utilities {
+  /* Component-specific radius */
+  .rounded-button {
+    border-radius: var(--radius-button);
+  }
+
+  .rounded-input {
+    border-radius: var(--radius-input);
+  }
+
+  .rounded-card {
+    border-radius: var(--radius-card);
+  }
+
+  .rounded-card-sm {
+    border-radius: var(--radius-card-sm);
+  }
+
+  .rounded-section {
+    border-radius: var(--radius-section);
+  }
+
+  .rounded-modal {
+    border-radius: var(--radius-modal);
+  }
+
+  .rounded-badge {
+    border-radius: var(--radius-badge);
+  }
+
+  .rounded-tag {
+    border-radius: var(--radius-tag);
+  }
+}

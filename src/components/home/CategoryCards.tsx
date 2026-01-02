@@ -60,7 +60,7 @@ export function CategoryCards() {
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-[-0.03em] sm:tracking-[-0.04em] text-[#0c1319]">
           Ta'lim muassasalarini tanlang
         </h2>
-        <p className="text-base sm:text-lg md:text-xl text-[#5a6c7d] max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg md:text-xl text-[#5a6c7d]">
           Barcha turdagi ta'lim muassasalari bitta platformada
         </p>
       </div>

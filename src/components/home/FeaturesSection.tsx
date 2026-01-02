@@ -60,7 +60,7 @@ export function FeaturesSection() {
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-[-0.02em] text-[#0c1319]">
           Nega aynan EduMap?
         </h2>
-        <p className="text-base sm:text-lg text-[#5a6c7d] max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg text-[#5a6c7d]">
           Ta'lim muassasasini to'g'ri tanlash uchun barcha kerakli narsalar
         </p>
       </div>

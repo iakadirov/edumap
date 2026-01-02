@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { StarBold } from '@solar-icons/react-perf';
+import { SectionHeader, SectionContent } from '@/components/ui/section';
 
 const testimonials = [
   {
     id: 1,
-    text: "EduMap orqali farzandim uchun eng yaxshi maktabni topdim. Juda qulay va oson! Barcha ma'lumotlar bir joyda va shaffof.",
+    text: "EduMap orqali farzandim uchun eng yaxshi maktabni topdim. Barcha ma'lumotlar bir joyda - narxlar, sharhlar, o'quv dasturi. Juda qulay!",
     author: 'Aziza Karimova',
     role: 'Ota-ona',
     location: 'Toshkent',
@@ -16,34 +17,34 @@ const testimonials = [
   },
   {
     id: 2,
-    text: "Universitetlarni solishtirish juda oson bo'ldi. Narxlar, reyting va sharhlar barchasi ochiq. Tavsiya qilaman!",
-    author: "Jamshid Rahmonov",
-    role: 'Talaba',
-    location: 'Samarqand',
-    rating: 5,
-    color: '#0284c7',
-  },
-  {
-    id: 3,
-    text: "Bolam uchun bog'cha qidirish qiyin edi, lekin EduMap yordamida tez va oson topdik. Rahmat!",
-    author: 'Nilufar Abdullayeva',
+    text: "3 ta maktabni solishtirib ko'rdim va eng mosini tanladim. Ota-onalar sharhlari juda foydali bo'ldi. Rahmat EduMap!",
+    author: "Sardor Rahmonov",
     role: 'Ota-ona',
-    location: "Buxoro",
+    location: 'Samarqand',
     rating: 5,
     color: '#31ab08',
   },
   {
+    id: 3,
+    text: "Xususiy maktablar narxlarini taqqoslash imkoniyati juda yaxshi. Endi boshqa saytlarni qidirish shart emas, barchasi shu yerda.",
+    author: 'Nilufar Abdullayeva',
+    role: 'Ota-ona',
+    location: "Buxoro",
+    rating: 5,
+    color: '#0284c7',
+  },
+  {
     id: 4,
-    text: "IT kurslari haqida to'liq ma'lumot olish uchun eng yaxshi platforma. Haqiqiy sharhlar juda foydali bo'ldi.",
-    author: 'Sardor Toshmatov',
-    role: "O'quvchi",
+    text: "Bolam uchun ingliz tilida o'qitiladigan maktab qidirdim. Filterlar orqali tez topdim. Platforma juda oson va tushunarli.",
+    author: 'Jamshid Toshmatov',
+    role: "Ota-ona",
     location: 'Toshkent',
     rating: 5,
     color: '#ef6e2e',
   },
 ];
 
-export function Testimonials() {
+export function SchoolsTestimonials() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
@@ -67,18 +68,13 @@ export function Testimonials() {
   const activeTestimonial = testimonials[activeIndex];
 
   return (
-    <div className="space-y-6 sm:space-y-8 md:space-y-10">
-      {/* Section header */}
-      <div className="text-center space-y-3 sm:space-y-4 px-2">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-[-0.02em] text-[#0c1319]">
-          Foydalanuvchilar fikrlari
-        </h2>
-        <p className="text-base sm:text-lg text-[#5a6c7d]">
-          Ota-onalar va talabalar tajribasi
-        </p>
-      </div>
+    <SectionContent>
+      <SectionHeader
+        title="Ota-onalar fikrlari"
+        subtitle="EduMap orqali maktab topgan ota-onalar tajribasi"
+      />
 
-      {/* Testimonial card - single, clean design */}
+      {/* Testimonial card */}
       <div className="max-w-3xl mx-auto px-2">
         <div
           className="relative bg-white rounded-[20px] sm:rounded-[24px] p-5 sm:p-8 md:p-10 shadow-sm border border-gray-100 transition-all duration-500"
@@ -94,7 +90,7 @@ export function Testimonials() {
             &ldquo;
           </div>
 
-          {/* Content with fade transition */}
+          {/* Content */}
           <div className="space-y-4 sm:space-y-6">
             {/* Quote text */}
             <p className="text-base sm:text-lg md:text-xl text-[#0c1319] leading-relaxed pr-8 sm:pr-12">
@@ -150,6 +146,6 @@ export function Testimonials() {
           />
         ))}
       </div>
-    </div>
+    </SectionContent>
   );
 }

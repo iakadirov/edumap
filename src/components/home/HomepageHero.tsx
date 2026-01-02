@@ -184,7 +184,7 @@ export function HomepageHero() {
           </span>{' '}
           bitta platformada
         </h1>
-        <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-[#5a6c7d] max-w-3xl mx-auto leading-relaxed text-center px-2">
+        <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-[#5a6c7d] leading-relaxed text-center px-2">
           Maktab, bog'cha, universitet yoki kurslarni toping, solishtiring va tanlang
         </p>
       </div>

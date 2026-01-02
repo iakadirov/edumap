@@ -151,7 +151,7 @@ export function RegionSelector() {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 max-h-[60vh] overflow-y-auto py-2 sm:py-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 max-h-[60vh] overflow-y-auto py-2 sm:py-4 px-0.5">
             {/* Вариант "O'zbekiston" (все регионы) */}
             <Button
               variant="outline"

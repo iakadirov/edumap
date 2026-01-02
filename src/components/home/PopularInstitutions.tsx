@@ -1,13 +1,10 @@
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { PopularInstitutionsClient } from './PopularInstitutionsClient';
-import type { PopularInstitution } from './PopularInstitutionsClient';
+import { RecentInstitutionsClient } from './PopularInstitutionsClient';
+import type { RecentInstitution } from './PopularInstitutionsClient';
 
-type OrganizationType = 'school' | 'kindergarten' | 'university' | 'course';
-
-async function getPopularInstitutions(orgType: OrganizationType): Promise<PopularInstitution[]> {
+async function getRecentInstitutions(): Promise<RecentInstitution[]> {
   const supabase = await createClient();
-  
+
   const { data, error } = await supabase
     .from('organizations')
     .select(`
@@ -15,6 +12,7 @@ async function getPopularInstitutions(orgType: OrganizationType): Promise<Popula
       name,
       name_uz,
       slug,
+      org_type,
       overall_rating,
       reviews_count,
       district,
@@ -22,43 +20,26 @@ async function getPopularInstitutions(orgType: OrganizationType): Promise<Popula
       logo_url,
       cover_image_url,
       banner_url,
+      created_at,
       school_details (
         fee_monthly_min,
         fee_monthly_max
       )
     `)
-    .eq('org_type', orgType)
     .in('status', ['active', 'published'])
-    .not('overall_rating', 'is', null)
-    .order('overall_rating', { ascending: false })
-    .order('reviews_count', { ascending: false })
-    .limit(3);
+    .order('created_at', { ascending: false })
+    .limit(6);
 
   if (error) {
-    console.error(`Error fetching ${orgType}:`, error);
+    console.error('Error fetching recent institutions:', error);
     return [];
   }
 
-  return (data || []) as PopularInstitution[];
+  return (data || []) as RecentInstitution[];
 }
 
 export async function PopularInstitutions() {
-  // Получаем популярные учреждения для каждого типа
-  const [schools, kindergartens, universities, courses] = await Promise.all([
-    getPopularInstitutions('school'),
-    getPopularInstitutions('kindergarten'),
-    getPopularInstitutions('university'),
-    getPopularInstitutions('course'),
-  ]);
+  const institutions = await getRecentInstitutions();
 
-  return (
-    <PopularInstitutionsClient
-      institutions={{
-        school: schools,
-        kindergarten: kindergartens,
-        university: universities,
-        course: courses,
-      }}
-    />
-  );
+  return <RecentInstitutionsClient institutions={institutions} />;
 }

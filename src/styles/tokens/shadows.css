@@ -1,0 +1,101 @@
+/**
+ * EduMap Design System - Shadow Tokens
+ *
+ * Subtle, modern shadows for depth and elevation.
+ * Includes colored shadows for interactive states.
+ */
+
+:root {
+  /* ========================================
+   * Elevation Shadows
+   * Progressive elevation scale
+   * ======================================== */
+  --shadow-none: none;
+
+  /* Level 0 - Flat, no elevation */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+
+  /* Level 1 - Slight elevation (cards at rest) */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.04),
+               0 1px 2px -1px rgba(0, 0, 0, 0.02);
+
+  /* Level 2 - Medium elevation (cards on hover) */
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+               0 2px 4px -2px rgba(0, 0, 0, 0.03);
+
+  /* Level 3 - High elevation (dropdowns, popovers) */
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
+               0 4px 6px -4px rgba(0, 0, 0, 0.04);
+
+  /* Level 4 - Highest elevation (modals) */
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+               0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
+  /* Level 5 - Maximum elevation */
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+
+  /* ========================================
+   * Colored Shadows
+   * For buttons and interactive elements
+   * ======================================== */
+
+  /* Primary (blue) */
+  --shadow-primary: 0 4px 14px 0 rgba(13, 139, 242, 0.25);
+  --shadow-primary-lg: 0 8px 20px 0 rgba(13, 139, 242, 0.3);
+
+  /* Success (green) */
+  --shadow-success: 0 4px 14px 0 rgba(49, 171, 8, 0.25);
+  --shadow-success-lg: 0 8px 20px 0 rgba(49, 171, 8, 0.3);
+
+  /* Error (orange) */
+  --shadow-error: 0 4px 14px 0 rgba(239, 110, 46, 0.25);
+  --shadow-error-lg: 0 8px 20px 0 rgba(239, 110, 46, 0.3);
+
+  /* Warning (amber) */
+  --shadow-warning: 0 4px 14px 0 rgba(245, 158, 11, 0.25);
+  --shadow-warning-lg: 0 8px 20px 0 rgba(245, 158, 11, 0.3);
+
+  /* Info (sky) */
+  --shadow-info: 0 4px 14px 0 rgba(2, 132, 199, 0.25);
+  --shadow-info-lg: 0 8px 20px 0 rgba(2, 132, 199, 0.3);
+
+  /* ========================================
+   * Special Shadows
+   * ======================================== */
+
+  /* Inner shadow for inputs */
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+
+  /* Focus ring shadow */
+  --shadow-ring: 0 0 0 3px rgba(13, 139, 242, 0.2);
+  --shadow-ring-error: 0 0 0 3px rgba(239, 110, 46, 0.2);
+
+  /* Card hover shadow */
+  --shadow-card-hover: 0 10px 30px -5px rgba(0, 0, 0, 0.1),
+                       0 4px 10px -4px rgba(0, 0, 0, 0.04);
+}
+
+/* ========================================
+ * Shadow Utility Classes
+ * ======================================== */
+
+@layer components {
+  /* Interactive card with hover effect */
+  .shadow-interactive {
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .shadow-interactive:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* Primary button shadow */
+  .shadow-btn-primary {
+    box-shadow: var(--shadow-primary);
+  }
+
+  .shadow-btn-primary:hover {
+    box-shadow: var(--shadow-primary-lg);
+  }
+}

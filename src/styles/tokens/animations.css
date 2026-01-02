@@ -1,0 +1,255 @@
+/**
+ * EduMap Design System - Animation Tokens
+ *
+ * Consistent timing and easing for smooth interactions.
+ * Respects user motion preferences.
+ */
+
+:root {
+  /* ========================================
+   * Duration Scale
+   * ======================================== */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 700ms;
+
+  /* ========================================
+   * Easing Functions
+   * ======================================== */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Bouncy easing for playful interactions */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Smooth easing for UI transitions */
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* Spring-like easing */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* ========================================
+   * Semantic Transitions
+   * ======================================== */
+  --transition-colors: color var(--duration-normal) var(--ease-in-out),
+                       background-color var(--duration-normal) var(--ease-in-out),
+                       border-color var(--duration-normal) var(--ease-in-out);
+
+  --transition-opacity: opacity var(--duration-normal) var(--ease-in-out);
+
+  --transition-transform: transform var(--duration-normal) var(--ease-out);
+
+  --transition-shadow: box-shadow var(--duration-normal) var(--ease-in-out);
+
+  --transition-all: all var(--duration-normal) var(--ease-in-out);
+
+  /* Component-specific */
+  --transition-button: background-color var(--duration-fast) var(--ease-in-out),
+                       box-shadow var(--duration-fast) var(--ease-in-out),
+                       transform var(--duration-fast) var(--ease-out);
+
+  --transition-card: box-shadow var(--duration-normal) var(--ease-out),
+                     transform var(--duration-normal) var(--ease-out);
+
+  --transition-input: border-color var(--duration-fast) var(--ease-in-out),
+                      box-shadow var(--duration-fast) var(--ease-in-out);
+}
+
+/* ========================================
+ * Animation Keyframes
+ * ======================================== */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Hero blob animation */
+@keyframes blob-float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+/* ========================================
+ * Animation Utility Classes
+ * ======================================== */
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in var(--duration-normal) var(--ease-out);
+  }
+
+  .animate-fade-out {
+    animation: fade-out var(--duration-normal) var(--ease-in);
+  }
+
+  .animate-slide-up {
+    animation: slide-up var(--duration-normal) var(--ease-out);
+  }
+
+  .animate-slide-down {
+    animation: slide-down var(--duration-normal) var(--ease-out);
+  }
+
+  .animate-scale-in {
+    animation: scale-in var(--duration-normal) var(--ease-out);
+  }
+
+  .animate-scale-out {
+    animation: scale-out var(--duration-fast) var(--ease-in);
+  }
+
+  .animate-pulse {
+    animation: pulse 2s var(--ease-in-out) infinite;
+  }
+
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+
+  .animate-bounce {
+    animation: bounce 1s var(--ease-in-out) infinite;
+  }
+
+  .animate-blob {
+    animation: blob-float 7s var(--ease-in-out) infinite;
+  }
+
+  /* Transition utilities */
+  .transition-colors {
+    transition: var(--transition-colors);
+  }
+
+  .transition-opacity {
+    transition: var(--transition-opacity);
+  }
+
+  .transition-transform {
+    transition: var(--transition-transform);
+  }
+
+  .transition-shadow {
+    transition: var(--transition-shadow);
+  }
+
+  .transition-button {
+    transition: var(--transition-button);
+  }
+
+  .transition-card {
+    transition: var(--transition-card);
+  }
+
+  .transition-input {
+    transition: var(--transition-input);
+  }
+}
+
+/* ========================================
+ * Reduced Motion Support
+ * ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

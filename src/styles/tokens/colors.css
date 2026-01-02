@@ -1,0 +1,121 @@
+/**
+ * EduMap Design System - Color Tokens
+ *
+ * Semantic color system based on purpose, not implementation.
+ * All colors are defined as CSS custom properties for runtime theming.
+ */
+
+:root {
+  /* ========================================
+   * Brand Colors
+   * ======================================== */
+  --color-brand: #0d8bf2;
+  --color-brand-light: #38bdf8;
+  --color-brand-dark: #0b7dd9;
+  --color-brand-darker: #0966b3;
+
+  /* ========================================
+   * Primary Palette
+   * Used for main actions, links, focus states
+   * ======================================== */
+  --color-primary: #0d8bf2;
+  --color-primary-light: #38bdf8;
+  --color-primary-dark: #0b7dd9;
+  --color-primary-foreground: #ffffff;
+
+  /* ========================================
+   * Secondary Palette
+   * Used for secondary actions, less prominent UI
+   * ======================================== */
+  --color-secondary: #e9edf1;
+  --color-secondary-dark: #d1d9e3;
+  --color-secondary-foreground: #0c1319;
+
+  /* ========================================
+   * Accent Palette
+   * Used for highlights, hover states
+   * ======================================== */
+  --color-accent: #e0f2fe;
+  --color-accent-dark: #bae6fd;
+  --color-accent-foreground: #0c1319;
+
+  /* ========================================
+   * Status Colors
+   * Semantic colors for feedback states
+   * ======================================== */
+
+  /* Success - green for positive outcomes */
+  --color-success: #31ab08;
+  --color-success-light: #4ade80;
+  --color-success-dark: #22c55e;
+  --color-success-foreground: #ffffff;
+  --color-success-bg: #f0fdf4;
+
+  /* Warning - amber for caution states */
+  --color-warning: #f59e0b;
+  --color-warning-light: #fbbf24;
+  --color-warning-dark: #d97706;
+  --color-warning-foreground: #ffffff;
+  --color-warning-bg: #fffbeb;
+
+  /* Error/Destructive - orange-red for failures */
+  --color-error: #ef6e2e;
+  --color-error-light: #fb923c;
+  --color-error-dark: #ea580c;
+  --color-error-foreground: #ffffff;
+  --color-error-bg: #fff7ed;
+
+  /* Info - sky blue for informational */
+  --color-info: #0284c7;
+  --color-info-light: #0ea5e9;
+  --color-info-dark: #0369a1;
+  --color-info-foreground: #ffffff;
+  --color-info-bg: #f0f9ff;
+
+  /* ========================================
+   * Neutral Palette
+   * Grays for text, borders, backgrounds
+   * ======================================== */
+  --color-neutral-50: #f2f9ff;
+  --color-neutral-100: #e9edf1;
+  --color-neutral-200: #d1d9e3;
+  --color-neutral-300: #b8c4d0;
+  --color-neutral-400: #8a9bab;
+  --color-neutral-500: #5a6c7d;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0c1319;
+
+  /* ========================================
+   * Surface Colors
+   * Backgrounds for different elevation levels
+   * ======================================== */
+  --color-surface: #fafdff;
+  --color-surface-elevated: #ffffff;
+  --color-surface-sunken: #f2f9ff;
+  --color-background: #f2f9ff;
+  --color-foreground: #0c1319;
+
+  /* ========================================
+   * Border Colors
+   * ======================================== */
+  --color-border: #d1d9e3;
+  --color-border-light: #e9edf1;
+  --color-border-dark: #b8c4d0;
+
+  /* ========================================
+   * Category Colors
+   * Specific colors for institution types
+   * ======================================== */
+  --color-schools: #0d8bf2;
+  --color-kindergartens: #31ab08;
+  --color-universities: #0284c7;
+  --color-courses: #ef6e2e;
+
+  /* ========================================
+   * Interactive States
+   * ======================================== */
+  --color-focus-ring: #0d8bf2;
+  --color-focus-ring-offset: #ffffff;
+}

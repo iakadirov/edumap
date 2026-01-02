@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import {
   BookBold,
   SmileCircleBold,
@@ -14,13 +13,14 @@ import {
 } from '@solar-icons/react-perf';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import { getThumbnailUrl } from '@/lib/utils/image-url';
-import { useEffect, useMemo } from 'react';
+import { SectionHeader, SectionContent } from '@/components/ui/section';
 
-export type PopularInstitution = {
+export type RecentInstitution = {
   id: string;
   name: string;
   name_uz: string | null;
   slug: string;
+  org_type: OrganizationType;
   overall_rating: number | null;
   reviews_count: number;
   district: string | null;
@@ -28,48 +28,44 @@ export type PopularInstitution = {
   logo_url: string | null;
   cover_image_url: string | null;
   banner_url: string | null;
+  created_at: string;
   school_details?: {
     fee_monthly_min: number | null;
     fee_monthly_max: number | null;
   } | null;
 };
 
-const categories = [
-  {
-    id: 'school' as const,
-    label: 'Maktablar',
+const categories = {
+  school: {
+    label: 'Maktab',
     icon: BookBold,
     href: '/schools',
+    color: '#0d8bf2',
   },
-  {
-    id: 'kindergarten' as const,
-    label: "Bog'chalar",
+  kindergarten: {
+    label: "Bog'cha",
     icon: SmileCircleBold,
     href: '/kindergartens',
+    color: '#31ab08',
   },
-  {
-    id: 'university' as const,
-    label: 'Oliygohlar',
+  university: {
+    label: 'OTM',
     icon: SquareAcademicCapBold,
     href: '/universities',
+    color: '#0284c7',
   },
-  {
-    id: 'course' as const,
-    label: 'Kurslar',
+  course: {
+    label: 'Kurs',
     icon: NotebookBold,
     href: '/courses',
+    color: '#ef6e2e',
   },
-];
+};
 
 type OrganizationType = 'school' | 'kindergarten' | 'university' | 'course';
 
-interface PopularInstitutionsClientProps {
-  institutions: {
-    school: PopularInstitution[];
-    kindergarten: PopularInstitution[];
-    university: PopularInstitution[];
-    course: PopularInstitution[];
-  };
+interface RecentInstitutionsClientProps {
+  institutions: RecentInstitution[];
 }
 
 function formatPrice(min: number | null, max: number | null): string {
@@ -94,15 +90,17 @@ function formatPrice(min: number | null, max: number | null): string {
   return `gacha ${formatAmount(max!)} so'm`;
 }
 
-function InstitutionCard({ institution, orgType }: { institution: PopularInstitution; orgType: OrganizationType }) {
+function InstitutionCard({ institution }: { institution: RecentInstitution }) {
   const [coverThumbnail, setCoverThumbnail] = useState<string | null>(null);
   const [logoThumbnail, setLogoThumbnail] = useState<string | null>(null);
 
   const displayName = institution.name_uz || institution.name;
   const coverUrl = institution.cover_image_url || institution.banner_url;
   const logoUrl = institution.logo_url;
+  const category = categories[institution.org_type];
+  const Icon = category?.icon || BookBold;
+  const href = category ? `${category.href}/${institution.slug}` : `/schools/${institution.slug}`;
 
-  // Загружаем thumbnail версии изображений
   useEffect(() => {
     if (coverUrl) {
       getThumbnailUrl(coverUrl, false)
@@ -120,73 +118,84 @@ function InstitutionCard({ institution, orgType }: { institution: PopularInstitu
     ? formatPrice(institution.school_details.fee_monthly_min, institution.school_details.fee_monthly_max)
     : null;
 
-  const category = categories.find(c => c.id === orgType);
-  const Icon = category?.icon || BookBold;
-  const href = category ? `${category.href}/${institution.slug}` : `/schools/${institution.slug}`;
-
   return (
-    <Link 
+    <Link
       href={href}
       className="group block"
     >
-      <div className="relative overflow-hidden rounded-[24px] bg-white border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      <div className="relative rounded-[20px] sm:rounded-[24px] bg-white border-2 border-gray-100 hover:border-[#0d8bf2] transition-all duration-300">
         {/* Cover image */}
-        <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="relative aspect-video overflow-hidden rounded-t-[18px] sm:rounded-t-[22px] bg-gradient-to-br from-blue-50 to-purple-50">
           {coverThumbnail ? (
             <OptimizedImage
               src={coverThumbnail}
               alt={displayName}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.02]"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Icon className="w-16 h-16 text-gray-200" />
+              <Icon className="w-12 h-12 sm:w-16 sm:h-16 text-gray-200" />
             </div>
           )}
-          
+
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-          
-          {/* Logo overlay */}
-          {logoThumbnail && (
-            <div className="absolute bottom-0 left-4 translate-y-1/2">
-              <div className="relative w-16 h-16 rounded-[12px] bg-white p-2 shadow-lg">
-                <OptimizedImage
-                  src={logoThumbnail}
-                  alt={`${displayName} logo`}
-                  fill
-                  className="object-contain rounded-[24px]"
-                />
-              </div>
-            </div>
-          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+
+          {/* Category badge */}
+          <div
+            className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-xs font-semibold text-white flex items-center gap-1.5"
+            style={{ backgroundColor: category?.color || '#0d8bf2' }}
+          >
+            <Icon className="w-3.5 h-3.5" />
+            {category?.label}
+          </div>
         </div>
 
+        {/* Logo overlay - positioned outside overflow-hidden container */}
+        {logoThumbnail && (
+          <div className="absolute left-3 sm:left-4 top-[calc(56.25%-1.5rem)] sm:top-[calc(56.25%-1.75rem)] z-10">
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white border-2 border-white shadow-lg overflow-hidden">
+              <OptimizedImage
+                src={logoThumbnail}
+                alt={`${displayName} logo`}
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+        )}
+
         {/* Content */}
-        <div className="p-5 pt-8 space-y-3">
+        <div className={`p-4 sm:p-5 space-y-2.5 sm:space-y-3 ${logoThumbnail ? 'pt-7 sm:pt-8' : ''}`}>
           {/* Name */}
-          <h3 className="font-bold text-lg leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
+          <h3 className="font-bold text-base sm:text-lg leading-tight line-clamp-2 group-hover:text-[#0d8bf2] transition-colors text-[#0c1319]">
             {displayName}
           </h3>
 
           {/* Rating */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
-              <StarBold className="w-4 h-4 text-amber-400 fill-amber-400" />
-              <span className="font-semibold text-gray-900">
-                {institution.overall_rating?.toFixed(1)}
+          {institution.overall_rating ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <StarBold className="w-4 h-4 text-amber-400" />
+                <span className="font-semibold text-[#0c1319] text-sm sm:text-base">
+                  {institution.overall_rating.toFixed(1)}
+                </span>
+              </div>
+              <span className="text-xs sm:text-sm text-[#5a6c7d]">
+                ({institution.reviews_count} sharh)
               </span>
             </div>
-            <span className="text-sm text-gray-500">
-              ({institution.reviews_count} {institution.reviews_count === 1 ? 'sharh' : 'sharh'})
-            </span>
-          </div>
+          ) : (
+            <div className="text-xs sm:text-sm text-[#5a6c7d]">
+              Hali baholanmagan
+            </div>
+          )}
 
           {/* Location */}
           {(institution.district || institution.city) && (
-            <div className="flex items-center gap-1.5 text-sm text-gray-600">
-              <MapPointLinear className="w-4 h-4 flex-shrink-0" />
+            <div className="flex items-center gap-1.5 text-xs sm:text-sm text-[#5a6c7d]">
+              <MapPointLinear className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
               <span className="line-clamp-1">
                 {[institution.district, institution.city].filter(Boolean).join(', ')}
               </span>
@@ -195,7 +204,7 @@ function InstitutionCard({ institution, orgType }: { institution: PopularInstitu
 
           {/* Price */}
           {price && (
-            <div className="text-sm font-semibold text-blue-600">
+            <div className="text-xs sm:text-sm font-semibold text-[#0d8bf2]">
               {price}
             </div>
           )}
@@ -205,84 +214,48 @@ function InstitutionCard({ institution, orgType }: { institution: PopularInstitu
   );
 }
 
-export function PopularInstitutionsClient({ institutions }: PopularInstitutionsClientProps) {
-  // Определяем активную категорию по умолчанию (первая с данными)
-  const defaultCategory = useMemo(() => {
-    if (institutions.school.length > 0) return 'school';
-    if (institutions.kindergarten.length > 0) return 'kindergarten';
-    if (institutions.university.length > 0) return 'university';
-    return 'course';
-  }, [institutions]);
-
-  const [activeCategory, setActiveCategory] = useState<OrganizationType>(defaultCategory);
-
-  const activeInstitutions = institutions[activeCategory];
-  const activeCategoryData = categories.find((c) => c.id === activeCategory);
-
-  // Фильтруем категории, оставляя только те, у которых есть данные
-  const availableCategories = categories.filter(cat => institutions[cat.id].length > 0);
-
-  return (
-    <div className="space-y-8">
-      {/* Section header */}
-      <div className="text-center space-y-4">
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-          Mashhur ta'lim muassasalari
-        </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Eng yaxshi reyting va ko'p sharhlar olgan muassasalar
-        </p>
-      </div>
-
-      {/* Category tabs */}
-      {availableCategories.length > 1 && (
-        <div className="flex justify-center gap-2 flex-wrap">
-          {availableCategories.map((category) => {
-            const Icon = category.icon;
-            const isActive = activeCategory === category.id;
-            return (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                className={cn(
-                  'inline-flex items-center gap-2 px-6 py-3 rounded-[12px] text-sm font-semibold transition-all duration-200',
-                  isActive
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                )}
-              >
-                <Icon className="w-4 h-4" />
-                {category.label}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Institution cards */}
-      {activeInstitutions.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-3">
-          {activeInstitutions.map((institution) => (
-            <InstitutionCard key={institution.id} institution={institution} orgType={activeCategory} />
-          ))}
-        </div>
-      ) : (
+export function RecentInstitutionsClient({ institutions }: RecentInstitutionsClientProps) {
+  if (institutions.length === 0) {
+    return (
+      <SectionContent>
+        <SectionHeader
+          title="Yangi qo'shilgan ta'lim muassasalari"
+          subtitle="EduMap platformasiga eng so'nggi qo'shilgan ta'lim muassasalari"
+        />
         <div className="text-center py-12 text-gray-500">
           Hozircha ma'lumotlar mavjud emas
         </div>
-      )}
+      </SectionContent>
+    );
+  }
+
+  return (
+    <SectionContent>
+      <SectionHeader
+        title="Yangi qo'shilgan ta'lim muassasalari"
+        subtitle="EduMap platformasiga eng so'nggi qo'shilgan ta'lim muassasalari"
+      />
+
+      {/* Institution cards */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        {institutions.map((institution) => (
+          <InstitutionCard key={institution.id} institution={institution} />
+        ))}
+      </div>
 
       {/* View all button */}
-      {activeInstitutions.length > 0 && activeCategoryData && (
-        <div className="text-center">
-          <Button asChild variant="outline" size="lg" className="rounded-[12px]">
-            <Link href={activeCategoryData.href}>
-              Barcha {activeCategoryData.label.toLowerCase()}ni ko'rish
-            </Link>
-          </Button>
-        </div>
-      )}
-    </div>
+      <div className="flex justify-center">
+        <Button
+          asChild
+          variant="outline"
+          className="h-12 sm:h-14 px-6 sm:px-8 rounded-xl sm:rounded-2xl border-2 border-gray-200 hover:border-[#0d8bf2] hover:bg-[#0d8bf2]/5 text-[#0c1319] text-base sm:text-lg font-semibold transition-all"
+        >
+          <Link href="/schools/list">
+            Barcha muassasalarni ko'rish
+          </Link>
+        </Button>
+      </div>
+    </SectionContent>
   );
 }
 

@@ -9,7 +9,10 @@
       "Bash(npm run lint:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(dir \"C:\\Claude\\edumap\")",
+      "Bash(findstr:*)",
+      "Bash(npm run dev:*)"
     ]
   }
 }

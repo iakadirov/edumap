@@ -1,0 +1,14 @@
+/**
+ * EduMap Design System - Token Index
+ *
+ * Central export point for all design tokens.
+ * Import this file to access all tokens.
+ */
+
+/* Core tokens */
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/spacing.css";
+@import "./tokens/shadows.css";
+@import "./tokens/radius.css";
+@import "./tokens/animations.css";

@@ -8,6 +8,7 @@ import {
   StarBold,
 } from '@solar-icons/react-perf';
 
+// Platform stats data
 const stats = [
   {
     id: 'institutions',

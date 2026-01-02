@@ -5,43 +5,39 @@ import {
   SortHorizontalBold,
   CheckCircleBold,
 } from '@solar-icons/react-perf';
+import { SectionHeader, SectionContent } from '@/components/ui/section';
 
 const steps = [
   {
     id: 1,
     title: 'Qidiring',
-    description: "Kerakli muassasani toping filterlar yordamida",
+    description: "Hudud, narx, til yoki o'quv dasturi bo'yicha kerakli maktablarni toping",
     icon: MagniferBold,
     color: '#0d8bf2',
   },
   {
     id: 2,
     title: 'Solishtiring',
-    description: "Narxlar, fikrlar va xususiyatlarni solishtiring",
+    description: "Narxlar, reytinglar, sharhlar va xususiyatlarni bir-biri bilan taqqoslang",
     icon: SortHorizontalBold,
     color: '#0284c7',
   },
   {
     id: 3,
     title: 'Tanlang',
-    description: "To'g'ri qaror qiling va muassasa bilan bog'laning",
+    description: "Eng mos maktabni tanlang va to'g'ridan-to'g'ri bog'laning",
     icon: CheckCircleBold,
     color: '#31ab08',
   },
 ];
 
-export function HowItWorks() {
+export function SchoolsHowItWorks() {
   return (
-    <div className="space-y-8 sm:space-y-10 md:space-y-12">
-      {/* Section header */}
-      <div className="text-center space-y-3 sm:space-y-4 px-2">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-[-0.02em] text-[#0c1319]">
-          Qanday ishlaydi?
-        </h2>
-        <p className="text-base sm:text-lg text-[#5a6c7d]">
-          3 oddiy qadamda ideal ta'lim muassasasini toping
-        </p>
-      </div>
+    <SectionContent className="scroll-mt-24" id="how-it-works">
+      <SectionHeader
+        title="Qanday ishlaydi?"
+        subtitle="3 oddiy qadamda ideal maktabni toping"
+      />
 
       {/* Steps */}
       <div className="relative max-w-4xl mx-auto">
@@ -119,6 +115,6 @@ export function HowItWorks() {
           })}
         </div>
       </div>
-    </div>
+    </SectionContent>
   );
 }
